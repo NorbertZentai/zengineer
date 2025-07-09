@@ -1,21 +1,26 @@
-<h2>{{ 'REGISTER.TITLE' | translate }}</h2>
-
-<form (ngSubmit)="onSubmit()" #registerForm="ngForm">
-  <label for="name">{{ 'REGISTER.NAME' | translate }}</label>
-  <input id="name" name="name" [(ngModel)]="name" required />
-
-  <label for="email">{{ 'REGISTER.EMAIL' | translate }}</label>
-  <input id="email" name="email" [(ngModel)]="email" required type="email" />
-
-  <label for="password">{{ 'REGISTER.PASSWORD' | translate }}</label>
-  <input id="password" name="password" [(ngModel)]="password" required type="password" />
-
-  <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
-
-  <button type="submit">{{ 'REGISTER.REGISTER' | translate }}</button>
-</form>
-
-<p>
-  {{ 'REGISTER.ALREADY_ACCOUNT' | translate }}
-  <a routerLink="/login">{{ 'REGISTER.LOGIN_LINK' | translate }}</a>
-</p>
+<div class="auth-card">
+  <div class="auth-card__header">
+    <mat-icon class="auth-card__icon">person_add</mat-icon>
+    <h2>{{ 'REGISTER.TITLE' | translate }}</h2>
+  </div>
+  <form (ngSubmit)="onSubmit()" #registerForm="ngForm" autocomplete="on">
+    <div class="form-group">
+      <label for="name">{{ 'REGISTER.NAME' | translate }}</label>
+      <input id="name" name="name" [(ngModel)]="name" required autocomplete="name" />
+    </div>
+    <div class="form-group">
+      <label for="email">{{ 'REGISTER.EMAIL' | translate }}</label>
+      <input id="email" name="email" [(ngModel)]="email" required type="email" autocomplete="email" />
+    </div>
+    <div class="form-group">
+      <label for="password">{{ 'REGISTER.PASSWORD' | translate }}</label>
+      <input id="password" name="password" [(ngModel)]="password" required type="password" autocomplete="new-password" />
+    </div>
+    <button type="submit" class="auth-btn">{{ 'REGISTER.REGISTER' | translate }}</button>
+    <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+  </form>
+  <div class="auth-card__footer">
+    <span>{{ 'REGISTER.ALREADY_ACCOUNT' | translate }}</span>
+    <a routerLink="/login">{{ 'REGISTER.LOGIN_LINK' | translate }}</a>
+  </div>
+</div>

@@ -4,6 +4,12 @@
     "LOGIN": "Bejelentkezés",
     "REGISTER": "Regisztráció"
   },
+  "NAV": {
+    "DASHBOARD": "Kezdőlap",
+    "PROFILE": "Profil",
+    "ABOUT": "Névjegy",
+    "CONTACT": "Kapcsolat"
+  },
   "LOGIN": {
     "TITLE": "Bejelentkezés",
     "EMAIL": "Email",
@@ -20,5 +26,6 @@
     "REGISTER": "Regisztrálok",
     "ALREADY_ACCOUNT": "Van már fiókod?",
     "LOGIN_LINK": "Lépj be itt"
-  }
+  },
+  "LOGOUT": "Kijelentkezés"
 }

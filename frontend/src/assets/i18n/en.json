@@ -4,6 +4,12 @@
     "LOGIN": "Login",
     "REGISTER": "Register"
   },
+  "NAV": {
+    "DASHBOARD": "Dashboard",
+    "PROFILE": "Profile",
+    "ABOUT": "About",
+    "CONTACT": "Contact"
+  },
   "LOGIN": {
     "TITLE": "Login",
     "EMAIL": "Email",
@@ -20,5 +26,6 @@
     "REGISTER": "Register",
     "ALREADY_ACCOUNT": "Already have an account?",
     "LOGIN_LINK": "Login here"
-  }
+  },
+  "LOGOUT": "Logout"
 }

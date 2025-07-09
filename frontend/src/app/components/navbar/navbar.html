@@ -1,22 +1,42 @@
 <nav class="navbar">
   <div class="navbar-left">
-    <a routerLink="/dashboard" routerLinkActive="active">{{ 'DASHBOARD' | translate }}</a>
-    <a routerLink="/profile" routerLinkActive="active">{{ 'PROFILE' | translate }}</a>
+    <!-- App icon (opcionális, de most eltávolítva) -->
+    <span class="navbar-title">Zengineer</span>
   </div>
-
+  <div class="navbar-center">
+    <a routerLink="/dashboard" routerLinkActive="active">
+      <span>{{ 'NAV.DASHBOARD' | translate }}</span>
+    </a>
+    <a routerLink="/profile" routerLinkActive="active">
+      <span>{{ 'NAV.PROFILE' | translate }}</span>
+    </a>
+    <a routerLink="/about" routerLinkActive="active">
+      <span>{{ 'NAV.ABOUT' | translate }}</span>
+    </a>
+    <a routerLink="/contact" routerLinkActive="active">
+      <span>{{ 'NAV.CONTACT' | translate }}</span>
+    </a>
+  </div>
   <div class="navbar-right">
-    <select (change)="changeLang($event)">
-      <option value="en">EN</option>
-      <option value="hu" selected>HU</option>
-    </select>
-
     <ng-container *ngIf="isLoggedIn(); else guestLinks">
-      <button (click)="logout()">{{ 'LOGOUT' | translate }}</button>
+      <button class="icon-btn" (click)="logout()" [attr.aria-label]="'COMMON.LOGOUT' | translate">
+        <mat-icon>logout</mat-icon>
+      </button>
     </ng-container>
-
     <ng-template #guestLinks>
-      <a routerLink="/login">{{ 'LOGIN.LOGIN' | translate }}</a>
-      <a routerLink="/register">{{ 'COMMON.REGISTER' | translate }}</a>
+      <a class="icon-btn" routerLink="/login" [attr.aria-label]="'COMMON.LOGIN' | translate">
+        <mat-icon>login</mat-icon>
+      </a>
+      <a class="icon-btn" routerLink="/register" [attr.aria-label]="'COMMON.REGISTER' | translate">
+        <mat-icon>person_add</mat-icon>
+      </a>
     </ng-template>
+    <select class="lang-switch" [value]="translate.currentLang" (change)="changeLang($event)">
+      <option value="hu">HU</option>
+      <option value="en">EN</option>
+    </select>
+    <button class="icon-btn" (click)="toggleTheme()" [attr.aria-label]="currentTheme === 'dark' ? 'Világos mód' : 'Sötét mód'">
+      <mat-icon>{{ currentTheme === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
+    </button>
   </div>
 </nav>

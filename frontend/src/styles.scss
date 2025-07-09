@@ -1,1 +1,40 @@
 /* You can add global styles to this file, and also import other style files */
+
+// DARK THEME
+:root[data-theme='dark'] {
+  --background: #181a1b;
+  --foreground: #f1f1f1;
+  --primary: #1976d2;
+  --navbar-bg: #23272a;
+  --navbar-border: #333;
+  --navbar-link: #f1f1f1;
+  --navbar-link-active: #1976d2;
+  --navbar-shadow: 0 1px 6px 0 rgba(25, 118, 210, 0.04);
+  --navbar-hover-bg: rgba(25, 118, 210, 0.07);
+  --navbar-active-bg: rgba(25, 118, 210, 0.13);
+  --navbar-btn-hover: var(--primary);
+  --navbar-btn-hover-text: #fff;
+}
+
+// LIGHT THEME
+:root[data-theme='light'] {
+  --background: #f1f1f1;
+  --foreground: #181a1b;
+  --primary: #1976d2;
+  --navbar-bg: #f1f1f1;
+  --navbar-border: #ccc;
+  --navbar-link: #181a1b;
+  --navbar-link-active: #1976d2;
+}
+
+:root[data-theme='dark'],
+:root[data-theme='light'] {
+  --font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
+
+body {
+  font-family: var(--font-family);
+  background: var(--background);
+  color: var(--foreground);
+  transition: background 0.2s, color 0.2s;
+}
