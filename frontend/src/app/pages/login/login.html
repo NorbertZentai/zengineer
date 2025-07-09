@@ -1,0 +1,20 @@
+<div class="login-container">
+  <h2>{{ 'LOGIN.TITLE' | translate }}</h2>
+
+  <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+    <label for="email">{{ 'LOGIN.EMAIL' | translate }}</label>
+    <input id="email" name="email" [(ngModel)]="email" required type="email" />
+
+    <label for="password">{{ 'LOGIN.PASSWORD' | translate }}</label>
+    <input id="password" name="password" [(ngModel)]="password" required type="password" />
+
+    <button type="submit">{{ 'LOGIN.LOGIN' | translate }}</button>
+  </form>
+
+  <p>
+    {{ 'LOGIN.NO_ACCOUNT' | translate }}
+    <a routerLink="/register">{{ 'LOGIN.REGISTER_LINK' | translate }}</a>
+  </p>
+
+  <p *ngIf="error" class="error">{{ error }}</p>
+</div>

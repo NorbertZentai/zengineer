@@ -1,0 +1,24 @@
+{
+  "COMMON": {
+    "TITLE": "Üdv a Zengineer-ben!",
+    "LOGIN": "Bejelentkezés",
+    "REGISTER": "Regisztráció"
+  },
+  "LOGIN": {
+    "TITLE": "Bejelentkezés",
+    "EMAIL": "Email",
+    "PASSWORD": "Jelszó",
+    "LOGIN": "Belépés",
+    "NO_ACCOUNT": "Még nincs fiókod?",
+    "REGISTER_LINK": "Regisztrálj itt"
+  },
+  "REGISTER": {
+    "TITLE": "Regisztráció",
+    "NAME": "Név",
+    "EMAIL": "Email",
+    "PASSWORD": "Jelszó",
+    "REGISTER": "Regisztrálok",
+    "ALREADY_ACCOUNT": "Van már fiókod?",
+    "LOGIN_LINK": "Lépj be itt"
+  }
+}

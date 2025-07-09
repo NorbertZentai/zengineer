@@ -1,0 +1,88 @@
+{
+  "hash": "25788faa",
+  "configHash": "73db1136",
+  "lockfileHash": "d79276b2",
+  "browserHash": "b17650f3",
+  "optimized": {
+    "@angular/common": {
+      "src": "../../../../../../node_modules/@angular/common/fesm2022/common.mjs",
+      "file": "@angular_common.js",
+      "fileHash": "384829ba",
+      "needsInterop": false
+    },
+    "@angular/common/http": {
+      "src": "../../../../../../node_modules/@angular/common/fesm2022/http.mjs",
+      "file": "@angular_common_http.js",
+      "fileHash": "a76fe93d",
+      "needsInterop": false
+    },
+    "@angular/core": {
+      "src": "../../../../../../node_modules/@angular/core/fesm2022/core.mjs",
+      "file": "@angular_core.js",
+      "fileHash": "1401ea18",
+      "needsInterop": false
+    },
+    "@angular/forms": {
+      "src": "../../../../../../node_modules/@angular/forms/fesm2022/forms.mjs",
+      "file": "@angular_forms.js",
+      "fileHash": "0b72b1f3",
+      "needsInterop": false
+    },
+    "@angular/platform-browser": {
+      "src": "../../../../../../node_modules/@angular/platform-browser/fesm2022/platform-browser.mjs",
+      "file": "@angular_platform-browser.js",
+      "fileHash": "1a202e79",
+      "needsInterop": false
+    },
+    "@angular/router": {
+      "src": "../../../../../../node_modules/@angular/router/fesm2022/router.mjs",
+      "file": "@angular_router.js",
+      "fileHash": "64aa1228",
+      "needsInterop": false
+    },
+    "@ngx-translate/core": {
+      "src": "../../../../../../node_modules/@ngx-translate/core/fesm2022/ngx-translate-core.mjs",
+      "file": "@ngx-translate_core.js",
+      "fileHash": "576bff64",
+      "needsInterop": false
+    },
+    "@ngx-translate/http-loader": {
+      "src": "../../../../../../node_modules/@ngx-translate/http-loader/fesm2022/ngx-translate-http-loader.mjs",
+      "file": "@ngx-translate_http-loader.js",
+      "fileHash": "d33a1d8b",
+      "needsInterop": false
+    },
+    "pocketbase": {
+      "src": "../../../../../../node_modules/pocketbase/dist/pocketbase.es.mjs",
+      "file": "pocketbase.js",
+      "fileHash": "e253e046",
+      "needsInterop": false
+    },
+    "zone.js": {
+      "src": "../../../../../../node_modules/zone.js/fesm2015/zone.js",
+      "file": "zone__js.js",
+      "fileHash": "976235b6",
+      "needsInterop": true
+    }
+  },
+  "chunks": {
+    "chunk-7LPJNLRW": {
+      "file": "chunk-7LPJNLRW.js"
+    },
+    "chunk-ACXIRDMZ": {
+      "file": "chunk-ACXIRDMZ.js"
+    },
+    "chunk-7NAOABU4": {
+      "file": "chunk-7NAOABU4.js"
+    },
+    "chunk-5KK3G4LL": {
+      "file": "chunk-5KK3G4LL.js"
+    },
+    "chunk-RPASHYY5": {
+      "file": "chunk-RPASHYY5.js"
+    },
+    "chunk-5K356HEJ": {
+      "file": "chunk-5K356HEJ.js"
+    }
+  }
+}

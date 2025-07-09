@@ -1,0 +1,22 @@
+<nav class="navbar">
+  <div class="navbar-left">
+    <a routerLink="/dashboard" routerLinkActive="active">{{ 'DASHBOARD' | translate }}</a>
+    <a routerLink="/profile" routerLinkActive="active">{{ 'PROFILE' | translate }}</a>
+  </div>
+
+  <div class="navbar-right">
+    <select (change)="changeLang($event)">
+      <option value="en">EN</option>
+      <option value="hu" selected>HU</option>
+    </select>
+
+    <ng-container *ngIf="isLoggedIn(); else guestLinks">
+      <button (click)="logout()">{{ 'LOGOUT' | translate }}</button>
+    </ng-container>
+
+    <ng-template #guestLinks>
+      <a routerLink="/login">{{ 'LOGIN.LOGIN' | translate }}</a>
+      <a routerLink="/register">{{ 'COMMON.REGISTER' | translate }}</a>
+    </ng-template>
+  </div>
+</nav>

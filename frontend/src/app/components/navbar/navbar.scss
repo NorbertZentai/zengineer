@@ -1,0 +1,16 @@
+nav {
+  display: flex;
+  gap: 1rem;
+  background: #f1f1f1;
+  padding: 1rem;
+  border-bottom: 1px solid #ccc;
+
+  a {
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+  select, button {
+    margin-left: auto;
+  }
+}
