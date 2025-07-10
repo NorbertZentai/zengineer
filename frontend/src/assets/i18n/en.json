@@ -6,6 +6,7 @@
   },
   "NAV": {
     "DASHBOARD": "Dashboard",
+    "QUIZ_MANAGER": "Quiz Manager",
     "PROFILE": "Profile",
     "ABOUT": "About",
     "CONTACT": "Contact"
@@ -27,5 +28,17 @@
     "ALREADY_ACCOUNT": "Already have an account?",
     "LOGIN_LINK": "Login here"
   },
-  "LOGOUT": "Logout"
+  "LOGOUT": "Logout",
+  "QUIZ_MANAGER": {
+    "TITLE": "Quiz Manager",
+    "NEW_PROJECT": "New project name",
+    "ADD_PROJECT": "Add project",
+    "NEW_FOLDER": "New folder name",
+    "ADD_FOLDER": "Add folder",
+    "NEW_QUIZFOLDER": "New quiz-folder name",
+    "ADD_QUIZFOLDER": "Add quiz-folder",
+    "NEW_QUIZ": "New quiz name",
+    "ADD_QUIZ": "Add quiz",
+    "CARDS": "Cards"
+  }
 }

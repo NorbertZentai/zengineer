@@ -15,5 +15,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/dashboard/dashboard').then(m => m.DashboardPage),
     canActivate: [authGuard],
   },
+  {
+    path: 'quiz-manager',
+    loadComponent: () => import('./pages/quiz-manager/quiz-manager').then(m => m.QuizManager),
+    canActivate: [authGuard],
+  },
   { path: '', redirectTo: 'login', pathMatch: 'full' },
 ];

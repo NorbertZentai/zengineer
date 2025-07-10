@@ -1,0 +1,325 @@
+<div class="quiz-manager-container">
+  <!-- Header with search and controls -->
+  <header class="manager-header">
+    <div class="header-left">
+      <nav class="breadcrumb" *ngIf="breadcrumb().length > 0">
+        <button 
+          mat-icon-button 
+          (click)="navigateToFolder(null)"
+          matTooltip="Kezdőlap">
+          <mat-icon>home</mat-icon>
+        </button>
+        <ng-container *ngFor="let folder of breadcrumb(); let last = last">
+          <mat-icon class="breadcrumb-separator">chevron_right</mat-icon>
+          <button 
+            *ngIf="!last"
+            mat-button 
+            (click)="navigateToFolder(folder)"
+            class="breadcrumb-item">
+            {{ folder.name }}
+          </button>
+          <span *ngIf="last" class="breadcrumb-current">{{ folder.name }}</span>
+        </ng-container>
+      </nav>
+      <h1 class="page-title" *ngIf="breadcrumb().length === 0">
+        <mat-icon class="title-icon">quiz</mat-icon>
+        Kvíz Menedzser
+      </h1>
+    </div>
+    
+    <div class="header-right">
+      <!-- Search -->
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Keresés kvízekben...</mat-label>
+        <input 
+          matInput 
+          [value]="quizService.searchQuery()"
+          (input)="onSearch($any($event.target).value)"
+          placeholder="Név vagy címke alapján">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+      
+      <!-- View mode controls -->
+      <div class="view-controls">
+        <button 
+          mat-icon-button 
+          [class.active]="viewMode() === 'grid'"
+          (click)="setViewMode('grid')"
+          matTooltip="Rács nézet">
+          <mat-icon>grid_view</mat-icon>
+        </button>
+        <button 
+          mat-icon-button 
+          [class.active]="viewMode() === 'list'"
+          (click)="setViewMode('list')"
+          matTooltip="Lista nézet">
+          <mat-icon>view_list</mat-icon>
+        </button>
+      </div>
+      
+      <!-- Sort controls -->
+      <button mat-icon-button [matMenuTriggerFor]="sortMenu" matTooltip="Rendezés">
+        <mat-icon>sort</mat-icon>
+      </button>
+      <mat-menu #sortMenu="matMenu">
+        <button mat-menu-item (click)="setSortBy('name')">
+          <mat-icon>{{ sortBy() === 'name' ? (sortAscending() ? 'keyboard_arrow_up' : 'keyboard_arrow_down') : 'sort_by_alpha' }}</mat-icon>
+          Név szerint
+        </button>
+        <button mat-menu-item (click)="setSortBy('created')">
+          <mat-icon>{{ sortBy() === 'created' ? (sortAscending() ? 'keyboard_arrow_up' : 'keyboard_arrow_down') : 'schedule' }}</mat-icon>
+          Létrehozás ideje
+        </button>
+        <button mat-menu-item (click)="setSortBy('updated')">
+          <mat-icon>{{ sortBy() === 'updated' ? (sortAscending() ? 'keyboard_arrow_up' : 'keyboard_arrow_down') : 'update' }}</mat-icon>
+          Módosítás ideje
+        </button>
+        <button mat-menu-item (click)="setSortBy('cards')">
+          <mat-icon>{{ sortBy() === 'cards' ? (sortAscending() ? 'keyboard_arrow_up' : 'keyboard_arrow_down') : 'style' }}</mat-icon>
+          Kártyák száma
+        </button>
+      </mat-menu>
+    </div>
+  </header>
+
+  <!-- Statistics bar -->
+  <div class="stats-bar" *ngIf="folderStats() as stats">
+    <div class="stat-item">
+      <mat-icon>quiz</mat-icon>
+      <span>{{ stats.totalQuizzes }} kvíz</span>
+    </div>
+    <div class="stat-item">
+      <mat-icon>style</mat-icon>
+      <span>{{ stats.totalCards }} kártya</span>
+    </div>
+    <div class="stat-item" *ngIf="stats.needsReview > 0">
+      <mat-icon>schedule</mat-icon>
+      <span>{{ stats.needsReview }} ismétlendő</span>
+    </div>
+  </div>
+
+  <!-- Action buttons -->
+  <div class="action-bar">
+    <button 
+      mat-raised-button 
+      color="primary"
+      (click)="showCreateFolderDialog()"
+      class="create-btn">
+      <mat-icon>create_new_folder</mat-icon>
+      Új mappa
+    </button>
+    <button 
+      mat-raised-button 
+      color="accent"
+      (click)="showCreateQuizDialog()"
+      class="create-btn">
+      <mat-icon>add</mat-icon>
+      Új kvíz
+    </button>
+  </div>
+
+  <!-- Content area -->
+  <main class="content-area" *ngIf="!quizService.isLoading()">
+    <!-- Quizzes display -->
+    <section class="quizzes-section">
+      <h2 class="section-title">
+        <mat-icon>quiz</mat-icon>
+        Kvízek
+        <span class="count" *ngIf="displayedQuizzes().length > 0">({{ displayedQuizzes().length }})</span>
+      </h2>
+      
+      <!-- Grid view -->
+      <div 
+        *ngIf="viewMode() === 'grid'" 
+        class="quizzes-grid">
+        <mat-card 
+          *ngFor="let quiz of displayedQuizzes(); trackBy: trackByQuizId"
+          class="quiz-card"
+          [style.border-left-color]="quiz.color">
+          
+          <mat-card-header>
+            <mat-icon 
+              [style.color]="quiz.color"
+              mat-card-avatar>
+              {{ quiz.icon || 'quiz' }}
+            </mat-icon>
+            <mat-card-title>{{ quiz.name }}</mat-card-title>
+            <mat-card-subtitle *ngIf="quiz.description">{{ quiz.description }}</mat-card-subtitle>
+            
+            <button 
+              mat-icon-button 
+              [matMenuTriggerFor]="quizMenu"
+              class="card-menu-btn">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            
+            <mat-menu #quizMenu="matMenu">
+              <button mat-menu-item (click)="navigateToQuiz(quiz)">
+                <mat-icon>visibility</mat-icon>
+                Megnyitás
+              </button>
+              <button mat-menu-item (click)="openCardEditor(quiz)">
+                <mat-icon>edit</mat-icon>
+                Kártyák szerkesztése
+              </button>
+              <button mat-menu-item (click)="startStudyMode(quiz)" [disabled]="quiz.cards.length === 0">
+                <mat-icon>school</mat-icon>
+                Tanulás
+              </button>
+              <button mat-menu-item (click)="showQuizStats(quiz)">
+                <mat-icon>analytics</mat-icon>
+                Statisztikák
+              </button>
+              <mat-divider></mat-divider>
+              <button mat-menu-item (click)="exportQuiz(quiz)">
+                <mat-icon>download</mat-icon>
+                Exportálás
+              </button>
+              <button mat-menu-item (click)="deleteQuiz(quiz)">
+                <mat-icon>delete</mat-icon>
+                Törlés
+              </button>
+            </mat-menu>
+          </mat-card-header>
+          
+          <mat-card-content>
+            <div class="quiz-stats">
+              <div class="stat-row">
+                <span class="stat">
+                  <mat-icon>style</mat-icon>
+                  {{ quiz.cards.length }} kártya
+                </span>
+                <span class="stat" *ngIf="quizService.getCardsNeedingReview(quiz).length > 0">
+                  <mat-icon>schedule</mat-icon>
+                  {{ quizService.getCardsNeedingReview(quiz).length }} ismétlendő
+                </span>
+              </div>
+            </div>
+            
+            <div class="quiz-tags" *ngIf="quiz.tags.length > 0">
+              <mat-chip *ngFor="let tag of quiz.tags" class="tag-chip">{{ tag }}</mat-chip>
+            </div>
+          </mat-card-content>
+          
+          <mat-card-actions>
+            <button 
+              mat-button 
+              color="primary"
+              (click)="startStudyMode(quiz)"
+              [disabled]="quiz.cards.length === 0">
+              <mat-icon>school</mat-icon>
+              Tanulás
+            </button>
+            <button 
+              mat-button 
+              (click)="openCardEditor(quiz)">
+              <mat-icon>edit</mat-icon>
+              Szerkesztés
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+      
+      <!-- Empty state -->
+      <div class="empty-state" *ngIf="displayedQuizzes().length === 0 && !quizService.searchQuery()">
+        <mat-icon class="empty-icon">quiz</mat-icon>
+        <h3>Nincsenek kvízek</h3>
+        <p>Hozz létre az első kvízedet a fenti gombbal!</p>
+        <button 
+          mat-raised-button 
+          color="primary"
+          (click)="showCreateQuizDialog()">
+          <mat-icon>add</mat-icon>
+          Kvíz létrehozása
+        </button>
+      </div>
+      
+      <!-- No search results -->
+      <div class="empty-state" *ngIf="displayedQuizzes().length === 0 && quizService.searchQuery()">
+        <mat-icon class="empty-icon">search_off</mat-icon>
+        <h3>Nincs találat</h3>
+        <p>Próbálj meg másik keresési kifejezést!</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Create Dialog -->
+<div class="create-dialog-overlay" *ngIf="showCreateDialog()" (click)="cancelCreate()">
+  <div class="create-dialog" (click)="$event.stopPropagation()">
+    <div class="dialog-header">
+      <h2>
+        <mat-icon>{{ createType() === 'folder' ? 'create_new_folder' : 'add' }}</mat-icon>
+        {{ createType() === 'folder' ? 'Új mappa' : 'Új kvíz' }}
+      </h2>
+      <button mat-icon-button (click)="cancelCreate()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    
+    <div class="dialog-content">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Név</mat-label>
+        <input 
+          matInput 
+          [ngModel]="createName()"
+          (ngModelChange)="createName.set($event)"
+          placeholder="Add meg a nevet"
+          (keydown.enter)="confirmCreate()">
+      </mat-form-field>
+      
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Leírás (opcionális)</mat-label>
+        <textarea 
+          matInput 
+          [ngModel]="createDescription()"
+          (ngModelChange)="createDescription.set($event)"
+          rows="3"
+          placeholder="Rövid leírás...">
+        </textarea>
+      </mat-form-field>
+      
+      <div class="customization-section">
+        <h4>Testreszabás</h4>
+        
+        <div class="color-selection">
+          <span class="selection-label">Szín:</span>
+          <div class="color-options">
+            <button 
+              *ngFor="let color of colorOptions"
+              class="color-option"
+              [class.selected]="selectedColor() === color"
+              [style.background-color]="color"
+              (click)="selectedColor.set(color)">
+            </button>
+          </div>
+        </div>
+        
+        <div class="icon-selection">
+          <span class="selection-label">Ikon:</span>
+          <div class="icon-options">
+            <button 
+              *ngFor="let icon of iconOptions"
+              mat-icon-button
+              class="icon-option"
+              [class.selected]="selectedIcon() === icon"
+              (click)="selectedIcon.set(icon)">
+              <mat-icon>{{ icon }}</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="dialog-actions">
+      <button mat-button (click)="cancelCreate()">Mégse</button>
+      <button 
+        mat-raised-button 
+        color="primary"
+        (click)="confirmCreate()"
+        [disabled]="!createName().trim()">
+        Létrehozás
+      </button>
+    </div>
+  </div>
+</div>

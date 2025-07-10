@@ -6,6 +6,7 @@
   },
   "NAV": {
     "DASHBOARD": "Kezdőlap",
+    "QUIZ_MANAGER": "Kvízkezelő",
     "PROFILE": "Profil",
     "ABOUT": "Névjegy",
     "CONTACT": "Kapcsolat"
@@ -27,5 +28,17 @@
     "ALREADY_ACCOUNT": "Van már fiókod?",
     "LOGIN_LINK": "Lépj be itt"
   },
-  "LOGOUT": "Kijelentkezés"
+  "LOGOUT": "Kijelentkezés",
+  "QUIZ_MANAGER": {
+    "TITLE": "Kvízkezelő",
+    "NEW_PROJECT": "Új projekt neve",
+    "ADD_PROJECT": "Projekt hozzáadása",
+    "NEW_FOLDER": "Új mappa neve",
+    "ADD_FOLDER": "Mappa hozzáadása",
+    "NEW_QUIZFOLDER": "Új kvíz-mappa neve",
+    "ADD_QUIZFOLDER": "Kvíz-mappa hozzáadása",
+    "NEW_QUIZ": "Új kvíz neve",
+    "ADD_QUIZ": "Kvíz hozzáadása",
+    "CARDS": "Kártyák"
+  }
 }

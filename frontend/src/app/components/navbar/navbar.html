@@ -16,6 +16,9 @@
     <a routerLink="/contact" routerLinkActive="active">
       <span>{{ 'NAV.CONTACT' | translate }}</span>
     </a>
+    <a routerLink="/quiz-manager" routerLinkActive="active">
+      <span>{{ 'NAV.QUIZ_MANAGER' | translate }}</span>
+    </a>
   </div>
   <div class="navbar-right">
     <ng-container *ngIf="isLoggedIn(); else guestLinks">

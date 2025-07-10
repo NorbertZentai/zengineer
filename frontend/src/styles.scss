@@ -1,40 +1,419 @@
-/* You can add global styles to this file, and also import other style files */
+/* Universal Theme System for Zengineer Quiz Manager */
 
+// =============================================================================
+// LIGHT THEME (Default)
+// =============================================================================
+:root,
+:root[data-theme='light'] {
+  // Base Colors
+  --primary: #1976d2;
+  --primary-light: #42a5f5;
+  --primary-dark: #1565c0;
+  --secondary: #dc004e;
+  --accent: #00acc1;
+  
+  // Backgrounds
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #f1f3f4;
+  --bg-overlay: rgba(0, 0, 0, 0.5);
+  --bg-gradient: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  
+  // Text Colors
+  --text-primary: #2c3e50;
+  --text-secondary: #495057;
+  --text-muted: #6c757d;
+  --text-light: #adb5bd;
+  --text-inverse: #ffffff;
+  
+  // Border Colors
+  --border-primary: #e9ecef;
+  --border-secondary: #dee2e6;
+  --border-accent: var(--primary);
+  
+  // Status Colors
+  --success: #28a745;
+  --success-light: #d4edda;
+  --warning: #ffc107;
+  --warning-light: #fff3cd;
+  --error: #dc3545;
+  --error-light: #f8d7da;
+  --info: #17a2b8;
+  --info-light: #d1ecf1;
+  
+  // Interactive States
+  --hover-bg: rgba(25, 118, 210, 0.04);
+  --active-bg: rgba(25, 118, 210, 0.08);
+  --focus-ring: rgba(25, 118, 210, 0.25);
+  
+  // Shadows
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.16);
+  
+  // Quiz Specific Colors
+  --quiz-card-bg: #ffffff;
+  --quiz-card-border: #e9ecef;
+  --quiz-card-hover: #f8f9fa;
+  --quiz-tag-bg: rgba(25, 118, 210, 0.1);
+  --quiz-tag-text: var(--primary);
+  --quiz-stat-icon: var(--primary);
+  --quiz-progress-bg: #e9ecef;
+  --quiz-progress-fill: var(--primary);
+  
+  // Navigation
+  --navbar-bg: #ffffff;
+  --navbar-border: #e9ecef;
+  --navbar-link: #495057;
+  --navbar-link-hover: var(--primary);
+  --navbar-link-active: var(--primary);
+  --navbar-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  
+  // Forms & Inputs
+  --input-bg: #ffffff;
+  --input-border: #ced4da;
+  --input-focus: var(--primary);
+  --input-placeholder: #6c757d;
+  
+  // Buttons
+  --btn-primary-bg: var(--primary);
+  --btn-primary-text: #ffffff;
+  --btn-primary-hover: var(--primary-dark);
+  --btn-secondary-bg: #6c757d;
+  --btn-secondary-text: #ffffff;
+  --btn-secondary-hover: #5a6268;
+  
+  // Dialog & Modal
+  --dialog-bg: #ffffff;
+  --dialog-backdrop: rgba(0, 0, 0, 0.5);
+  --dialog-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+// =============================================================================
 // DARK THEME
+// =============================================================================
 :root[data-theme='dark'] {
-  --background: #181a1b;
-  --foreground: #f1f1f1;
-  --primary: #1976d2;
-  --navbar-bg: #23272a;
-  --navbar-border: #333;
-  --navbar-link: #f1f1f1;
-  --navbar-link-active: #1976d2;
-  --navbar-shadow: 0 1px 6px 0 rgba(25, 118, 210, 0.04);
-  --navbar-hover-bg: rgba(25, 118, 210, 0.07);
-  --navbar-active-bg: rgba(25, 118, 210, 0.13);
-  --navbar-btn-hover: var(--primary);
-  --navbar-btn-hover-text: #fff;
+  // Base Colors
+  --primary: #42a5f5;
+  --primary-light: #64b5f6;
+  --primary-dark: #1976d2;
+  --secondary: #f06292;
+  --accent: #26c6da;
+  
+  // Backgrounds
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d3748;
+  --bg-tertiary: #4a5568;
+  --bg-overlay: rgba(0, 0, 0, 0.8);
+  --bg-gradient: linear-gradient(135deg, #1a1a1a 0%, #2d3748 100%);
+  
+  // Text Colors
+  --text-primary: #e2e8f0;
+  --text-secondary: #cbd5e0;
+  --text-muted: #a0aec0;
+  --text-light: #718096;
+  --text-inverse: #1a202c;
+  
+  // Border Colors
+  --border-primary: #4a5568;
+  --border-secondary: #2d3748;
+  --border-accent: var(--primary);
+  
+  // Status Colors
+  --success: #48bb78;
+  --success-light: rgba(72, 187, 120, 0.2);
+  --warning: #ed8936;
+  --warning-light: rgba(237, 137, 54, 0.2);
+  --error: #f56565;
+  --error-light: rgba(245, 101, 101, 0.2);
+  --info: #4299e1;
+  --info-light: rgba(66, 153, 225, 0.2);
+  
+  // Interactive States
+  --hover-bg: rgba(66, 165, 245, 0.08);
+  --active-bg: rgba(66, 165, 245, 0.16);
+  --focus-ring: rgba(66, 165, 245, 0.4);
+  
+  // Shadows
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.6);
+  
+  // Quiz Specific Colors
+  --quiz-card-bg: #2d3748;
+  --quiz-card-border: #4a5568;
+  --quiz-card-hover: #4a5568;
+  --quiz-tag-bg: rgba(66, 165, 245, 0.2);
+  --quiz-tag-text: var(--primary);
+  --quiz-stat-icon: var(--primary);
+  --quiz-progress-bg: #4a5568;
+  --quiz-progress-fill: var(--primary);
+  
+  // Navigation
+  --navbar-bg: #1a1a1a;
+  --navbar-border: #2d3748;
+  --navbar-link: #cbd5e0;
+  --navbar-link-hover: var(--primary);
+  --navbar-link-active: var(--primary);
+  --navbar-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+  
+  // Forms & Inputs
+  --input-bg: #2d3748;
+  --input-border: #4a5568;
+  --input-focus: var(--primary);
+  --input-placeholder: #a0aec0;
+  
+  // Buttons
+  --btn-primary-bg: var(--primary);
+  --btn-primary-text: #1a202c;
+  --btn-primary-hover: var(--primary-light);
+  --btn-secondary-bg: #4a5568;
+  --btn-secondary-text: #e2e8f0;
+  --btn-secondary-hover: #718096;
+  
+  // Dialog & Modal
+  --dialog-bg: #2d3748;
+  --dialog-backdrop: rgba(0, 0, 0, 0.8);
+  --dialog-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
 }
 
-// LIGHT THEME
-:root[data-theme='light'] {
-  --background: #f1f1f1;
-  --foreground: #181a1b;
-  --primary: #1976d2;
-  --navbar-bg: #f1f1f1;
-  --navbar-border: #ccc;
-  --navbar-link: #181a1b;
-  --navbar-link-active: #1976d2;
+// =============================================================================
+// GLOBAL STYLES
+// =============================================================================
+:root {
+  // Typography
+  --font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --font-mono: 'Fira Code', 'Consolas', 'Monaco', monospace;
+  
+  // Transitions
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+  
+  // Border Radius
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 50%;
+  
+  // Spacing (based on 8px grid)
+  --space-1: 0.25rem; // 4px
+  --space-2: 0.5rem;  // 8px
+  --space-3: 0.75rem; // 12px
+  --space-4: 1rem;    // 16px
+  --space-5: 1.25rem; // 20px
+  --space-6: 1.5rem;  // 24px
+  --space-8: 2rem;    // 32px
+  --space-10: 2.5rem; // 40px
+  --space-12: 3rem;   // 48px
+  --space-16: 4rem;   // 64px
+  
+  // Z-Index Scale
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+  --z-toast: 1080;
 }
 
-:root[data-theme='dark'],
-:root[data-theme='light'] {
-  --font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-}
-
+// Base body styles
 body {
   font-family: var(--font-family);
-  background: var(--background);
-  color: var(--foreground);
-  transition: background 0.2s, color 0.2s;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background var(--transition-normal), color var(--transition-normal);
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
 }
+
+// Scrollbar theming
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-tertiary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-secondary);
+  border-radius: var(--radius-md);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+// =============================================================================
+// UTILITY CLASSES
+// =============================================================================
+
+// Text utilities
+.text-primary { color: var(--text-primary) !important; }
+.text-secondary { color: var(--text-secondary) !important; }
+.text-muted { color: var(--text-muted) !important; }
+.text-success { color: var(--success) !important; }
+.text-warning { color: var(--warning) !important; }
+.text-error { color: var(--error) !important; }
+.text-info { color: var(--info) !important; }
+
+// Background utilities
+.bg-primary { background-color: var(--bg-primary) !important; }
+.bg-secondary { background-color: var(--bg-secondary) !important; }
+.bg-tertiary { background-color: var(--bg-tertiary) !important; }
+
+// Shadow utilities
+.shadow-sm { box-shadow: var(--shadow-sm) !important; }
+.shadow-md { box-shadow: var(--shadow-md) !important; }
+.shadow-lg { box-shadow: var(--shadow-lg) !important; }
+.shadow-xl { box-shadow: var(--shadow-xl) !important; }
+
+// Border utilities
+.border { border: 1px solid var(--border-primary) !important; }
+.border-secondary { border-color: var(--border-secondary) !important; }
+.border-accent { border-color: var(--border-accent) !important; }
+
+// Radius utilities
+.rounded-sm { border-radius: var(--radius-sm) !important; }
+.rounded { border-radius: var(--radius-md) !important; }
+.rounded-lg { border-radius: var(--radius-lg) !important; }
+.rounded-xl { border-radius: var(--radius-xl) !important; }
+.rounded-full { border-radius: var(--radius-full) !important; }
+
+// =============================================================================
+// ANGULAR MATERIAL THEME OVERRIDES
+// =============================================================================
+
+// Override Material Dialog
+.mat-mdc-dialog-surface {
+  background: var(--dialog-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+.mat-mdc-dialog-container .mdc-dialog__surface {
+  background: var(--dialog-bg) !important;
+}
+
+// Override Material Cards
+.mat-mdc-card {
+  background: var(--quiz-card-bg) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--quiz-card-border) !important;
+}
+
+// Override Material Form Fields
+.mat-mdc-form-field {
+  .mat-mdc-text-field-wrapper {
+    background: var(--input-bg) !important;
+  }
+  
+  .mat-mdc-form-field-input-control {
+    color: var(--text-primary) !important;
+  }
+  
+  .mat-mdc-form-field-input-control::placeholder {
+    color: var(--input-placeholder) !important;
+  }
+}
+
+// Override Material Buttons
+.mat-mdc-raised-button.mat-primary {
+  background: var(--btn-primary-bg) !important;
+  color: var(--btn-primary-text) !important;
+}
+
+.mat-mdc-raised-button.mat-accent {
+  background: var(--accent) !important;
+  color: var(--text-inverse) !important;
+}
+
+// Override Material Icons
+.mat-icon {
+  color: inherit;
+}
+
+// Override Material Menu
+.mat-mdc-menu-panel {
+  background: var(--dialog-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+.mat-mdc-menu-item {
+  color: var(--text-primary) !important;
+  
+  &:hover {
+    background: var(--hover-bg) !important;
+  }
+}
+
+// Override Material Chips
+.mat-mdc-chip {
+  background: var(--quiz-tag-bg) !important;
+  color: var(--quiz-tag-text) !important;
+}
+
+// Override Material Snackbar
+.mat-mdc-snack-bar-container {
+  background: var(--dialog-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+// =============================================================================
+// RESPONSIVE DESIGN
+// =============================================================================
+@media (max-width: 768px) {
+  :root {
+    --space-4: 0.75rem;
+    --space-6: 1rem;
+    --space-8: 1.5rem;
+  }
+}
+
+// =============================================================================
+// ANIMATIONS
+// =============================================================================
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+// Utility animation classes
+.animate-fade-in { animation: fadeIn var(--transition-normal); }
+.animate-slide-up { animation: slideInUp var(--transition-normal); }
+.animate-slide-down { animation: slideInDown var(--transition-normal); }
+.animate-pulse { animation: pulse 2s infinite; }

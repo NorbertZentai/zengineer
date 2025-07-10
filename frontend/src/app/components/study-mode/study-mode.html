@@ -1,0 +1,239 @@
+<div class="study-mode-container" *ngIf="!showResult()">
+  <!-- Header -->
+  <div class="study-header">
+    <div class="header-left">
+      <button mat-icon-button (click)="exitStudy()" class="exit-btn">
+        <mat-icon>close</mat-icon>
+      </button>
+      <h2>{{ quiz.name }}</h2>
+    </div>
+    
+    <div class="header-center">
+      <!-- Study Mode Selector -->
+      <div class="mode-selector">
+        <button 
+          mat-button
+          [class.active]="studyMode() === 'classic'"
+          (click)="changeStudyMode('classic')">
+          <mat-icon>quiz</mat-icon>
+          Összes kártya
+        </button>
+        <button 
+          mat-button
+          [class.active]="studyMode() === 'review'"
+          (click)="changeStudyMode('review')">
+          <mat-icon>schedule</mat-icon>
+          Ismétlendő
+        </button>
+        <button 
+          mat-button
+          [class.active]="studyMode() === 'hard_cards'"
+          (click)="changeStudyMode('hard_cards')">
+          <mat-icon>trending_up</mat-icon>
+          Nehéz kártyák
+        </button>
+      </div>
+    </div>
+    
+    <div class="header-right">
+      <div class="timer">
+        <mat-icon>schedule</mat-icon>
+        {{ formatTime(elapsedTime()) }}
+      </div>
+    </div>
+  </div>
+  
+  <!-- Progress Bar -->
+  <div class="progress-section">
+    <div class="progress-info">
+      <span class="progress-text">
+        {{ currentCardIndex() + 1 }} / {{ studyCards().length }}
+      </span>
+      <span class="accuracy" [style.color]="getAccuracyColor(studyStats().accuracy)">
+        {{ studyStats().accuracy.toFixed(0) }}% pontosság
+      </span>
+    </div>
+    <mat-progress-bar 
+      mode="determinate" 
+      [value]="progress()"
+      class="study-progress">
+    </mat-progress-bar>
+  </div>
+  
+  <!-- Study Card -->
+  <div class="study-area" *ngIf="currentCard() as card">
+    <div class="card-info">
+      <span 
+        class="difficulty-badge"
+        [style.background-color]="getCardDifficultyColor(card.difficulty)">
+        {{ getCardDifficultyLabel(card.difficulty) }}
+      </span>
+      <div class="card-tags" *ngIf="card.tags.length > 0">
+        <mat-chip *ngFor="let tag of card.tags">{{ tag }}</mat-chip>
+      </div>
+    </div>
+    
+    <div class="study-card" 
+         [class.flipped]="isFlipped()"
+         (click)="flipCard()">
+      <div class="card-inner">
+        <div class="card-face card-front">
+          <div class="card-content">
+            <div class="flip-hint" *ngIf="!isFlipped()">
+              <mat-icon>touch_app</mat-icon>
+              Kattints a válasz megtekintéséhez
+            </div>
+            <div class="card-text">{{ card.front }}</div>
+          </div>
+        </div>
+        <div class="card-face card-back">
+          <div class="card-content">
+            <div class="card-text">{{ card.back }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="study-actions" *ngIf="isFlipped()">
+      <button 
+        mat-raised-button 
+        color="warn"
+        class="action-btn wrong-btn"
+        (click)="answerCard(false)">
+        <mat-icon>close</mat-icon>
+        Nem tudtam
+      </button>
+      <button 
+        mat-raised-button 
+        class="action-btn skip-btn"
+        (click)="skipCard()">
+        <mat-icon>skip_next</mat-icon>
+        Kihagyás
+      </button>
+      <button 
+        mat-raised-button 
+        color="primary"
+        class="action-btn correct-btn"
+        (click)="answerCard(true)">
+        <mat-icon>check</mat-icon>
+        Tudtam
+      </button>
+    </div>
+    
+    <div class="card-controls" *ngIf="!isFlipped()">
+      <button mat-button (click)="resetCard()">
+        <mat-icon>refresh</mat-icon>
+        Újra
+      </button>
+      <button mat-button (click)="flipCard()">
+        <mat-icon>flip</mat-icon>
+        Válasz mutatása
+      </button>
+    </div>
+  </div>
+  
+  <!-- Stats Panel -->
+  <div class="stats-panel">
+    <div class="stat-item correct">
+      <mat-icon>check_circle</mat-icon>
+      <span class="stat-value">{{ studyStats().correct }}</span>
+      <span class="stat-label">Helyes</span>
+    </div>
+    <div class="stat-item wrong">
+      <mat-icon>cancel</mat-icon>
+      <span class="stat-value">{{ studyStats().wrong }}</span>
+      <span class="stat-label">Helytelen</span>
+    </div>
+    <div class="stat-item remaining">
+      <mat-icon>schedule</mat-icon>
+      <span class="stat-value">{{ studyStats().remaining }}</span>
+      <span class="stat-label">Hátra</span>
+    </div>
+  </div>
+</div>
+
+<!-- Results Screen -->
+<div class="results-container" *ngIf="showResult()">
+  <div class="results-header">
+    <mat-icon class="results-icon">emoji_events</mat-icon>
+    <h2>Tanulás befejezve!</h2>
+  </div>
+  
+  <div class="results-stats">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value large">{{ studyStats().total }}</div>
+        <div class="stat-label">Összes kártya</div>
+      </div>
+      <div class="stat-card correct">
+        <div class="stat-value large">{{ studyStats().correct }}</div>
+        <div class="stat-label">Helyes válasz</div>
+      </div>
+      <div class="stat-card wrong">
+        <div class="stat-value large">{{ studyStats().wrong }}</div>
+        <div class="stat-label">Helytelen válasz</div>
+      </div>
+      <div class="stat-card accuracy" [style.color]="getAccuracyColor(studyStats().accuracy)">
+        <div class="stat-value large">{{ studyStats().accuracy.toFixed(0) }}%</div>
+        <div class="stat-label">Pontosság</div>
+      </div>
+      <div class="stat-card time">
+        <div class="stat-value large">{{ formatTime(elapsedTime()) }}</div>
+        <div class="stat-label">Tanulási idő</div>
+      </div>
+    </div>
+    
+    <div class="performance-message">
+      <div *ngIf="studyStats().accuracy >= 90" class="excellent">
+        <mat-icon>star</mat-icon>
+        <span>Kiváló teljesítmény! Nagyon jól megy!</span>
+      </div>
+      <div *ngIf="studyStats().accuracy >= 70 && studyStats().accuracy < 90" class="good">
+        <mat-icon>thumb_up</mat-icon>
+        <span>Jó munka! Még egy kis gyakorlás és tökéletes lesz!</span>
+      </div>
+      <div *ngIf="studyStats().accuracy < 70" class="needs-work">
+        <mat-icon>school</mat-icon>
+        <span>Még van mit gyakorolni. Ne add fel, a következő alkalommal jobban fog menni!</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="results-actions">
+    <button 
+      mat-raised-button 
+      color="primary"
+      (click)="restartStudy()">
+      <mat-icon>refresh</mat-icon>
+      Újra tanulás
+    </button>
+    <button mat-button (click)="close(true)">
+      <mat-icon>check</mat-icon>
+      Befejezés
+    </button>
+  </div>
+</div>
+
+<!-- Empty State -->
+<div class="empty-study" *ngIf="studyCards().length === 0 && !showResult()">
+  <mat-icon class="empty-icon">quiz</mat-icon>
+  <h3>Nincsenek tanulható kártyák</h3>
+  <p *ngIf="studyMode() === 'review'">
+    Jelenleg nincsenek ismétlendő kártyák. Próbáld ki a "Összes kártya" módot!
+  </p>
+  <p *ngIf="studyMode() === 'hard_cards'">
+    Nincsenek nehéz kártyák. Próbáld ki a "Összes kártya" módot!
+  </p>
+  <div class="empty-actions">
+    <button 
+      mat-raised-button 
+      color="primary"
+      (click)="changeStudyMode('classic')">
+      Összes kártya tanulása
+    </button>
+    <button mat-button (click)="close(false)">
+      Bezárás
+    </button>
+  </div>
+</div>

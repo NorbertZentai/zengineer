@@ -1,0 +1,285 @@
+<div class="card-editor-container">
+  <div class="editor-header">
+    <div class="header-left">
+      <h2>
+        <mat-icon>edit</mat-icon>
+        {{ quiz.name }} - Kártyák szerkesztése
+      </h2>
+      <span class="card-count">{{ cards().length }} kártya</span>
+    </div>
+    <div class="header-actions">
+      <button mat-button (click)="exportCards()">
+        <mat-icon>download</mat-icon>
+        Exportálás
+      </button>
+      <button mat-button>
+        <mat-icon>upload</mat-icon>
+        <input type="file" accept=".json" (change)="importCards($event)" style="display: none">
+        Importálás
+      </button>
+    </div>
+  </div>
+
+  <mat-tab-group>
+    <!-- Card List Tab -->
+    <mat-tab label="Kártyák listája">
+      <div class="tab-content">
+        <!-- Filters -->
+        <div class="filters-section">
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Keresés kártyákban...</mat-label>
+            <input 
+              matInput 
+              [value]="searchQuery()"
+              (input)="onSearch($any($event.target).value)"
+              placeholder="Szöveg vagy címke">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline" class="difficulty-filter">
+            <mat-label>Nehézség</mat-label>
+            <mat-select 
+              [value]="selectedDifficulty()"
+              (selectionChange)="onDifficultyFilter($event.value)">
+              <mat-option value="all">Összes</mat-option>
+              <mat-option value="easy">Könnyű</mat-option>
+              <mat-option value="medium">Közepes</mat-option>
+              <mat-option value="hard">Nehéz</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <!-- Cards List -->
+        <div class="cards-list" cdkDropList (cdkDropListDropped)="onCardDrop($event)">
+          <div 
+            *ngFor="let card of filteredCards(); let i = index; trackBy: trackByCardId"
+            class="card-item"
+            cdkDrag>
+            
+            <div class="card-content" *ngIf="editingCardIndex() !== i">
+              <div class="card-drag-handle" cdkDragHandle>
+                <mat-icon>drag_indicator</mat-icon>
+              </div>
+              
+              <div class="card-body">
+                <div class="card-front">
+                  <strong>Kérdés:</strong> {{ card.front }}
+                </div>
+                <div class="card-back">
+                  <strong>Válasz:</strong> {{ card.back }}
+                </div>
+                
+                <div class="card-meta">
+                  <span 
+                    class="difficulty-badge"
+                    [style.background-color]="getDifficultyColor(card.difficulty)">
+                    {{ getDifficultyLabel(card.difficulty) }}
+                  </span>
+                  
+                  <div class="card-tags" *ngIf="card.tags.length > 0">
+                    <mat-chip *ngFor="let tag of card.tags" class="tag-chip">
+                      {{ tag }}
+                    </mat-chip>
+                  </div>
+                  
+                  <div class="card-stats">
+                    <span class="stat">
+                      <mat-icon>refresh</mat-icon>
+                      {{ card.reviewCount }}
+                    </span>
+                    <span class="stat">
+                      <mat-icon>trending_up</mat-icon>
+                      {{ (card.successRate * 100).toFixed(0) }}%
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="card-actions">
+                <button 
+                  mat-icon-button 
+                  (click)="startEditCard(i)"
+                  matTooltip="Szerkesztés">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button 
+                  mat-icon-button 
+                  (click)="duplicateCard(card)"
+                  matTooltip="Másolás">
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+                <button 
+                  mat-icon-button 
+                  color="warn"
+                  (click)="deleteCard(card)"
+                  matTooltip="Törlés">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+            
+            <!-- Edit Form -->
+            <div class="card-edit-form" *ngIf="editingCardIndex() === i">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Kérdés</mat-label>
+                <textarea 
+                  matInput 
+                  [value]="card.front"
+                  #frontInput
+                  rows="2">
+                </textarea>
+              </mat-form-field>
+              
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Válasz</mat-label>
+                <textarea 
+                  matInput 
+                  [value]="card.back"
+                  #backInput
+                  rows="2">
+                </textarea>
+              </mat-form-field>
+              
+              <mat-form-field appearance="outline">
+                <mat-label>Nehézség</mat-label>
+                <mat-select [value]="card.difficulty" #difficultyInput>
+                  <mat-option value="easy">Könnyű</mat-option>
+                  <mat-option value="medium">Közepes</mat-option>
+                  <mat-option value="hard">Nehéz</mat-option>
+                </mat-select>
+              </mat-form-field>
+              
+              <div class="edit-actions">
+                <button 
+                  mat-button 
+                  color="primary"
+                  (click)="saveEditCard(card, {
+                    front: frontInput.value,
+                    back: backInput.value,
+                    difficulty: difficultyInput.value
+                  })">
+                  <mat-icon>check</mat-icon>
+                  Mentés
+                </button>
+                <button mat-button (click)="cancelEdit()">
+                  <mat-icon>close</mat-icon>
+                  Mégse
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="filteredCards().length === 0">
+          <mat-icon class="empty-icon">style</mat-icon>
+          <h3>Nincsenek kártyák</h3>
+          <p *ngIf="searchQuery() || selectedDifficulty() !== 'all'">
+            Próbálj meg másik szűrőt!
+          </p>
+          <p *ngIf="!searchQuery() && selectedDifficulty() === 'all'">
+            Hozd létre az első kártyát az "Új kártya" fülön!
+          </p>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Add New Card Tab -->
+    <mat-tab label="Új kártya">
+      <div class="tab-content">
+        <div class="new-card-form">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Kérdés / Előlap</mat-label>
+            <textarea 
+              matInput 
+              [value]="newCardFront()"
+              (input)="newCardFront.set($any($event.target).value)"
+              placeholder="Add meg a kérdést vagy a kártya előlapját"
+              rows="3">
+            </textarea>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Válasz / Hátlap</mat-label>
+            <textarea 
+              matInput 
+              [value]="newCardBack()"
+              (input)="newCardBack.set($any($event.target).value)"
+              placeholder="Add meg a választ vagy a kártya hátlapját"
+              rows="3">
+            </textarea>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline">
+            <mat-label>Nehézség</mat-label>
+            <mat-select 
+              [value]="newCardDifficulty()"
+              (selectionChange)="newCardDifficulty.set($event.value)">
+              <mat-option value="easy">Könnyű</mat-option>
+              <mat-option value="medium">Közepes</mat-option>
+              <mat-option value="hard">Nehéz</mat-option>
+            </mat-select>
+          </mat-form-field>
+          
+          <div class="tags-section">
+            <h4>Címkék</h4>
+            <div class="existing-tags" *ngIf="availableTags().length > 0">
+              <span class="label">Meglévő címkék:</span>
+              <mat-chip 
+                *ngFor="let tag of availableTags()"
+                (click)="addTagToNewCard(tag)"
+                [class.selected]="newCardTags().includes(tag)">
+                {{ tag }}
+              </mat-chip>
+            </div>
+            
+            <mat-form-field appearance="outline" class="tag-input">
+              <mat-label>Új címke</mat-label>
+              <input 
+                matInput 
+                #tagInput
+                placeholder="Írj egy címkét és nyomj Enter-t"
+                (keydown.enter)="addTagToNewCard(tagInput.value); tagInput.value = ''">
+            </mat-form-field>
+            
+            <div class="selected-tags" *ngIf="newCardTags().length > 0">
+              <span class="label">Kiválasztott címkék:</span>
+              <mat-chip 
+                *ngFor="let tag of newCardTags()"
+                class="selected-tag">
+                {{ tag }}
+                <button matChipRemove (click)="removeTagFromNewCard(tag)">
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </mat-chip>
+            </div>
+          </div>
+          
+          <div class="form-actions">
+            <button 
+              mat-raised-button 
+              color="primary"
+              (click)="addCard()"
+              [disabled]="!newCardFront().trim() || !newCardBack().trim()">
+              <mat-icon>add</mat-icon>
+              Kártya hozzáadása
+            </button>
+            <button mat-button (click)="resetNewCardForm()">
+              <mat-icon>refresh</mat-icon>
+              Űrlap törlése
+            </button>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+
+  <!-- Dialog Actions -->
+  <div class="dialog-actions">
+    <button mat-button (click)="cancel()">Bezárás</button>
+    <button mat-raised-button color="primary" (click)="close()">
+      <mat-icon>check</mat-icon>
+      Mentés és bezárás
+    </button>
+  </div>
+</div>
