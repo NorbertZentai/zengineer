@@ -1,0 +1,57 @@
+# CI/CD pipeline a Zengineer projekthez
+# Ez a workflow automatikusan buildeli, teszteli és Docker image-be csomagolja a frontend és backend részt,
+# majd Docker Compose-szal integrációs lépést is futtat. Minden lépéshez magyarázó kommentek találhatók.
+
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]  # Csak a main branch-re való push esetén fut le
+  pull_request:
+    branches: [ main ]  # PR esetén is lefut
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest  # A frontend job Ubuntu runneren fut
+    defaults:
+      run:
+        working-directory: frontend  # Minden parancs a frontend mappában fut
+    steps:
+      - uses: actions/checkout@v4  # Kód letöltése
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20  # Node.js 20 beállítása
+      - name: Install dependencies
+        run: npm ci  # Függőségek telepítése
+      - name: Lint
+        run: npm run lint --if-present  # Kódstílus ellenőrzés
+      - name: Test
+        run: npm run test --if-present -- --watch=false --browsers=ChromeHeadless  # Unit tesztek futtatása
+      - name: Build
+        run: npm run build --if-present  # Production build
+      - name: Build Docker image
+        run: docker build -t zengineer-frontend:latest .  # Docker image buildelése
+
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend  # Minden parancs a backend mappában fut
+    steps:
+      - uses: actions/checkout@v4  # Kód letöltése
+      - name: Build Docker image
+        run: docker build -t zengineer-backend:latest .  # Backend Docker image buildelése
+
+  integration:
+    runs-on: ubuntu-latest
+    needs: [frontend, backend]  # Csak akkor indul, ha a frontend és backend job sikeres
+    steps:
+      - uses: actions/checkout@v4  # Kód letöltése
+      - name: Docker Compose up
+        run: docker-compose up -d --build  # Összes szolgáltatás indítása
+      - name: Wait for services
+        run: sleep 10  # Várakozás, hogy minden elinduljon
+      # Itt lehetne integrációs teszt, pl. curl vagy Postman
+      - name: Docker Compose down
+        run: docker-compose down  # Konténerek leállítása
