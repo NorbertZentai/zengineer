@@ -87,10 +87,10 @@ jobs:
         run: |
           echo "Starting services..."
           if [ -f docker-compose.yml ]; then
-            docker-compose up -d --build
+            docker compose up -d --build
             sleep 30
             echo "Checking service status:"
-            docker-compose ps
+            docker compose ps
           else
             echo "No docker-compose.yml found, skipping Docker setup"
             exit 1
@@ -118,8 +118,8 @@ jobs:
       - name: 🛑 Stop services
         run: |
           echo "Stopping services..."
-          if command -v docker-compose >/dev/null 2>&1; then
-            docker-compose down -v || echo "Failed to stop services"
+          if command -v docker >/dev/null 2>&1; then
+            docker compose down -v || echo "Failed to stop services"
           fi
         if: always()
 
