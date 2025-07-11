@@ -3,3 +3,13 @@ dist
 .git
 .gitignore
 Dockerfile
+.dockerignore
+README.md
+.env
+.angular
+*.md
+.vscode
+coverage
+.nyc_output
+karma.conf.js
+src/**/*.spec.ts

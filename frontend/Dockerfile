@@ -8,14 +8,14 @@ WORKDIR /app
 # Csak a csomagdefiníciók másolása a cache miatt
 COPY package*.json ./
 
-# Telepítés
-RUN npm install
+# Dependencies telepítése (dev és prod is kell a buildhez)
+RUN npm ci --silent
 
 # Teljes projekt másolása és build
 COPY . .
 
 # Angular app buildelése production módban
-RUN npm run build -- --configuration production
+RUN npm run build
 
 # -------------------------
 # Stage 2 – Serve with NGINX
