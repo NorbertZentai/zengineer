@@ -18,17 +18,27 @@ export class Register {
   password = '';
   name = '';
   errorMessage: string | null = null;
+  isLoading = false;
 
   constructor(private auth: AuthService, private router: Router) {}
 
   async onSubmit() {
+    if (this.isLoading) return;
+    
+    this.errorMessage = null;
+    this.isLoading = true;
+    
     try {
       await this.auth.register(this.email, this.password, this.name);
       await this.auth.login(this.email, this.password);
       this.router.navigateByUrl('/dashboard');
     } catch (err: any) {
-      this.errorMessage = 'Hiba történt a regisztráció során.';
+      // Use the error from AuthService if available
+      const authError = this.auth.lastError();
+      this.errorMessage = authError?.message || 'Hiba történt a regisztráció során.';
       console.error(err);
+    } finally {
+      this.isLoading = false;
     }
   }
 }

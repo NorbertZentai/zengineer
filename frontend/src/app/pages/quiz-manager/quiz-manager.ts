@@ -67,9 +67,23 @@ export class QuizManager {
     const path: QuizFolder[] = [];
     
     if (current) {
-      // Build breadcrumb path
-      path.push(current);
-      // Add logic to build full path from root
+      // Build full breadcrumb path from root to current
+      let currentNode: QuizFolder | null = current;
+      const reversePath: QuizFolder[] = [];
+      
+      // Traverse up to root
+      while (currentNode) {
+        reversePath.push(currentNode);
+        if (currentNode.parentId) {
+          const folders = this.quizService.folders();
+          currentNode = this.findFolderById(folders, currentNode.parentId);
+        } else {
+          currentNode = null;
+        }
+      }
+      
+      // Reverse to get root-to-current order
+      path.push(...reversePath.reverse());
     }
     
     return path;
@@ -158,7 +172,7 @@ export class QuizManager {
     // Load initial data
     effect(() => {
       if (this.quizService.isLoading()) {
-        console.log('Loading quiz data...');
+        // Loading state - could show spinner
       }
     });
   }
@@ -387,7 +401,7 @@ export class QuizManager {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('Cards updated');
+        // Cards were updated, refresh might be needed
       }
     });
   }
@@ -495,8 +509,22 @@ export class QuizManager {
     event.preventDefault();
     try {
       const data = JSON.parse(event.dataTransfer?.getData('text/plain') || '');
-      console.log('Drop:', data, 'into', targetFolder);
-      // Implement move logic here
+      
+      // TODO: Implement actual move logic
+      if (data.type === 'quiz') {
+        // Move quiz to target folder
+        // await this.quizService.moveQuiz(data.id, targetFolder.id);
+      } else if (data.type === 'folder') {
+        // Move folder to target folder
+        // await this.quizService.moveFolder(data.id, targetFolder.id);
+      }
+      
+      // For now, just show a message
+      this.snackBar.open(
+        `${this.translate.instant('QUIZ_MANAGER.MESSAGES.MOVE_NOT_IMPLEMENTED')}`,
+        this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'),
+        { duration: 3000 }
+      );
     } catch (error) {
       console.error('Error handling drop:', error);
     }

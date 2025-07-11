@@ -17,12 +17,16 @@ export class App {
   protected title = 'zengineer';
 
   constructor(private translate: TranslateService, private auth: AuthService, private router: Router) {
+    // Initialize languages
     translate.addLangs(['en', 'hu']);
+    translate.setDefaultLang('hu');
 
+    // Determine language to use
     const savedLang = localStorage.getItem('lang');
     const browserLang = translate.getBrowserLang();
     const langToUse = savedLang || (browserLang?.match(/en|hu/) ? browserLang : 'hu');
 
+    // Set the language
     translate.use(langToUse);
   }
 

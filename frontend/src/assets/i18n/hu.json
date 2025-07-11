@@ -1,114 +1,36 @@
 {
   "COMMON": {
-    "TITLE": "Üdv a Zengineer-ben!",
-    "LOGIN": "Bejelentkezés",
-    "REGISTER": "Regisztráció"
+    "TITLE": "Udv a Zengineer-ben!",
+    "LOGIN": "Bejelentkezes",
+    "REGISTER": "Regisztracio"
   },
   "NAV": {
-    "DASHBOARD": "Kezdőlap",
-    "QUIZ_MANAGER": "Kvízkezelő",
+    "DASHBOARD": "Kezdolap",
+    "QUIZ_MANAGER": "Kvizkezelo",
     "PROFILE": "Profil",
-    "ABOUT": "Névjegy",
+    "ABOUT": "Nevjegy",
     "CONTACT": "Kapcsolat"
   },
   "LOGIN": {
-    "TITLE": "Bejelentkezés",
+    "TITLE": "Bejelentkezes",
     "EMAIL": "Email",
-    "PASSWORD": "Jelszó",
-    "LOGIN": "Belépés",
-    "NO_ACCOUNT": "Még nincs fiókod?",
-    "REGISTER_LINK": "Regisztrálj itt"
+    "PASSWORD": "Jelszo",
+    "LOGIN": "Belepes",
+    "NO_ACCOUNT": "Meg nincs fiokod?",
+    "REGISTER_LINK": "Regisztralj itt"
   },
-  "REGISTER": {
-    "TITLE": "Regisztráció",
-    "NAME": "Név",
-    "EMAIL": "Email",
-    "PASSWORD": "Jelszó",
-    "REGISTER": "Regisztrálok",
-    "ALREADY_ACCOUNT": "Van már fiókod?",
-    "LOGIN_LINK": "Lépj be itt"
-  },
-  "LOGOUT": "Kijelentkezés",
   "QUIZ_MANAGER": {
-    "TITLE": "Kvízkezelő",
-    "PAGE_TITLE": "Kvíz Menedzser",
-    "NEW_PROJECT": "Új projekt neve",
-    "ADD_PROJECT": "Projekt hozzáadása",
-    "NEW_FOLDER": "Új mappa neve",
-    "ADD_FOLDER": "Mappa hozzáadása",
-    "NEW_QUIZFOLDER": "Új kvíz-mappa neve",
-    "ADD_QUIZFOLDER": "Kvíz-mappa hozzáadása",
-    "NEW_QUIZ": "Új kvíz neve",
-    "ADD_QUIZ": "Kvíz hozzáadása",
-    "CARDS": "Kártyák",
-    "SEARCH_PLACEHOLDER": "Keresés kvízekben...",
-    "SEARCH_BY": "Név vagy címke alapján",
-    "VIEW_GRID": "Rács nézet",
-    "VIEW_LIST": "Lista nézet",
-    "SORT": "Rendezés",
-    "SORT_BY_NAME": "Név szerint",
-    "SORT_BY_CREATED": "Létrehozás ideje",
-    "SORT_BY_UPDATED": "Módosítás ideje",
-    "SORT_BY_CARDS": "Kártyák száma",
-    "HOME": "Kezdőlap",
-    "STATS": {
-      "QUIZZES": "kvíz",
-      "CARDS": "kártya",
-      "NEEDS_REVIEW": "ismétlendő"
-    },
+    "TITLE": "Kvizkezelo",
+    "PAGE_TITLE": "Kviz Menedzser",
+    "SEARCH_PLACEHOLDER": "Kereses kvizekben...",
     "ACTIONS": {
-      "NEW_FOLDER": "Új mappa",
-      "NEW_QUIZ": "Új kvíz",
-      "OPEN": "Megnyitás",
-      "EDIT_CARDS": "Kártyák szerkesztése",
-      "STUDY": "Tanulás",
-      "STATISTICS": "Statisztikák",
-      "EXPORT": "Exportálás",
-      "DELETE": "Törlés",
-      "EDIT": "Szerkesztés"
-    },
-    "CREATE_DIALOG": {
-      "NEW_FOLDER": "Új mappa",
-      "NEW_QUIZ": "Új kvíz",
-      "NAME": "Név",
-      "NAME_PLACEHOLDER": "Add meg a nevet",
-      "DESCRIPTION": "Leírás (opcionális)",
-      "DESCRIPTION_PLACEHOLDER": "Rövid leírás...",
-      "CUSTOMIZATION": "Testreszabás",
-      "COLOR": "Szín:",
-      "ICON": "Ikon:",
-      "CANCEL": "Mégse",
-      "CREATE": "Létrehozás",
-      "CLOSE": "Bezár"
+      "NEW_FOLDER": "Uj mappa",
+      "NEW_QUIZ": "Uj kviz"
     },
     "EMPTY_STATE": {
-      "NO_QUIZZES": "Nincsenek kvízek",
-      "NO_QUIZZES_DESC": "Hozz létre az első kvízedet a fenti gombbal!",
-      "CREATE_QUIZ": "Kvíz létrehozása",
-      "NO_RESULTS": "Nincs találat",
-      "NO_RESULTS_DESC": "Próbálj meg másik keresési kifejezést!"
-    },
-    "MESSAGES": {
-      "FOLDER_CREATED": "Mappa sikeresen létrehozva",
-      "QUIZ_CREATED": "Kvíz sikeresen létrehozva",
-      "CREATE_ERROR": "Hiba történt a létrehozás során",
-      "FOLDER_UPDATED": "Mappa frissítve",
-      "QUIZ_UPDATED": "Kvíz frissítve",
-      "UPDATE_ERROR": "Hiba történt a frissítés során",
-      "FOLDER_DELETED": "Mappa törölve",
-      "QUIZ_DELETED": "Kvíz törölve",
-      "DELETE_ERROR": "Hiba történt a törlés során",
-      "NO_CARDS": "A kvízben nincsenek kártyák",
-      "STUDY_COMPLETE": "Tanulás befejezve!",
-      "CORRECT_ANSWERS": "helyes válasz",
-      "QUIZ_EXPORTED": "Kvíz exportálva",
-      "EXPORT_ERROR": "Hiba történt az exportálás során"
-    },
-    "CONFIRM": {
-      "DELETE_FOLDER": "Biztosan törölni szeretnéd a",
-      "DELETE_FOLDER_WARNING": "mappát? Ez törli az összes benne lévő kvízt is.",
-      "DELETE_QUIZ": "Biztosan törölni szeretnéd a",
-      "DELETE_QUIZ_WARNING": "kvízt?"
+      "NO_QUIZZES": "Meg nincsenek kvizeid",
+      "NO_QUIZZES_DESC": "Kezdd el a tanulast egy uj kviz letrehozasaval",
+      "CREATE_QUIZ": "Kviz letrehozasa"
     }
   }
 }

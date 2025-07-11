@@ -10,48 +10,310 @@ on:
   pull_request:
     branches: [ master ]  # PR esetén is lefut
 
+env:
+  # Környezeti változók a jobb hibaüzenetekhez
+  FORCE_COLOR: 1
+  NPM_CONFIG_COLOR: always
+  DOCKER_BUILDKIT: 1
+
 jobs:
   frontend:
     runs-on: ubuntu-latest  # A frontend job Ubuntu runneren fut
     defaults:
       run:
         working-directory: frontend  # Minden parancs a frontend mappában fut
+        shell: bash
     steps:
       - uses: actions/checkout@v4  # Kód letöltése
+      
+      - name: Make error formatter executable
+        run: chmod +x .github/scripts/format-error.sh
+      
       - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: 20  # Node.js 20 beállítása
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      - name: Display Node.js and npm versions
+        run: |
+          echo "Node.js version: $(node --version)"
+          echo "npm version: $(npm --version)"
+          echo "Working directory: $(pwd)"
+          echo "Directory contents:"
+          ls -la
+      
       - name: Install dependencies
-        run: npm ci  # Függőségek telepítése
+        run: |
+          echo "Installing npm dependencies..."
+          npm ci --verbose 2>&1 | tee npm-install.log  # Függőségek telepítése részletes outputtal
+          if [ ${PIPESTATUS[0]} -ne 0 ]; then
+            echo "❌ NPM install failed!"
+            chmod +x ../../.github/scripts/format-error.sh
+            ../../.github/scripts/format-error.sh "npm_install" "npm-install.log" "Frontend dependency installation"
+            exit 1
+          fi
+          echo "✅ Dependencies installed successfully"
+        continue-on-error: false
+      
+      - name: Display package.json scripts
+        run: |
+          echo "Available npm scripts:"
+          npm run --silent
+          echo "Package.json content:"
+          cat package.json | jq '.scripts' 2>/dev/null || echo "jq not available, showing raw package.json"
+      
       - name: Lint
-        run: npm run lint --if-present  # Kódstílus ellenőrzés
+        run: |
+          echo "Running lint checks..."
+          npm run lint --if-present 2>&1 | tee lint-output.log
+          if [ ${PIPESTATUS[0]} -ne 0 ]; then
+            echo "❌ Lint errors found:"
+            cat lint-output.log
+            exit 1
+          fi
+          echo "✅ Lint checks passed"
+        continue-on-error: false
+      
       - name: Test
-        run: npm run test --if-present -- --watch=false --browsers=ChromeHeadless  # Unit tesztek futtatása
+        run: |
+          echo "Running unit tests..."
+          npm run test --if-present -- --watch=false --browsers=ChromeHeadless --code-coverage 2>&1 | tee test-output.log
+          if [ ${PIPESTATUS[0]} -ne 0 ]; then
+            echo "❌ Tests failed:"
+            cat test-output.log
+            exit 1
+          fi
+          echo "✅ All tests passed"
+        continue-on-error: false
+      
       - name: Build
-        run: npm run build --if-present  # Production build
+        run: |
+          echo "Building production frontend..."
+          echo "Available disk space before build:"
+          df -h
+          npm run build --if-present 2>&1 | tee build-output.log
+          if [ ${PIPESTATUS[0]} -ne 0 ]; then
+            echo "❌ Build failed!"
+            chmod +x ../../.github/scripts/format-error.sh
+            ../../.github/scripts/format-error.sh "npm_build" "build-output.log" "Frontend production build"
+            echo "Build directory contents (if exists):"
+            ls -la dist/ 2>/dev/null || echo "No dist directory found"
+            exit 1
+          fi
+          echo "✅ Build successful"
+          echo "Build output directory:"
+          ls -la dist/ 2>/dev/null || echo "No dist directory found"
+        continue-on-error: false
+      
       - name: Build Docker image
-        run: docker build -t zengineer-frontend:latest .  # Docker image buildelése
+        run: |
+          echo "Building Docker image for frontend..."
+          echo "Dockerfile content:"
+          cat Dockerfile
+          echo "Building image..."
+          docker build -t zengineer-frontend:latest . --progress=plain 2>&1 | tee docker-build.log
+          if [ ${PIPESTATUS[0]} -ne 0 ]; then
+            echo "❌ Docker build failed!"
+            chmod +x ../../.github/scripts/format-error.sh
+            ../../.github/scripts/format-error.sh "docker_build" "docker-build.log" "Frontend Docker image build"
+            echo "Docker system info:"
+            docker system df
+            docker images
+            exit 1
+          fi
+          echo "✅ Docker image built successfully"
+          docker images | grep zengineer-frontend
+          
+      - name: Generate error report on failure
+        if: failure()
+        run: |
+          chmod +x ../../.github/scripts/generate-error-report.sh
+          ../../.github/scripts/generate-error-report.sh
+          
+      - name: Upload error artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-error-logs
+          path: frontend/artifacts/
+          retention-days: 30
 
   backend:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: backend  # Minden parancs a backend mappában fut
+        shell: bash
     steps:
       - uses: actions/checkout@v4  # Kód letöltése
+      
+      - name: Make scripts executable
+        run: |
+          chmod +x .github/scripts/format-error.sh
+          chmod +x .github/scripts/generate-error-report.sh
+      
+      - name: Display backend directory structure
+        run: |
+          echo "Backend directory contents:"
+          ls -la
+          echo "Current working directory: $(pwd)"
+      
+      - name: Check Dockerfile
+        run: |
+          echo "Dockerfile content:"
+          cat Dockerfile 2>/dev/null || echo "❌ Dockerfile not found in backend directory"
+          if [ ! -f Dockerfile ]; then
+            echo "Available files:"
+            find . -name "Dockerfile*" -o -name "*.dockerfile"
+            exit 1
+          fi
+      
       - name: Build Docker image
-        run: docker build -t zengineer-backend:latest .  # Backend Docker image buildelése
+        run: |
+          echo "Building Docker image for backend..."
+          docker build -t zengineer-backend:latest . --progress=plain 2>&1 | tee backend-docker-build.log
+          if [ ${PIPESTATUS[0]} -ne 0 ]; then
+            echo "❌ Backend Docker build failed!"
+            chmod +x ../../.github/scripts/format-error.sh
+            ../../.github/scripts/format-error.sh "docker_build" "backend-docker-build.log" "Backend Docker image build"
+            echo "Docker system info:"
+            docker system df
+            docker images
+            exit 1
+          fi
+          echo "✅ Backend Docker image built successfully"
+          docker images | grep zengineer-backend
+          
+      - name: Generate error report on failure
+        if: failure()
+        run: |
+          chmod +x ../../.github/scripts/generate-error-report.sh
+          ../../.github/scripts/generate-error-report.sh
+          
+      - name: Upload error artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-error-logs
+          path: backend/artifacts/
+          retention-days: 30
 
   integration:
     runs-on: ubuntu-latest
     needs: [frontend, backend]  # Csak akkor indul, ha a frontend és backend job sikeres
     steps:
       - uses: actions/checkout@v4  # Kód letöltése
+      
+      - name: Check Docker Compose file
+        run: |
+          echo "Checking docker-compose.yml..."
+          if [ -f docker-compose.yml ]; then
+            echo "Docker Compose file found:"
+            cat docker-compose.yml
+          else
+            echo "❌ docker-compose.yml not found in root directory"
+            echo "Available files in root:"
+            ls -la
+            exit 1
+          fi
+      
       - name: Docker Compose up
-        run: docker-compose up -d --build  # Összes szolgáltatás indítása
-      - name: Wait for services
-        run: sleep 10  # Várakozás, hogy minden elinduljon
-      # Itt lehetne integrációs teszt, pl. curl vagy Postman
+        run: |
+          echo "Starting services with Docker Compose..."
+          docker-compose up -d --build 2>&1 | tee docker-compose-up.log
+          if [ ${PIPESTATUS[0]} -ne 0 ]; then
+            echo "❌ Docker Compose failed to start!"
+            chmod +x .github/scripts/format-error.sh
+            .github/scripts/format-error.sh "docker_compose" "docker-compose-up.log" "Docker Compose service startup"
+            echo "Docker Compose logs:"
+            docker-compose logs
+            exit 1
+          fi
+          echo "✅ Services started successfully"
+      
+      - name: Wait for services and check health
+        run: |
+          echo "Waiting for services to be ready..."
+          sleep 15
+          echo "Checking service status:"
+          docker-compose ps
+          echo "Service logs:"
+          docker-compose logs --tail=50
+      
+      - name: Basic health checks
+        run: |
+          echo "Running basic health checks..."
+          # Frontend health check
+          echo "Checking frontend (port 4200)..."
+          curl -f http://localhost:4200 || echo "⚠️ Frontend not responding on port 4200"
+          
+          # Backend health check
+          echo "Checking backend (port 8080)..."
+          curl -f http://localhost:8080/health || curl -f http://localhost:8080 || echo "⚠️ Backend not responding on port 8080"
+        continue-on-error: true
+      
       - name: Docker Compose down
-        run: docker-compose down  # Konténerek leállítása
+        run: |
+          echo "Stopping services..."
+          docker-compose down -v 2>&1 | tee docker-compose-down.log
+          if [ ${PIPESTATUS[0]} -ne 0 ]; then
+            echo "⚠️ Warning: Docker Compose down failed:"
+            cat docker-compose-down.log
+          fi
+          echo "✅ Services stopped"
+        if: always()  # Ez mindig lefut, még hiba esetén is
+        
+      - name: Generate error report on failure
+        if: failure()
+        run: |
+          chmod +x .github/scripts/generate-error-report.sh
+          .github/scripts/generate-error-report.sh
+          
+      - name: Upload error artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-error-logs
+          path: artifacts/
+          retention-days: 30
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: [frontend, backend, integration]
+    if: always()  # Mindig lefut, függetlenül a többi job eredményétől
+    steps:
+      - name: Check job results and notify
+        run: |
+          echo "=== CI/CD Pipeline Summary ==="
+          echo "Frontend job: ${{ needs.frontend.result }}"
+          echo "Backend job: ${{ needs.backend.result }}"
+          echo "Integration job: ${{ needs.integration.result }}"
+          
+          if [[ "${{ needs.frontend.result }}" == "failure" ]]; then
+            echo "❌ Frontend job failed!"
+          elif [[ "${{ needs.frontend.result }}" == "success" ]]; then
+            echo "✅ Frontend job succeeded!"
+          fi
+          
+          if [[ "${{ needs.backend.result }}" == "failure" ]]; then
+            echo "❌ Backend job failed!"
+          elif [[ "${{ needs.backend.result }}" == "success" ]]; then
+            echo "✅ Backend job succeeded!"
+          fi
+          
+          if [[ "${{ needs.integration.result }}" == "failure" ]]; then
+            echo "❌ Integration job failed!"
+          elif [[ "${{ needs.integration.result }}" == "success" ]]; then
+            echo "✅ Integration job succeeded!"
+          fi
+          
+          # Összesített eredmény
+          if [[ "${{ needs.frontend.result }}" == "success" && "${{ needs.backend.result }}" == "success" && "${{ needs.integration.result }}" == "success" ]]; then
+            echo "🎉 All jobs completed successfully!"
+            exit 0
+          else
+            echo "⚠️ One or more jobs failed. Check the logs above for details."
+            exit 1
+          fi

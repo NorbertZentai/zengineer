@@ -102,7 +102,8 @@
       "STUDY_COMPLETE": "Study completed!",
       "CORRECT_ANSWERS": "correct answers",
       "QUIZ_EXPORTED": "Quiz exported",
-      "EXPORT_ERROR": "Error occurred during export"
+      "EXPORT_ERROR": "Error occurred during export",
+      "MOVE_NOT_IMPLEMENTED": "Move functionality is not yet implemented"
     },
     "CONFIRM": {
       "DELETE_FOLDER": "Are you sure you want to delete the",

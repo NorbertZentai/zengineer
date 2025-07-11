@@ -37,6 +37,7 @@ export class NavbarComponent {
 
   changeLang(event: Event) {
     const value = (event.target as HTMLSelectElement).value;
+    localStorage.setItem('lang', value);
     this.translate.use(value);
   }
 

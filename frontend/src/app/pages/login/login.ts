@@ -18,15 +18,25 @@ export class Login {
   email = '';
   password = '';
   error = '';
+  isLoading = false;
 
   constructor(private auth: AuthService, private router: Router) {}
 
   async onSubmit() {
+    if (this.isLoading) return;
+    
+    this.error = '';
+    this.isLoading = true;
+    
     try {
       await this.auth.login(this.email, this.password);
       this.router.navigateByUrl('/dashboard');
     } catch (err: any) {
-      this.error = 'Hibás bejelentkezési adatok.';
+      // Use the error from AuthService if available
+      const authError = this.auth.lastError();
+      this.error = authError?.message || 'Hibás bejelentkezési adatok.';
+    } finally {
+      this.isLoading = false;
     }
   }
 }
