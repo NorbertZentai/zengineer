@@ -77,20 +77,34 @@ jobs:
       - name: 📦 Install root dependencies
         run: |
           echo "Installing dependencies for auth tests..."
-          npm ci
+          if [ -f package.json ]; then
+            npm ci
+          else
+            echo "No package.json found, skipping npm install"
+          fi
 
       - name: 🐳 Start services with Docker Compose
         run: |
           echo "Starting services..."
-          docker-compose up -d --build
-          sleep 30
-          echo "Checking service status:"
-          docker-compose ps
+          if [ -f docker-compose.yml ]; then
+            docker-compose up -d --build
+            sleep 30
+            echo "Checking service status:"
+            docker-compose ps
+          else
+            echo "No docker-compose.yml found, skipping Docker setup"
+            exit 1
+          fi
 
       - name: 🧪 Run Auth Integration Tests
         run: |
           echo "🔐 Running authentication integration tests..."
-          node test-auth.js
+          if [ -f test-auth.js ]; then
+            node test-auth.js
+          else
+            echo "test-auth.js not found, skipping auth tests"
+            exit 1
+          fi
         env:
           POCKETBASE_URL: http://localhost:8080
 
@@ -104,7 +118,9 @@ jobs:
       - name: 🛑 Stop services
         run: |
           echo "Stopping services..."
-          docker-compose down -v
+          if command -v docker-compose >/dev/null 2>&1; then
+            docker-compose down -v || echo "Failed to stop services"
+          fi
         if: always()
 
   notify:
