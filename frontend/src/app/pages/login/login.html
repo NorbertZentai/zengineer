@@ -3,7 +3,7 @@
     <mat-icon class="auth-card__icon">login</mat-icon>
     <h2>{{ 'LOGIN.TITLE' | translate }}</h2>
   </div>
-  <form (ngSubmit)="onSubmit()" #loginForm="ngForm" autocomplete="on" role="form" aria-label="{{ 'LOGIN.TITLE' | translate }}">
+  <form (ngSubmit)="onSubmit()" #loginForm="ngForm" autocomplete="on" role="form" [attr.aria-label]="'LOGIN.TITLE' | translate">
     <div class="form-group">
       <label for="email">{{ 'LOGIN.EMAIL' | translate }}</label>
       <input 
