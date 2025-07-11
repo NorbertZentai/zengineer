@@ -241,17 +241,39 @@ jobs:
           docker-compose ps
           echo "Service logs:"
           docker-compose logs --tail=50
-      
+
+      - name: Setup Node.js for integration tests
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install root dependencies for auth tests
+        run: |
+          echo "Installing root level dependencies for auth tests..."
+          npm ci
+
+      - name: Run Auth Integration Tests
+        run: |
+          echo "🧪 Running authentication integration tests..."
+          echo "Testing complete auth flow: register → login → logout → delete"
+          node test-auth.js
+          if [ $? -ne 0 ]; then
+            echo "❌ Auth tests failed!"
+            exit 1
+          fi
+          echo "✅ Auth tests passed successfully!"
+
       - name: Basic health checks
         run: |
           echo "Running basic health checks..."
           # Frontend health check
-          echo "Checking frontend (port 4200)..."
-          curl -f http://localhost:4200 || echo "⚠️ Frontend not responding on port 4200"
+          echo "Checking frontend (port 3000)..."
+          curl -f http://localhost:3000 || echo "⚠️ Frontend not responding on port 3000"
           
-          # Backend health check
+          # Backend health check  
           echo "Checking backend (port 8080)..."
-          curl -f http://localhost:8080/health || curl -f http://localhost:8080 || echo "⚠️ Backend not responding on port 8080"
+          curl -f http://localhost:8080/api/health || curl -f http://localhost:8080 || echo "⚠️ Backend not responding on port 8080"
         continue-on-error: true
       
       - name: Docker Compose down

@@ -14,8 +14,8 @@ RUN npm ci --silent
 # Teljes projekt másolása és build
 COPY . .
 
-# Angular app buildelése production módban
-RUN npm run build
+# Angular app buildelése Docker konfigurációval
+RUN npm run build -- --configuration docker
 
 # -------------------------
 # Stage 2 – Serve with NGINX

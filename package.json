@@ -1,0 +1,29 @@
+{
+  "name": "zengineer",
+  "version": "1.0.0",
+  "main": "test-auth.js",
+  "type": "module",
+  "scripts": {
+    "test": "node test-auth.js",
+    "test:auth": "node test-auth.js",
+    "test:ci": "node test-auth.js",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NorbertZentai/zengineer.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NorbertZentai/zengineer/issues"
+  },
+  "homepage": "https://github.com/NorbertZentai/zengineer#readme",
+  "description": "",
+  "dependencies": {
+    "pocketbase": "^0.26.1"
+  }
+}
