@@ -24,9 +24,34 @@
     "NAME": "Név",
     "EMAIL": "Email",
     "PASSWORD": "Jelszó",
+    "CONFIRM_PASSWORD": "Jelszó megerősítése",
     "REGISTER": "Regisztrálok",
+    "REGISTERING": "Regisztráció...",
     "ALREADY_ACCOUNT": "Van már fiókod?",
-    "LOGIN_LINK": "Lépj be itt"
+    "LOGIN_LINK": "Lépj be itt",
+    "TOGGLE_PASSWORD": "Jelszó láthatóságának váltása",
+    "TOGGLE_CONFIRM_PASSWORD": "Jelszó megerősítés láthatóságának váltása",
+    "PASSWORD_REQUIREMENTS": "A jelszónak tartalmaznia kell",
+    "REQ_LENGTH": "Legalább 8 karakter",
+    "REQ_UPPERCASE": "Nagybetű",
+    "REQ_LOWERCASE": "Kisbetű", 
+    "REQ_NUMBER": "Szám",
+    "REQ_SPECIAL": "Speciális karakter (!@#$%^&*)",
+    "VALIDATION": {
+      "NAME_REQUIRED": "A név megadása kötelező",
+      "NAME_TOO_SHORT": "A név legalább 2 karakter legyen",
+      "NAME_TOO_LONG": "A név maximum 50 karakter lehet",
+      "EMAIL_REQUIRED": "Az email cím megadása kötelező",
+      "EMAIL_INVALID": "Kérjük, adjon meg egy érvényes email címet",
+      "PASSWORD_REQUIRED": "A jelszó megadása kötelező",
+      "PASSWORD_WEAK": "A jelszó nem felel meg a követelményeknek",
+      "CONFIRM_PASSWORD_REQUIRED": "A jelszó megerősítése kötelező",
+      "PASSWORDS_DONT_MATCH": "A jelszavak nem egyeznek",
+      "FORM_INVALID": "Kérjük, javítsa ki a hibákat a folytatáshoz"
+    },
+    "ERROR": {
+      "GENERAL": "Hiba történt a regisztráció során. Kérjük, próbálja újra."
+    }
   },
   "LOGOUT": "Kijelentkezés",
   "QUIZ_MANAGER": {

@@ -6,18 +6,128 @@
   <form (ngSubmit)="onSubmit()" #registerForm="ngForm" autocomplete="on">
     <div class="form-group">
       <label for="name">{{ 'REGISTER.NAME' | translate }}</label>
-      <input id="name" name="name" [(ngModel)]="name" required autocomplete="name" />
+      <input 
+        id="name" 
+        name="name" 
+        [(ngModel)]="name" 
+        required 
+        autocomplete="name"
+        (blur)="onNameBlur()"
+        [class.invalid]="validationErrors.name"
+      />
+      <div class="error" *ngIf="validationErrors.name">
+        {{ validationErrors.name | translate }}
+      </div>
     </div>
+    
     <div class="form-group">
       <label for="email">{{ 'REGISTER.EMAIL' | translate }}</label>
-      <input id="email" name="email" [(ngModel)]="email" required type="email" autocomplete="email" />
+      <input 
+        id="email" 
+        name="email" 
+        [(ngModel)]="email" 
+        required 
+        type="email" 
+        autocomplete="email"
+        (blur)="onEmailBlur()"
+        [class.invalid]="validationErrors.email"
+      />
+      <div class="error" *ngIf="validationErrors.email">
+        {{ validationErrors.email | translate }}
+      </div>
     </div>
+    
     <div class="form-group">
       <label for="password">{{ 'REGISTER.PASSWORD' | translate }}</label>
-      <input id="password" name="password" [(ngModel)]="password" required type="password" autocomplete="new-password" />
+      <div class="password-input-container">
+        <input 
+          id="password" 
+          name="password" 
+          [(ngModel)]="password" 
+          required 
+          [type]="showPassword ? 'text' : 'password'" 
+          autocomplete="new-password"
+          (input)="onPasswordInput()"
+          [class.invalid]="validationErrors.password"
+        />
+        <button 
+          type="button" 
+          class="password-toggle" 
+          (click)="togglePasswordVisibility()"
+          [attr.aria-label]="'REGISTER.TOGGLE_PASSWORD' | translate"
+        >
+          <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+      </div>
+      <div class="password-requirements" *ngIf="password">
+        <p class="requirements-title">{{ 'REGISTER.PASSWORD_REQUIREMENTS' | translate }}:</p>
+        <ul class="requirements-list">
+          <li [class.valid]="passwordRequirements.length">
+            <mat-icon class="requirement-icon">{{ passwordRequirements.length ? 'check' : 'close' }}</mat-icon>
+            {{ 'REGISTER.REQ_LENGTH' | translate }}
+          </li>
+          <li [class.valid]="passwordRequirements.uppercase">
+            <mat-icon class="requirement-icon">{{ passwordRequirements.uppercase ? 'check' : 'close' }}</mat-icon>
+            {{ 'REGISTER.REQ_UPPERCASE' | translate }}
+          </li>
+          <li [class.valid]="passwordRequirements.lowercase">
+            <mat-icon class="requirement-icon">{{ passwordRequirements.lowercase ? 'check' : 'close' }}</mat-icon>
+            {{ 'REGISTER.REQ_LOWERCASE' | translate }}
+          </li>
+          <li [class.valid]="passwordRequirements.number">
+            <mat-icon class="requirement-icon">{{ passwordRequirements.number ? 'check' : 'close' }}</mat-icon>
+            {{ 'REGISTER.REQ_NUMBER' | translate }}
+          </li>
+          <li [class.valid]="passwordRequirements.special">
+            <mat-icon class="requirement-icon">{{ passwordRequirements.special ? 'check' : 'close' }}</mat-icon>
+            {{ 'REGISTER.REQ_SPECIAL' | translate }}
+          </li>
+        </ul>
+      </div>
+      <div class="error" *ngIf="validationErrors.password">
+        {{ validationErrors.password | translate }}
+      </div>
     </div>
-    <button type="submit" class="auth-btn">{{ 'REGISTER.REGISTER' | translate }}</button>
-    <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+    
+    <div class="form-group">
+      <label for="confirmPassword">{{ 'REGISTER.CONFIRM_PASSWORD' | translate }}</label>
+      <div class="password-input-container">
+        <input 
+          id="confirmPassword" 
+          name="confirmPassword" 
+          [(ngModel)]="confirmPassword" 
+          required 
+          [type]="showConfirmPassword ? 'text' : 'password'" 
+          autocomplete="new-password"
+          (input)="onConfirmPasswordInput()"
+          [class.invalid]="validationErrors.confirmPassword"
+        />
+        <button 
+          type="button" 
+          class="password-toggle" 
+          (click)="toggleConfirmPasswordVisibility()"
+          [attr.aria-label]="'REGISTER.TOGGLE_CONFIRM_PASSWORD' | translate"
+        >
+          <mat-icon>{{ showConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+      </div>
+      <div class="error" *ngIf="validationErrors.confirmPassword">
+        {{ validationErrors.confirmPassword | translate }}
+      </div>
+    </div>
+    
+    <button 
+      type="submit" 
+      class="auth-btn" 
+      [disabled]="isLoading"
+      [class.loading]="isLoading"
+    >
+      {{ isLoading ? ('REGISTER.REGISTERING' | translate) : ('REGISTER.REGISTER' | translate) }}
+    </button>
+    
+    <div class="error general-error" *ngIf="errorMessage">
+      {{ errorMessage | translate }}
+    </div>
   </form>
   <div class="auth-card__footer">
     <span>{{ 'REGISTER.ALREADY_ACCOUNT' | translate }}</span>

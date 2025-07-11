@@ -24,9 +24,34 @@
     "NAME": "Name",
     "EMAIL": "Email",
     "PASSWORD": "Password",
+    "CONFIRM_PASSWORD": "Confirm Password",
     "REGISTER": "Register",
+    "REGISTERING": "Registering...",
     "ALREADY_ACCOUNT": "Already have an account?",
-    "LOGIN_LINK": "Login here"
+    "LOGIN_LINK": "Login here",
+    "TOGGLE_PASSWORD": "Toggle password visibility",
+    "TOGGLE_CONFIRM_PASSWORD": "Toggle confirm password visibility",
+    "PASSWORD_REQUIREMENTS": "Password must contain",
+    "REQ_LENGTH": "At least 8 characters",
+    "REQ_UPPERCASE": "Uppercase letter",
+    "REQ_LOWERCASE": "Lowercase letter",
+    "REQ_NUMBER": "Number",
+    "REQ_SPECIAL": "Special character (!@#$%^&*)",
+    "VALIDATION": {
+      "NAME_REQUIRED": "Name is required",
+      "NAME_TOO_SHORT": "Name must be at least 2 characters",
+      "NAME_TOO_LONG": "Name can be maximum 50 characters",
+      "EMAIL_REQUIRED": "Email is required",
+      "EMAIL_INVALID": "Please enter a valid email address",
+      "PASSWORD_REQUIRED": "Password is required",
+      "PASSWORD_WEAK": "Password does not meet requirements",
+      "CONFIRM_PASSWORD_REQUIRED": "Password confirmation is required",
+      "PASSWORDS_DONT_MATCH": "Passwords do not match",
+      "FORM_INVALID": "Please fix the errors to continue"
+    },
+    "ERROR": {
+      "GENERAL": "An error occurred during registration. Please try again."
+    }
   },
   "LOGOUT": "Logout",
   "QUIZ_MANAGER": {
