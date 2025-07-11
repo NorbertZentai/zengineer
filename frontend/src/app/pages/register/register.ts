@@ -194,15 +194,9 @@ export class Register {
       if (success) {
         this.notificationService.success('REGISTER.SUCCESS', 'REGISTER.WELCOME');
         
-        // Auto login after successful registration
-        const loginSuccess = await this.auth.login(this.email, this.password);
-        if (loginSuccess) {
-          this.router.navigateByUrl('/dashboard');
-        } else {
-          // If auto login fails, redirect to login page
-          this.notificationService.info('REGISTER.LOGIN_REQUIRED');
-          this.router.navigateByUrl('/login');
-        }
+        // Redirect to login page after successful registration
+        this.notificationService.info('REGISTER.LOGIN_REQUIRED');
+        this.router.navigateByUrl('/login');
       } else {
         // Use the error from AuthService if available
         const authError = this.auth.lastError();
