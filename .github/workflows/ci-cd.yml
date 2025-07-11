@@ -6,9 +6,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]  # Csak a main branch-re való push esetén fut le
+    branches: [ master ]  # Csak a master branch-re való push esetén fut le
   pull_request:
-    branches: [ main ]  # PR esetén is lefut
+    branches: [ master ]  # PR esetén is lefut
 
 jobs:
   frontend:

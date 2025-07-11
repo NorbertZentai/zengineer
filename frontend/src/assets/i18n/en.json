@@ -31,6 +31,7 @@
   "LOGOUT": "Logout",
   "QUIZ_MANAGER": {
     "TITLE": "Quiz Manager",
+    "PAGE_TITLE": "Quiz Manager",
     "NEW_PROJECT": "New project name",
     "ADD_PROJECT": "Add project",
     "NEW_FOLDER": "New folder name",
@@ -39,6 +40,75 @@
     "ADD_QUIZFOLDER": "Add quiz-folder",
     "NEW_QUIZ": "New quiz name",
     "ADD_QUIZ": "Add quiz",
-    "CARDS": "Cards"
+    "CARDS": "Cards",
+    "SEARCH_PLACEHOLDER": "Search in quizzes...",
+    "SEARCH_BY": "By name or tag",
+    "VIEW_GRID": "Grid view",
+    "VIEW_LIST": "List view",
+    "SORT": "Sort",
+    "SORT_BY_NAME": "By name",
+    "SORT_BY_CREATED": "By creation date",
+    "SORT_BY_UPDATED": "By modification date",
+    "SORT_BY_CARDS": "By number of cards",
+    "HOME": "Home",
+    "STATS": {
+      "QUIZZES": "quizzes",
+      "CARDS": "cards",
+      "NEEDS_REVIEW": "needs review"
+    },
+    "ACTIONS": {
+      "NEW_FOLDER": "New folder",
+      "NEW_QUIZ": "New quiz",
+      "OPEN": "Open",
+      "EDIT_CARDS": "Edit cards",
+      "STUDY": "Study",
+      "STATISTICS": "Statistics",
+      "EXPORT": "Export",
+      "DELETE": "Delete",
+      "EDIT": "Edit"
+    },
+    "CREATE_DIALOG": {
+      "NEW_FOLDER": "New folder",
+      "NEW_QUIZ": "New quiz",
+      "NAME": "Name",
+      "NAME_PLACEHOLDER": "Enter the name",
+      "DESCRIPTION": "Description (optional)",
+      "DESCRIPTION_PLACEHOLDER": "Short description...",
+      "CUSTOMIZATION": "Customization",
+      "COLOR": "Color:",
+      "ICON": "Icon:",
+      "CANCEL": "Cancel",
+      "CREATE": "Create",
+      "CLOSE": "Close"
+    },
+    "EMPTY_STATE": {
+      "NO_QUIZZES": "No quizzes",
+      "NO_QUIZZES_DESC": "Create your first quiz with the button above!",
+      "CREATE_QUIZ": "Create quiz",
+      "NO_RESULTS": "No results",
+      "NO_RESULTS_DESC": "Try a different search term!"
+    },
+    "MESSAGES": {
+      "FOLDER_CREATED": "Folder created successfully",
+      "QUIZ_CREATED": "Quiz created successfully",
+      "CREATE_ERROR": "Error occurred during creation",
+      "FOLDER_UPDATED": "Folder updated",
+      "QUIZ_UPDATED": "Quiz updated",
+      "UPDATE_ERROR": "Error occurred during update",
+      "FOLDER_DELETED": "Folder deleted",
+      "QUIZ_DELETED": "Quiz deleted",
+      "DELETE_ERROR": "Error occurred during deletion",
+      "NO_CARDS": "The quiz has no cards",
+      "STUDY_COMPLETE": "Study completed!",
+      "CORRECT_ANSWERS": "correct answers",
+      "QUIZ_EXPORTED": "Quiz exported",
+      "EXPORT_ERROR": "Error occurred during export"
+    },
+    "CONFIRM": {
+      "DELETE_FOLDER": "Are you sure you want to delete the",
+      "DELETE_FOLDER_WARNING": "folder? This will delete all quizzes in it too.",
+      "DELETE_QUIZ": "Are you sure you want to delete the",
+      "DELETE_QUIZ_WARNING": "quiz?"
+    }
   }
 }

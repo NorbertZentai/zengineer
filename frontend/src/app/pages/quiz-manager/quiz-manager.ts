@@ -13,7 +13,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { QuizService, Quiz, QuizFolder, QuizCard, StudySession } from '../../services/quiz.service';
 import { QuizCardEditorComponent } from '../../components/quiz-card-editor/quiz-card-editor';
 import { StudyModeComponent } from '../../components/study-mode/study-mode';
@@ -43,11 +43,7 @@ export type SortBy = 'name' | 'created' | 'updated' | 'cards';
     MatDividerModule,
     MatDialogModule,
     MatSnackBarModule,
-    TranslateModule,
-    // These components are used via MatDialog service in openCardEditor(), startStudyMode(), showQuizStats()
-    QuizCardEditorComponent,
-    StudyModeComponent,
-    QuizStatsComponent
+    TranslateModule
   ],
 })
 export class QuizManager {
@@ -156,7 +152,8 @@ export class QuizManager {
   constructor(
     public quizService: QuizService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private translate: TranslateService
   ) {
     // Load initial data
     effect(() => {
@@ -252,7 +249,11 @@ export class QuizManager {
           name,
           currentFolder?.id
         );
-        this.snackBar.open('Mappa sikeresen létrehozva', 'Bezár', { duration: 3000 });
+        this.snackBar.open(
+          this.translate.instant('QUIZ_MANAGER.MESSAGES.FOLDER_CREATED'), 
+          this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
+          { duration: 3000 }
+        );
       } else {
         const quiz = await this.quizService.createQuiz(
           name,
@@ -266,13 +267,21 @@ export class QuizManager {
           icon: this.selectedIcon()
         });
         
-        this.snackBar.open('Kvíz sikeresen létrehozva', 'Bezár', { duration: 3000 });
+        this.snackBar.open(
+          this.translate.instant('QUIZ_MANAGER.MESSAGES.QUIZ_CREATED'), 
+          this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
+          { duration: 3000 }
+        );
       }
       
       this.cancelCreate();
     } catch (error) {
       console.error('Error creating item:', error);
-      this.snackBar.open('Hiba történt a létrehozás során', 'Bezár', { duration: 3000 });
+      this.snackBar.open(
+        this.translate.instant('QUIZ_MANAGER.MESSAGES.CREATE_ERROR'), 
+        this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
+        { duration: 3000 }
+      );
     }
   }
 
@@ -292,44 +301,78 @@ export class QuizManager {
   async updateFolder(folder: QuizFolder, updates: Partial<QuizFolder>): Promise<void> {
     try {
       await this.quizService.updateFolder(folder.id!, updates);
-      this.snackBar.open('Mappa frissítve', 'Bezár', { duration: 2000 });
+      this.snackBar.open(
+        this.translate.instant('QUIZ_MANAGER.MESSAGES.FOLDER_UPDATED'), 
+        this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
+        { duration: 2000 }
+      );
     } catch (error) {
       console.error('Error updating folder:', error);
-      this.snackBar.open('Hiba történt a frissítés során', 'Bezár', { duration: 3000 });
+      this.snackBar.open(
+        this.translate.instant('QUIZ_MANAGER.MESSAGES.UPDATE_ERROR'), 
+        this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
+        { duration: 3000 }
+      );
     }
   }
 
   async updateQuiz(quiz: Quiz, updates: Partial<Quiz>): Promise<void> {
     try {
       await this.quizService.updateQuiz(quiz.id!, updates);
-      this.snackBar.open('Kvíz frissítve', 'Bezár', { duration: 2000 });
+      this.snackBar.open(
+        this.translate.instant('QUIZ_MANAGER.MESSAGES.QUIZ_UPDATED'), 
+        this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
+        { duration: 2000 }
+      );
     } catch (error) {
       console.error('Error updating quiz:', error);
-      this.snackBar.open('Hiba történt a frissítés során', 'Bezár', { duration: 3000 });
+      this.snackBar.open(
+        this.translate.instant('QUIZ_MANAGER.MESSAGES.UPDATE_ERROR'), 
+        this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
+        { duration: 3000 }
+      );
     }
   }
 
   // Delete operations
   async deleteFolder(folder: QuizFolder): Promise<void> {
-    if (confirm(`Biztosan törölni szeretnéd a "${folder.name}" mappát? Ez törli az összes benne lévő kvízt is.`)) {
+    const confirmMessage = `${this.translate.instant('QUIZ_MANAGER.CONFIRM.DELETE_FOLDER')} "${folder.name}" ${this.translate.instant('QUIZ_MANAGER.CONFIRM.DELETE_FOLDER_WARNING')}`;
+    if (confirm(confirmMessage)) {
       try {
         await this.quizService.deleteFolder(folder.id!);
-        this.snackBar.open('Mappa törölve', 'Bezár', { duration: 2000 });
+        this.snackBar.open(
+          this.translate.instant('QUIZ_MANAGER.MESSAGES.FOLDER_DELETED'), 
+          this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
+          { duration: 2000 }
+        );
       } catch (error) {
         console.error('Error deleting folder:', error);
-        this.snackBar.open('Hiba történt a törlés során', 'Bezár', { duration: 3000 });
+        this.snackBar.open(
+          this.translate.instant('QUIZ_MANAGER.MESSAGES.DELETE_ERROR'), 
+          this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
+          { duration: 3000 }
+        );
       }
     }
   }
 
   async deleteQuiz(quiz: Quiz): Promise<void> {
-    if (confirm(`Biztosan törölni szeretnéd a "${quiz.name}" kvízt?`)) {
+    const confirmMessage = `${this.translate.instant('QUIZ_MANAGER.CONFIRM.DELETE_QUIZ')} "${quiz.name}" ${this.translate.instant('QUIZ_MANAGER.CONFIRM.DELETE_QUIZ_WARNING')}`;
+    if (confirm(confirmMessage)) {
       try {
         await this.quizService.deleteQuiz(quiz.id!);
-        this.snackBar.open('Kvíz törölve', 'Bezár', { duration: 2000 });
+        this.snackBar.open(
+          this.translate.instant('QUIZ_MANAGER.MESSAGES.QUIZ_DELETED'), 
+          this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
+          { duration: 2000 }
+        );
       } catch (error) {
         console.error('Error deleting quiz:', error);
-        this.snackBar.open('Hiba történt a törlés során', 'Bezár', { duration: 3000 });
+        this.snackBar.open(
+          this.translate.instant('QUIZ_MANAGER.MESSAGES.DELETE_ERROR'), 
+          this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
+          { duration: 3000 }
+        );
       }
     }
   }
@@ -352,7 +395,11 @@ export class QuizManager {
   // Study mode
   startStudyMode(quiz: Quiz): void {
     if (quiz.cards.length === 0) {
-      this.snackBar.open('A kvízben nincsenek kártyák', 'Bezár', { duration: 3000 });
+      this.snackBar.open(
+        this.translate.instant('QUIZ_MANAGER.MESSAGES.NO_CARDS'), 
+        this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
+        { duration: 3000 }
+      );
       return;
     }
 
@@ -368,8 +415,8 @@ export class QuizManager {
     dialogRef.afterClosed().subscribe((result: StudySession | null) => {
       if (result) {
         this.snackBar.open(
-          `Tanulás befejezve! ${result.correctAnswers}/${result.totalAnswers} helyes válasz`,
-          'Bezár',
+          `${this.translate.instant('QUIZ_MANAGER.MESSAGES.STUDY_COMPLETE')} ${result.correctAnswers}/${result.totalAnswers} ${this.translate.instant('QUIZ_MANAGER.MESSAGES.CORRECT_ANSWERS')}`,
+          this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'),
           { duration: 5000 }
         );
       }
@@ -415,10 +462,18 @@ export class QuizManager {
       a.click();
       
       URL.revokeObjectURL(url);
-      this.snackBar.open('Kvíz exportálva', 'Bezár', { duration: 2000 });
+      this.snackBar.open(
+        this.translate.instant('QUIZ_MANAGER.MESSAGES.QUIZ_EXPORTED'), 
+        this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
+        { duration: 2000 }
+      );
     } catch (error) {
       console.error('Error exporting quiz:', error);
-      this.snackBar.open('Hiba történt az exportálás során', 'Bezár', { duration: 3000 });
+      this.snackBar.open(
+        this.translate.instant('QUIZ_MANAGER.MESSAGES.EXPORT_ERROR'), 
+        this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
+        { duration: 3000 }
+      );
     }
   }
 
