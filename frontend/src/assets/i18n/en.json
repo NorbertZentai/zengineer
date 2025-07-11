@@ -3,6 +3,7 @@
     "TITLE": "Welcome to Zengineer!",
     "LOGIN": "Login",
     "REGISTER": "Register",
+    "LOGOUT": "Logout",
     "CLOSE": "Close"
   },
   "NAV": {
@@ -172,5 +173,12 @@
       "DELETE_QUIZ": "Are you sure you want to delete the",
       "DELETE_QUIZ_WARNING": "quiz?"
     }
+  },
+  "DASHBOARD": {
+    "TITLE": "Dashboard",
+    "LOGGED_IN_USER": "Logged in user",
+    "RECENT_ACTIVITY": "Recent activity",
+    "STATISTICS": "Statistics",
+    "QUICK_ACTIONS": "Quick actions"
   }
 }

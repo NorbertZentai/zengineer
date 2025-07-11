@@ -3,6 +3,7 @@
     "TITLE": "Üdv a Zengineer-ben!",
     "LOGIN": "Bejelentkezés",
     "REGISTER": "Regisztráció",
+    "LOGOUT": "Kijelentkezés",
     "CLOSE": "Bezárás"
   },
   "NAV": {
@@ -139,24 +140,40 @@
       "COLOR": "Szín:",
       "ICON": "Ikon:",
       "CANCEL": "Mégse",
-      "CREATE": "Létrehozás"
+      "CREATE": "Létrehozás",
+      "CLOSE": "Bezárás"
     },
     "EMPTY_STATE": {
       "NO_QUIZZES": "Még nincsenek kvízeid",
       "NO_QUIZZES_DESC": "Kezdd el a tanulást egy új kvíz létrehozásával",
-      "CREATE_QUIZ": "Kvíz létrehozása"
+      "CREATE_QUIZ": "Kvíz létrehozása",
+      "NO_RESULTS": "Nincs találat",
+      "NO_RESULTS_DESC": "Próbálj meg más keresési kifejezést!"
     },
     "MESSAGES": {
       "FOLDER_CREATED": "Mappa sikeresen létrehozva",
       "QUIZ_CREATED": "Kvíz sikeresen létrehozva",
+      "CREATE_ERROR": "Hiba történt a létrehozás során",
+      "FOLDER_UPDATED": "Mappa frissítve",
+      "QUIZ_UPDATED": "Kvíz frissítve",
+      "UPDATE_ERROR": "Hiba történt a frissítés során",
       "FOLDER_DELETED": "Mappa törölve",
       "QUIZ_DELETED": "Kvíz törölve",
+      "DELETE_ERROR": "Hiba történt a törlés során",
+      "NO_CARDS": "A kvízben nincsenek kártyák",
+      "STUDY_COMPLETE": "Tanulás befejezve!",
+      "CORRECT_ANSWERS": "helyes válasz",
+      "QUIZ_EXPORTED": "Kvíz exportálva",
+      "EXPORT_ERROR": "Hiba történt az exportálás során",
+      "MOVE_NOT_IMPLEMENTED": "Az áthelyezés funkció még nem készült el",
       "EXPORT_SUCCESS": "Kvíz sikeresen exportálva",
       "IMPORT_SUCCESS": "Kvíz sikeresen importálva"
     },
     "CONFIRM": {
-      "DELETE_FOLDER": "Biztosan törölni szeretnéd ezt a mappát?",
-      "DELETE_QUIZ": "Biztosan törölni szeretnéd ezt a kvízt?"
+      "DELETE_FOLDER": "Biztosan törölni szeretnéd a",
+      "DELETE_FOLDER_WARNING": "mappát? Ez törli az összes benne lévő kvízt is.",
+      "DELETE_QUIZ": "Biztosan törölni szeretnéd a",
+      "DELETE_QUIZ_WARNING": "kvízt?"
     }
   },
   "QUIZ_EDITOR": {
@@ -184,6 +201,7 @@
   },
   "DASHBOARD": {
     "TITLE": "Irányítópult",
+    "LOGGED_IN_USER": "Bejelentkezett felhasználó",
     "RECENT_ACTIVITY": "Legutóbbi tevékenység",
     "STATISTICS": "Statisztikák",
     "QUICK_ACTIONS": "Gyors műveletek"
