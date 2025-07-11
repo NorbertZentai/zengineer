@@ -23,4 +23,4 @@ VOLUME ["/pb/pb_data"]
 
 EXPOSE 8080
 
-CMD ["/pb/pocketbase", "serve", "--http=0.0.0.0:8080", "--origins=https://zengineer-frontend.onrender.com,http://localhost:3000,http://127.0.0.1:3000"]
+CMD ["/pb/pocketbase", "serve", "--http=0.0.0.0:8080", "--origins=https://zengineer.cv,https://zengineer-frontend.onrender.com,http://localhost:3000,http://127.0.0.1:3000"]
