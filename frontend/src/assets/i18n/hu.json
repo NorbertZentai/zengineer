@@ -2,7 +2,8 @@
   "COMMON": {
     "TITLE": "Üdv a Zengineer-ben!",
     "LOGIN": "Bejelentkezés",
-    "REGISTER": "Regisztráció"
+    "REGISTER": "Regisztráció",
+    "CLOSE": "Bezárás"
   },
   "NAV": {
     "DASHBOARD": "Kezdőlap",
@@ -16,8 +17,34 @@
     "EMAIL": "Email",
     "PASSWORD": "Jelszó",
     "LOGIN": "Belépés",
+    "LOGGING_IN": "Bejelentkezés...",
     "NO_ACCOUNT": "Még nincs fiókod?",
-    "REGISTER_LINK": "Regisztrálj itt"
+    "REGISTER_LINK": "Regisztrálj itt",
+    "TOGGLE_PASSWORD": "Jelszó láthatóságának váltása",
+    "REMEMBER_ME": "Emlékezz rám",
+    "FORGOT_PASSWORD": "Elfelejtetted a jelszót?",
+    "VALIDATION": {
+      "EMAIL_REQUIRED": "Az email cím megadása kötelező",
+      "EMAIL_INVALID": "Kérlek adj meg egy érvényes email címet",
+      "PASSWORD_REQUIRED": "A jelszó megadása kötelező",
+      "FORM_INVALID": "Kérlek javítsd ki a hibákat a folytatáshoz"
+    },
+    "ERROR": {
+      "GENERAL": "Bejelentkezés sikertelen. Kérlek ellenőrizd az adataidat.",
+      "TITLE": "Bejelentkezési hiba"
+    },
+    "SUCCESS": "Sikeres bejelentkezés!",
+    "WELCOME_BACK": "Üdv újra!",
+    "FORGOT_PASSWORD_MODAL": {
+      "TITLE": "Jelszó visszaállítása",
+      "DESCRIPTION": "Add meg az email címed és küldünk egy linket a jelszó visszaállításához.",
+      "EMAIL_PLACEHOLDER": "Add meg az email címed",
+      "SEND": "Visszaállítási link küldése",
+      "SENDING": "Küldés...",
+      "CANCEL": "Mégse",
+      "SUCCESS": "Visszaállítási link elküldve! Nézd meg az emailjeidet.",
+      "ERROR": "Nem sikerült elküldeni a visszaállítási linket. Próbáld újra."
+    }
   },
   "REGISTER": {
     "TITLE": "Regisztráció",
@@ -32,11 +59,16 @@
     "TOGGLE_PASSWORD": "Jelszó láthatóságának váltása",
     "TOGGLE_CONFIRM_PASSWORD": "Jelszó megerősítés láthatóságának váltása",
     "PASSWORD_REQUIREMENTS": "A jelszónak tartalmaznia kell",
-    "REQ_LENGTH": "Legalább 8 karakter",
+    "REQ_LENGTH_6": "Legalább 6 karakter",
     "REQ_UPPERCASE": "Nagybetű",
     "REQ_LOWERCASE": "Kisbetű", 
     "REQ_NUMBER": "Szám",
-    "REQ_SPECIAL": "Speciális karakter (!@#$%^&*)",
+    "STRENGTH": {
+      "WEAK": "Gyenge",
+      "MEDIUM": "Közepes",
+      "GOOD": "Jó", 
+      "STRONG": "Erős"
+    },
     "VALIDATION": {
       "NAME_REQUIRED": "A név megadása kötelező",
       "NAME_TOO_SHORT": "A név legalább 2 karakter legyen",
@@ -50,8 +82,12 @@
       "FORM_INVALID": "Kérjük, javítsa ki a hibákat a folytatáshoz"
     },
     "ERROR": {
-      "GENERAL": "Hiba történt a regisztráció során. Kérjük, próbálja újra."
-    }
+      "GENERAL": "Hiba történt a regisztráció során. Kérlek próbáld újra.",
+      "TITLE": "Regisztrációs hiba"
+    },
+    "SUCCESS": "Sikeres regisztráció!",
+    "WELCOME": "Üdv a Zengineer-ben!",
+    "LOGIN_REQUIRED": "Kérlek jelentkezz be a folytatáshoz."
   },
   "LOGOUT": "Kijelentkezés",
   "QUIZ_MANAGER": {

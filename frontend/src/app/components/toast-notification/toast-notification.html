@@ -1,0 +1,35 @@
+<div class="toast-container">
+  <div 
+    *ngFor="let toast of toasts; trackBy: trackByFn" 
+    class="toast" 
+    [class]="'toast-' + toast.type"
+    [@slideIn]
+  >
+    <div class="toast-content">
+      <div class="toast-icon">
+        <mat-icon>{{ getIcon(toast.type) }}</mat-icon>
+      </div>
+      <div class="toast-body">
+        <div class="toast-title" *ngIf="toast.title">
+          {{ toast.title | translate }}
+        </div>
+        <div class="toast-message">
+          {{ toast.message | translate }}
+        </div>
+      </div>
+      <button 
+        class="toast-close" 
+        (click)="removeToast(toast.id)"
+        [attr.aria-label]="'COMMON.CLOSE' | translate"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div class="toast-progress" *ngIf="!toast.persistent && toast.duration">
+      <div 
+        class="toast-progress-bar" 
+        [style.animation-duration.ms]="toast.duration"
+      ></div>
+    </div>
+  </div>
+</div>

@@ -3,20 +3,167 @@
     <mat-icon class="auth-card__icon">login</mat-icon>
     <h2>{{ 'LOGIN.TITLE' | translate }}</h2>
   </div>
-  <form (ngSubmit)="onSubmit()" #loginForm="ngForm" autocomplete="on">
+  <form (ngSubmit)="onSubmit()" #loginForm="ngForm" autocomplete="on" role="form" aria-label="{{ 'LOGIN.TITLE' | translate }}">
     <div class="form-group">
       <label for="email">{{ 'LOGIN.EMAIL' | translate }}</label>
-      <input id="email" name="email" [(ngModel)]="email" required type="email" autocomplete="email" />
+      <input 
+        id="email" 
+        name="email" 
+        [(ngModel)]="email" 
+        required 
+        type="email" 
+        autocomplete="email"
+        (blur)="onEmailBlur()"
+        [class.invalid]="validationErrors.email"
+        [attr.aria-describedby]="validationErrors.email ? 'email-error' : null"
+        [attr.aria-invalid]="validationErrors.email ? 'true' : 'false'"
+      />
+      <div class="error" *ngIf="validationErrors.email" id="email-error" role="alert">
+        {{ validationErrors.email | translate }}
+      </div>
     </div>
+    
     <div class="form-group">
       <label for="password">{{ 'LOGIN.PASSWORD' | translate }}</label>
-      <input id="password" name="password" [(ngModel)]="password" required type="password" autocomplete="current-password" />
+      <div class="password-input-container">
+        <input 
+          id="password" 
+          name="password" 
+          [(ngModel)]="password" 
+          required 
+          [type]="showPassword ? 'text' : 'password'" 
+          autocomplete="current-password"
+          (blur)="onPasswordBlur()"
+          [class.invalid]="validationErrors.password"
+          [attr.aria-describedby]="validationErrors.password ? 'password-error' : null"
+          [attr.aria-invalid]="validationErrors.password ? 'true' : 'false'"
+        />
+        <button 
+          type="button" 
+          class="password-toggle" 
+          (click)="togglePasswordVisibility()"
+          [attr.aria-label]="'LOGIN.TOGGLE_PASSWORD' | translate"
+          [attr.aria-pressed]="showPassword"
+        >
+          <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+      </div>
+      <div class="error" *ngIf="validationErrors.password" id="password-error" role="alert">
+        {{ validationErrors.password | translate }}
+      </div>
     </div>
-    <button type="submit" class="auth-btn">{{ 'LOGIN.LOGIN' | translate }}</button>
-    <p *ngIf="error" class="error">{{ error }}</p>
+    
+    <div class="form-group remember-me">
+      <label class="checkbox-container">
+        <input 
+          type="checkbox" 
+          [(ngModel)]="rememberMe" 
+          name="rememberMe"
+          id="rememberMe"
+        />
+        <span class="checkmark"></span>
+        {{ 'LOGIN.REMEMBER_ME' | translate }}
+      </label>
+    </div>
+    
+    <button 
+      type="submit" 
+      class="auth-btn" 
+      [disabled]="isLoading || !isFormValid()"
+      [class.loading]="isLoading"
+    >
+      <span *ngIf="!isLoading">{{ 'LOGIN.LOGIN' | translate }}</span>
+      <span *ngIf="isLoading" class="loading-content">
+        <mat-icon class="spinning">refresh</mat-icon>
+        {{ 'LOGIN.LOGGING_IN' | translate }}
+      </span>
+    </button>
+    
+    <div class="forgot-password">
+      <a href="#" (click)="onForgotPassword($event)">{{ 'LOGIN.FORGOT_PASSWORD' | translate }}</a>
+    </div>
+    
+    <div class="error general-error" *ngIf="errorMessage">
+      {{ errorMessage | translate }}
+    </div>
   </form>
   <div class="auth-card__footer">
     <span>{{ 'LOGIN.NO_ACCOUNT' | translate }}</span>
     <a routerLink="/register">{{ 'LOGIN.REGISTER_LINK' | translate }}</a>
+  </div>
+</div>
+
+<!-- Forgot Password Modal -->
+<div 
+  class="modal-overlay" 
+  *ngIf="showForgotPasswordModal" 
+  (click)="closeForgotPasswordModal()"
+  role="dialog"
+  aria-modal="true"
+  [attr.aria-labelledby]="'forgot-password-title'"
+  [attr.aria-describedby]="'forgot-password-description'"
+>
+  <div class="modal-content" (click)="$event.stopPropagation()" tabindex="-1" #modalContent>
+    <div class="modal-header">
+      <h3 id="forgot-password-title">{{ 'LOGIN.FORGOT_PASSWORD_MODAL.TITLE' | translate }}</h3>
+      <button 
+        class="close-btn" 
+        (click)="closeForgotPasswordModal()"
+        [attr.aria-label]="'COMMON.CLOSE' | translate"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    
+    <div class="modal-body" *ngIf="!resetEmailSent">
+      <p id="forgot-password-description">{{ 'LOGIN.FORGOT_PASSWORD_MODAL.DESCRIPTION' | translate }}</p>
+      
+      <div class="form-group">
+        <label for="forgotPasswordEmail" class="sr-only">{{ 'LOGIN.EMAIL' | translate }}</label>
+        <input 
+          id="forgotPasswordEmail"
+          type="email" 
+          [(ngModel)]="forgotPasswordEmail"
+          [placeholder]="'LOGIN.FORGOT_PASSWORD_MODAL.EMAIL_PLACEHOLDER' | translate"
+          class="modal-input"
+          [disabled]="isSendingReset"
+          [attr.aria-describedby]="forgotPasswordError ? 'forgot-password-error' : null"
+          [attr.aria-invalid]="forgotPasswordError ? 'true' : 'false'"
+          #firstFocusableElement
+        />
+      </div>
+      
+      <div class="error" *ngIf="forgotPasswordError" id="forgot-password-error" role="alert">
+        {{ forgotPasswordError | translate }}
+      </div>
+      
+      <div class="modal-actions">
+        <button 
+          class="modal-btn secondary" 
+          (click)="closeForgotPasswordModal()"
+          [disabled]="isSendingReset"
+        >
+          {{ 'LOGIN.FORGOT_PASSWORD_MODAL.CANCEL' | translate }}
+        </button>
+        <button 
+          class="modal-btn primary" 
+          (click)="sendPasswordReset()"
+          [disabled]="isSendingReset || !forgotPasswordEmail.trim()"
+          [class.loading]="isSendingReset"
+          #lastFocusableElement
+        >
+          <span *ngIf="!isSendingReset">{{ 'LOGIN.FORGOT_PASSWORD_MODAL.SEND' | translate }}</span>
+          <span *ngIf="isSendingReset" class="loading-content">
+            <mat-icon class="spinning">refresh</mat-icon>
+            {{ 'LOGIN.FORGOT_PASSWORD_MODAL.SENDING' | translate }}
+          </span>
+        </button>
+      </div>
+    </div>
+    
+    <div class="modal-body success" *ngIf="resetEmailSent">
+      <mat-icon class="success-icon" aria-hidden="true">check_circle</mat-icon>
+      <p>{{ 'LOGIN.FORGOT_PASSWORD_MODAL.SUCCESS' | translate }}</p>
+    </div>
   </div>
 </div>

@@ -5,11 +5,12 @@ import { AuthService } from './services/auth.service';
 import { Router } from '@angular/router';
 import { CommonModule  } from '@angular/common';
 import { NavbarComponent } from './components/navbar/navbar';
+import { ToastNotification } from './components/toast-notification/toast-notification';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, TranslateModule, CommonModule, NavbarComponent],
+  imports: [RouterOutlet, TranslateModule, CommonModule, NavbarComponent, ToastNotification],
   templateUrl: './app.html',
   styleUrls: ['./app.scss']
 })

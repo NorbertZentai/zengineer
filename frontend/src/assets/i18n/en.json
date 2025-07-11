@@ -2,7 +2,8 @@
   "COMMON": {
     "TITLE": "Welcome to Zengineer!",
     "LOGIN": "Login",
-    "REGISTER": "Register"
+    "REGISTER": "Register",
+    "CLOSE": "Close"
   },
   "NAV": {
     "DASHBOARD": "Dashboard",
@@ -16,8 +17,34 @@
     "EMAIL": "Email",
     "PASSWORD": "Password",
     "LOGIN": "Login",
+    "LOGGING_IN": "Logging in...",
     "NO_ACCOUNT": "No account yet?",
-    "REGISTER_LINK": "Register here"
+    "REGISTER_LINK": "Register here",
+    "TOGGLE_PASSWORD": "Toggle password visibility",
+    "REMEMBER_ME": "Remember me",
+    "FORGOT_PASSWORD": "Forgot password?",
+    "VALIDATION": {
+      "EMAIL_REQUIRED": "Email is required",
+      "EMAIL_INVALID": "Please enter a valid email address",
+      "PASSWORD_REQUIRED": "Password is required",
+      "FORM_INVALID": "Please fix the errors to continue"
+    },
+    "ERROR": {
+      "GENERAL": "Login failed. Please check your credentials.",
+      "TITLE": "Login Failed"
+    },
+    "SUCCESS": "Login successful!",
+    "WELCOME_BACK": "Welcome back!",
+    "FORGOT_PASSWORD_MODAL": {
+      "TITLE": "Reset Password",
+      "DESCRIPTION": "Enter your email address and we'll send you a link to reset your password.",
+      "EMAIL_PLACEHOLDER": "Enter your email",
+      "SEND": "Send Reset Link",
+      "SENDING": "Sending...",
+      "CANCEL": "Cancel",
+      "SUCCESS": "Reset link sent! Check your email.",
+      "ERROR": "Failed to send reset link. Please try again."
+    }
   },
   "REGISTER": {
     "TITLE": "Register",
@@ -32,11 +59,16 @@
     "TOGGLE_PASSWORD": "Toggle password visibility",
     "TOGGLE_CONFIRM_PASSWORD": "Toggle confirm password visibility",
     "PASSWORD_REQUIREMENTS": "Password must contain",
-    "REQ_LENGTH": "At least 8 characters",
+    "REQ_LENGTH_6": "At least 6 characters",
     "REQ_UPPERCASE": "Uppercase letter",
     "REQ_LOWERCASE": "Lowercase letter",
     "REQ_NUMBER": "Number",
-    "REQ_SPECIAL": "Special character (!@#$%^&*)",
+    "STRENGTH": {
+      "WEAK": "Weak",
+      "MEDIUM": "Medium", 
+      "GOOD": "Good",
+      "STRONG": "Strong"
+    },
     "VALIDATION": {
       "NAME_REQUIRED": "Name is required",
       "NAME_TOO_SHORT": "Name must be at least 2 characters",
@@ -50,8 +82,12 @@
       "FORM_INVALID": "Please fix the errors to continue"
     },
     "ERROR": {
-      "GENERAL": "An error occurred during registration. Please try again."
-    }
+      "GENERAL": "An error occurred during registration. Please try again.",
+      "TITLE": "Registration Failed"
+    },
+    "SUCCESS": "Registration successful!",
+    "WELCOME": "Welcome to Zengineer!",
+    "LOGIN_REQUIRED": "Please log in to continue."
   },
   "LOGOUT": "Logout",
   "QUIZ_MANAGER": {

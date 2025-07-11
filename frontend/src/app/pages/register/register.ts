@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { NotificationService } from '../../services/notification.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatIconModule } from '@angular/material/icon';
 
@@ -23,14 +24,16 @@ export class Register {
   showPassword = false;
   showConfirmPassword = false;
   
-  // Password validation states
+  // Password validation states - simplified requirements
   passwordRequirements = {
     length: false,
     uppercase: false,
     lowercase: false,
-    number: false,
-    special: false
+    number: false
   };
+  
+  // Password strength (0-100%)
+  passwordStrength = 0;
   
   // Validation errors
   validationErrors = {
@@ -40,7 +43,11 @@ export class Register {
     confirmPassword: ''
   };
 
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(
+    private auth: AuthService, 
+    private router: Router,
+    private notificationService: NotificationService
+  ) {}
 
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
@@ -85,12 +92,14 @@ export class Register {
   validatePassword() {
     const password = this.password;
     
-    // Update password requirements
-    this.passwordRequirements.length = password.length >= 8;
+    // Update password requirements - simplified (6 chars, upper, lower, number)
+    this.passwordRequirements.length = password.length >= 6;
     this.passwordRequirements.uppercase = /[A-Z]/.test(password);
     this.passwordRequirements.lowercase = /[a-z]/.test(password);
     this.passwordRequirements.number = /\d/.test(password);
-    this.passwordRequirements.special = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+    
+    // Calculate password strength (0-100%)
+    this.calculatePasswordStrength();
     
     const allRequirementsMet = Object.values(this.passwordRequirements).every(req => req);
     
@@ -105,6 +114,24 @@ export class Register {
     
     this.validationErrors.password = '';
     return true;
+  }
+  
+  calculatePasswordStrength() {
+    const password = this.password;
+    let strength = 0;
+    
+    // Length scoring (up to 40 points)
+    if (password.length >= 6) strength += 25;
+    if (password.length >= 8) strength += 10;
+    if (password.length >= 12) strength += 5;
+    
+    // Character type scoring (20 points each)
+    if (/[A-Z]/.test(password)) strength += 20;
+    if (/[a-z]/.test(password)) strength += 20;
+    if (/\d/.test(password)) strength += 20;
+    if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) strength += 15;
+    
+    this.passwordStrength = Math.min(100, strength);
   }
 
   validateConfirmPassword() {
@@ -165,24 +192,44 @@ export class Register {
     try {
       const success = await this.auth.register(this.email, this.password, this.name);
       if (success) {
+        this.notificationService.success('REGISTER.SUCCESS', 'REGISTER.WELCOME');
+        
         // Auto login after successful registration
         const loginSuccess = await this.auth.login(this.email, this.password);
         if (loginSuccess) {
           this.router.navigateByUrl('/dashboard');
         } else {
           // If auto login fails, redirect to login page
+          this.notificationService.info('REGISTER.LOGIN_REQUIRED');
           this.router.navigateByUrl('/login');
         }
       } else {
         // Use the error from AuthService if available
         const authError = this.auth.lastError();
-        this.errorMessage = authError?.message || 'REGISTER.ERROR.GENERAL';
+        const errorMsg = authError?.message || 'REGISTER.ERROR.GENERAL';
+        this.errorMessage = errorMsg;
+        this.notificationService.error(errorMsg, 'REGISTER.ERROR.TITLE');
       }
     } catch (err: any) {
       console.error('Registration error:', err);
       this.errorMessage = 'REGISTER.ERROR.GENERAL';
+      this.notificationService.error('REGISTER.ERROR.GENERAL', 'REGISTER.ERROR.TITLE');
     } finally {
       this.isLoading = false;
     }
+  }
+  
+  getStrengthClass(): string {
+    if (this.passwordStrength < 30) return 'weak';
+    if (this.passwordStrength < 60) return 'medium';
+    if (this.passwordStrength < 80) return 'good';
+    return 'strong';
+  }
+  
+  getStrengthText(): string {
+    if (this.passwordStrength < 30) return 'REGISTER.STRENGTH.WEAK';
+    if (this.passwordStrength < 60) return 'REGISTER.STRENGTH.MEDIUM';
+    if (this.passwordStrength < 80) return 'REGISTER.STRENGTH.GOOD';
+    return 'REGISTER.STRENGTH.STRONG';
   }
 }

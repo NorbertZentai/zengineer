@@ -136,6 +136,48 @@
           }
         }
       }
+      
+      .password-strength-container {
+        margin-top: 8px;
+        
+        .strength-meter {
+          width: 100%;
+          height: 6px;
+          background: var(--navbar-border);
+          border-radius: 3px;
+          overflow: hidden;
+          margin-bottom: 6px;
+          
+          .strength-bar {
+            height: 100%;
+            transition: all 0.3s ease;
+            border-radius: 3px;
+            
+            &.weak {
+              background: linear-gradient(90deg, #e53935, #ff5722);
+            }
+            
+            &.medium {
+              background: linear-gradient(90deg, #ff9800, #ffc107);
+            }
+            
+            &.good {
+              background: linear-gradient(90deg, #4caf50, #8bc34a);
+            }
+            
+            &.strong {
+              background: linear-gradient(90deg, #4caf50, #2e7d32);
+            }
+          }
+        }
+        
+        .strength-text {
+          font-size: 0.85rem;
+          color: var(--navbar-link);
+          font-weight: 500;
+          text-align: center;
+        }
+      }
     }
     .auth-btn {
       margin-top: 0.3rem;
@@ -161,22 +203,23 @@
       }
       
       &.loading {
-        position: relative;
+        opacity: 0.8;
+      }
+      
+      .loading-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
         
-        &::after {
-          content: '';
-          position: absolute;
-          width: 20px;
-          height: 20px;
-          margin: auto;
-          border: 2px solid transparent;
-          border-top-color: #ffffff;
-          border-radius: 50%;
-          animation: spin 1s ease infinite;
-          right: 15px;
-          top: 50%;
-          transform: translateY(-50%);
+        .spinning {
+          animation: spin 1s linear infinite;
         }
+      }
+      
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
       }
     }
     .error {
