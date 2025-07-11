@@ -7,8 +7,10 @@
     "test": "node test-auth.js",
     "test:auth": "node test-auth.js",
     "test:ci": "node test-auth.js",
+    "docker:build": "docker-compose build",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
+    "docker:rebuild": "docker-compose down && docker-compose build --no-cache && docker-compose up -d",
     "docker:logs": "docker-compose logs -f"
   },
   "repository": {

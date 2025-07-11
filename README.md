@@ -63,6 +63,47 @@ cd backend
 # PocketBase runs automatically in Docker
 ```
 
+## 🐛 Docker Troubleshooting
+
+Ha a frontend és backend között nincs kapcsolat Docker-ben:
+
+### Gyors diagnosztika
+```bash
+# Docker containerek státusza
+docker-compose ps
+
+# Backend kapcsolat tesztelése
+curl -s http://localhost:8080/api/health
+```
+
+### Gyakori problémák és megoldások
+
+1. **Container kommunikáció**
+   ```bash
+   # Ellenőrizd a hálózatot
+   docker network ls | grep zengineer
+   
+   # Containers state
+   docker-compose ps
+   ```
+
+2. **Environment konfiguráció**
+   - `environment.docker.ts`: API proxy (`/api`)
+   - `environment.prod.ts`: Direct backend URL (`https://zengineer-backend.onrender.com`)
+
+3. **CORS problémák**
+   - Backend origins beállítva: `http://localhost:3000,http://frontend`
+   - Nginx proxy CORS headers hozzáadva
+
+4. **Build konfigurációk**
+   ```bash
+   # Proxy-val (Docker helyi fejlesztés)
+   npm run build:docker
+   
+   # Production (Render.com deployment)
+   npm run build:prod
+   ```
+
 ### Testing
 
 ```bash
@@ -78,6 +119,40 @@ npm run test:ci
 ```
 
 ## 📦 Deployment
+
+### 🚀 **Render.com Deployment** (Production)
+
+A projekt készen áll a Render.com automatikus deployment-re:
+
+**Frontend**: `https://zengineer-frontend.onrender.com`
+**Backend**: `https://zengineer-backend.onrender.com`
+
+```bash
+# Render.com deployment steps:
+1. Connect GitHub repository to Render.com
+2. Frontend service: Docker build using Dockerfile
+3. Backend service: Docker build using backend/Dockerfile
+4. Environment variables automatically configured
+```
+
+### 🐳 **Docker Deployment** (Local/Development)
+
+```bash
+# Helyi Docker környezet
+npm run docker:rebuild
+
+# Docker logs követése
+npm run docker:logs
+```
+
+### ⚙️ **Build Konfigurációk**
+
+- **Production** (Render.com): `npm run build:prod` 
+  - `environment.prod.ts` → `https://zengineer-backend.onrender.com`
+- **Docker** (Helyi): `npm run build:docker`
+  - `environment.docker.ts` → `/api` proxy
+- **Development**: `npm start`
+  - `environment.ts` → `http://localhost:8090`
 
 The application automatically builds and deploys via GitHub Actions:
 
@@ -116,6 +191,37 @@ The application automatically builds and deploys via GitHub Actions:
 ## 📄 License
 
 This project is licensed under the ISC License.
+
+## ✅ **Deployment Status**
+
+### 🚀 **Render.com Ready** ✅
+
+**Szükséges lépések a Render.com-on:**
+
+1. **Repository csatlakoztatása:**
+   ```
+   https://github.com/NorbertZentai/zengineer
+   ```
+
+2. **Backend Service létrehozása:**
+   - **Service Type**: Web Service
+   - **Environment**: Docker
+   - **Dockerfile Path**: `./backend/Dockerfile`
+   - **Build Context**: `./backend`
+
+3. **Frontend Service létrehozása:**
+   - **Service Type**: Web Service  
+   - **Environment**: Docker
+   - **Dockerfile Path**: `./frontend/Dockerfile`
+   - **Build Context**: `./frontend`
+
+4. **Environment Variables** (automatikusan konfigurált):
+   - Backend CORS: `https://zengineer-frontend.onrender.com`
+   - Frontend API URL: `https://zengineer-backend.onrender.com`
+
+### 🎯 **Expected URLs:**
+- 🌐 **Frontend**: `https://zengineer-frontend.onrender.com`
+- 🔗 **Backend**: `https://zengineer-backend.onrender.com`
 
 ---
 

@@ -2,11 +2,13 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.docker
     ports:
       - "3000:80"
     depends_on:
       - backend
+    networks:
+      - zengineer-network
 
   backend:
     build:
@@ -16,3 +18,11 @@ services:
       - "8080:8080"
     volumes:
       - ./backend/pb_data:/pb/pb_data
+    networks:
+      - zengineer-network
+    environment:
+      - PB_CORS_ORIGINS=http://localhost:3000,http://frontend
+
+networks:
+  zengineer-network:
+    driver: bridge
