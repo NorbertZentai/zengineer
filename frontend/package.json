@@ -7,6 +7,7 @@
     "build": "ng build",
     "build:prod": "ng build --configuration production",
     "build:docker": "ng build --configuration docker",
+    "build:lenient": "ng build --configuration lenient",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint"

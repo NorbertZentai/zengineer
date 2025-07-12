@@ -191,7 +191,7 @@ export class Register {
     this.isLoading = true;
     
     try {
-      const success = await this.auth.register(this.email, this.password, this.name);
+      const success = await this.auth.register(this.email, this.password);
       if (success) {
         this.notificationService.success('REGISTER.SUCCESS', 'REGISTER.WELCOME');
         
@@ -201,9 +201,9 @@ export class Register {
       } else {
         // Use the error from AuthService if available
         const authError = this.auth.lastError();
-        const errorMsg = authError?.message || this.translate.instant('REGISTER.ERROR.GENERAL');
+        const errorMsg = (authError as any)?.message || this.translate.instant('REGISTER.ERROR.GENERAL');
         this.errorMessage = errorMsg;
-        this.notificationService.error(authError?.message || 'REGISTER.ERROR.GENERAL', 'REGISTER.ERROR.TITLE');
+        this.notificationService.error((authError as any)?.message || 'REGISTER.ERROR.GENERAL', 'REGISTER.ERROR.TITLE');
       }
     } catch (err: any) {
       console.error('Registration error:', err);

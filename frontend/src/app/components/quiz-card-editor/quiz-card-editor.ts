@@ -62,7 +62,7 @@ export class QuizCardEditorComponent {
     private fb: FormBuilder
   ) {
     this.quiz = data.quiz;
-    this.cards.set([...this.quiz.cards]);
+    this.cards.set([...(this.quiz.cards || [])]);
     this.updateFilteredCards();
     this.updateAvailableTags();
   }
@@ -163,7 +163,9 @@ export class QuizCardEditorComponent {
   }
 
   duplicateCard(card: QuizCard): void {
-    const newCard: Omit<QuizCard, 'id' | 'created' | 'updated'> = {
+    const newCard: Omit<QuizCard, 'id' | 'created_at' | 'updated_at'> = {
+      question: card.front + ' (másolat)',
+      answer: card.back,
       front: card.front + ' (másolat)',
       back: card.back,
       difficulty: card.difficulty,

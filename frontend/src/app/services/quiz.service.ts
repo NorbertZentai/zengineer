@@ -31,6 +31,7 @@ export interface QuizCard {
   difficulty: 'easy' | 'medium' | 'hard'; // nem optional, alapértelmezett medium
   reviewCount: number; // nem optional, alapértelmezett 0
   successRate: number; // nem optional, alapértelmezett 0
+  lastReviewed?: Date;
   nextReview?: Date;
   created_at?: string;
   updated_at?: string;
@@ -248,6 +249,16 @@ export class QuizService {
     return data;
   }
 
+  async deleteFolder(folderId: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('quiz_folders')
+      .delete()
+      .eq('id', folderId);
+
+    if (error) throw error;
+    await this.loadFolders(); // Refresh list
+  }
+
   // 🃏 QUIZ CARDS METHODS
   async addQuizCard(quizId: string, card: Omit<QuizCard, 'id' | 'quiz_id'>) {
     const { data, error } = await this.supabase
@@ -390,6 +401,8 @@ export class QuizService {
     if (updates.difficulty !== undefined) updateData.difficulty = updates.difficulty;
     if (updates.reviewCount !== undefined) updateData.reviewCount = updates.reviewCount;
     if (updates.successRate !== undefined) updateData.successRate = updates.successRate;
+    if (updates.lastReviewed !== undefined) updateData.last_reviewed = updates.lastReviewed;
+    if (updates.nextReview !== undefined) updateData.next_review = updates.nextReview;
 
     const { data, error } = await this.supabase
       .from('quiz_cards')

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zengineer - Email Megerősítés</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #e8eaed;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+        
+        .email-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: #1a202c;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            border: 1px solid #2d3748;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            padding: 50px 30px;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+        
+        .logo {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: none;
+            letter-spacing: -0.5px;
+        }
+        
+        .logo::before {
+            content: "⚡";
+            margin-right: 8px;
+            font-size: 2rem;
+        }
+        
+        .tagline {
+            font-size: 0.95rem;
+            opacity: 0.85;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+        
+        .content {
+            padding: 40px 30px;
+            text-align: center;
+            background: #1a202c;
+        }
+        
+        .greeting {
+            font-size: 1.4rem;
+            color: #60a5fa;
+            margin-bottom: 16px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+        
+        .message {
+            font-size: 1rem;
+            color: #cbd5e1;
+            margin-bottom: 32px;
+            line-height: 1.6;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .verification-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+            color: white;
+            text-decoration: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+            transition: all 0.3s ease;
+            margin: 24px 0;
+            border: 1px solid #3b82f6;
+        }
+        
+        .verification-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 35px rgba(37, 99, 235, 0.4);
+            background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+        }
+        
+        .security-info {
+            background: #2d3748;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 28px 0;
+            border-left: 3px solid #3b82f6;
+            text-align: left;
+        }
+        
+        .security-title {
+            font-weight: 600;
+            color: #60a5fa;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+        
+        .security-title::before {
+            content: "🔒";
+            margin-right: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .security-text {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            line-height: 1.5;
+        }
+        
+        .footer {
+            background: #0f172a;
+            padding: 25px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.85rem;
+            border-top: 1px solid #2d3748;
+        }
+        
+        .footer-links {
+            margin: 12px 0;
+        }
+        
+        .footer-links a {
+            color: #60a5fa;
+            text-decoration: none;
+            margin: 0 12px;
+            font-size: 0.85rem;
+        }
+        
+        .footer-links a:hover {
+            color: #93c5fd;
+        }
+        
+        .social-links {
+            margin: 15px 0;
+        }
+        
+        .social-links a {
+            display: inline-block;
+            margin: 0 8px;
+            color: #60a5fa;
+            font-size: 1.1rem;
+        }
+        
+        @media (max-width: 600px) {
+            body {
+                padding: 20px 10px;
+            }
+            
+            .email-container {
+                margin: 0;
+                border-radius: 12px;
+            }
+            
+            .header {
+                padding: 40px 20px;
+            }
+            
+            .content {
+                padding: 30px 20px;
+            }
+            
+            .logo {
+                font-size: 1.8rem;
+            }
+            
+            .greeting {
+                font-size: 1.2rem;
+            }
+            
+            .verification-button {
+                padding: 14px 28px;
+                font-size: 0.95rem;
+                width: 100%;
+                max-width: 280px;
+            }
+            
+            .security-info {
+                padding: 16px;
+                margin: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <div class="logo">Zengineer</div>
+            <div class="tagline">Intelligens Tanulás a Jövőnek</div>
+        </div>
+        
+        <div class="content">
+            <div class="greeting">Üdvözlünk a Zengineer közösségében!</div>
+            
+            <div class="message">
+                Köszönjük, hogy csatlakoztál hozzánk! Csak egy lépés választ el az első tanulási élményedtől. 
+                Kérjük, erősítsd meg email címedet az alábbi gombra kattintva:
+            </div>
+            
+            <a href="{{ .ConfirmationURL }}" class="verification-button">
+                Email Megerősítése
+            </a>
+            
+            <div class="security-info">
+                <div class="security-title">Biztonság Első</div>
+                <div class="security-text">
+                    Ez a link 24 órán belül lejár. Ha nem te regisztráltál, egyszerűen töröld ezt az emailt.
+                    Soha ne add meg jelszavadat harmadik félnek!
+                </div>
+            </div>
+            
+            <div class="message">
+                A megerősítés után azonnal elkezdheted használni a Zengineer minden funkcióját:
+            </div>
+            
+            <div style="margin: 24px 0; color: #94a3b8; font-size: 0.9rem;">
+                <div style="margin: 8px 0;">⚡ Személyre szabott kvízek</div>
+                <div style="margin: 8px 0;">📚 Intelligens tanulási rendszer</div>
+                <div style="margin: 8px 0;">📊 Részletes statisztikák</div>
+                <div style="margin: 8px 0;">🎯 Gamifikált élmény</div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <div>© 2025 Zengineer. Minden jog fenntartva.</div>
+            
+            <div class="footer-links">
+                <a href="#" target="_blank">Adatvédelem</a>
+                <a href="#" target="_blank">Felhasználási feltételek</a>
+                <a href="#" target="_blank">Támogatás</a>
+            </div>
+            
+            <div style="margin-top: 20px; font-size: 0.8rem; color: #475569;">
+                Ha problémád van, válaszolj erre az emailre vagy írj nekünk: support@zengineer.hu
+            </div>
+        </div>
+    </div>
+</body>
+</html>

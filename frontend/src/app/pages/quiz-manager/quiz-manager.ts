@@ -18,6 +18,7 @@ import { QuizService, Quiz, QuizFolder, QuizCard, StudySession } from '../../ser
 import { QuizCardEditorComponent } from '../../components/quiz-card-editor/quiz-card-editor';
 import { StudyModeComponent } from '../../components/study-mode/study-mode';
 import { QuizStatsComponent } from '../../components/quiz-stats/quiz-stats';
+import { safeArray, safeAccess } from '../../utils/safe-access';
 
 export type ViewMode = 'grid' | 'list' | 'study';
 export type SortBy = 'name' | 'created' | 'updated' | 'cards';
@@ -97,7 +98,7 @@ export class QuizManager {
     const selectedTags = this._selectedTags();
     if (selectedTags.length > 0) {
       quizzes = quizzes.filter(quiz => 
-        selectedTags.some(tag => quiz.tags.includes(tag))
+        selectedTags.some(tag => safeArray(quiz.tags).includes(tag))
       );
     }
     
@@ -112,13 +113,13 @@ export class QuizManager {
           comparison = a.name.localeCompare(b.name);
           break;
         case 'created':
-          comparison = a.created.getTime() - b.created.getTime();
+          comparison = (a.created?.getTime() || 0) - (b.created?.getTime() || 0);
           break;
         case 'updated':
-          comparison = a.updated.getTime() - b.updated.getTime();
+          comparison = (a.updated?.getTime() || 0) - (b.updated?.getTime() || 0);
           break;
         case 'cards':
-          comparison = a.cards.length - b.cards.length;
+          comparison = safeArray(a.cards).length - safeArray(b.cards).length;
           break;
       }
       return ascending ? comparison : -comparison;
@@ -131,7 +132,7 @@ export class QuizManager {
   availableTags = computed(() => {
     const allTags = new Set<string>();
     this.quizService.allQuizzes().forEach(quiz => {
-      quiz.tags.forEach(tag => allTags.add(tag));
+      safeArray(quiz.tags).forEach(tag => allTags.add(tag));
     });
     return Array.from(allTags).sort();
   });
@@ -141,9 +142,9 @@ export class QuizManager {
     const folder = this.quizService.currentFolder();
     if (!folder) return null;
     
-    const totalQuizzes = folder.quizzes.length;
-    const totalCards = folder.quizzes.reduce((sum, quiz) => sum + quiz.cards.length, 0);
-    const needsReview = folder.quizzes.reduce((sum, quiz) => 
+    const totalQuizzes = safeArray(folder.quizzes).length;
+    const totalCards = safeArray(folder.quizzes).reduce((sum, quiz) => sum + safeArray(quiz.cards).length, 0);
+    const needsReview = safeArray(folder.quizzes).reduce((sum, quiz) => 
       sum + this.quizService.getCardsNeedingReview(quiz).length, 0
     );
     
@@ -259,20 +260,20 @@ export class QuizManager {
       const currentFolder = this.quizService.currentFolder();
       
       if (this.createType() === 'folder') {
-        await this.quizService.createFolder(
+        await this.quizService.createFolder({
           name,
-          currentFolder?.id
-        );
+          parent_id: currentFolder?.id
+        });
         this.snackBar.open(
           this.translate.instant('QUIZ_MANAGER.MESSAGES.FOLDER_CREATED'), 
           this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
           { duration: 3000 }
         );
       } else {
-        const quiz = await this.quizService.createQuiz(
+        const quiz = await this.quizService.createQuiz({
           name,
-          currentFolder?.id
-        );
+          folder_id: currentFolder?.id
+        });
         
         // Update quiz with additional properties
         await this.quizService.updateQuiz(quiz.id!, {
@@ -408,7 +409,7 @@ export class QuizManager {
 
   // Study mode
   startStudyMode(quiz: Quiz): void {
-    if (quiz.cards.length === 0) {
+    if (safeArray(quiz.cards).length === 0) {
       this.snackBar.open(
         this.translate.instant('QUIZ_MANAGER.MESSAGES.NO_CARDS'), 
         this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
@@ -449,7 +450,7 @@ export class QuizManager {
   private findFolderById(folders: QuizFolder[], id: string): QuizFolder | null {
     for (const folder of folders) {
       if (folder.id === id) return folder;
-      const found = this.findFolderById(folder.children, id);
+      const found = this.findFolderById(safeArray(folder.children), id);
       if (found) return found;
     }
     return null;
