@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: '/api'
+  supabaseUrl: 'https://your-project.supabase.co',
+  supabaseKey: 'your-anon-public-key-here'
 };

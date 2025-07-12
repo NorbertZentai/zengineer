@@ -2,26 +2,14 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile.docker
+      dockerfile: Dockerfile.simple
     ports:
       - "3000:80"
-    depends_on:
-      - backend
-    networks:
-      - zengineer-network
-
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./backend/pb_data:/pb/pb_data
-    networks:
-      - zengineer-network
     environment:
-      - PB_CORS_ORIGINS=http://localhost:3000,http://frontend
+      - SUPABASE_URL=https://eiktdiiziwesatueiyht.supabase.co
+      - SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpa3RkaWl6aXdlc2F0dWVpeWh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzNDQ4ODIsImV4cCI6MjA2NzkyMDg4Mn0.YpMFYilCeBY6nuhJPB_HiiqvNIhi0zULyRwjcbhx-yU
+    networks:
+      - zengineer-network
 
 networks:
   zengineer-network:

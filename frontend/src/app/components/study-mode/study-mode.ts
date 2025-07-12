@@ -185,7 +185,7 @@ export class StudyModeComponent {
 
   private finishStudy(): void {
     this.showResult.set(true);
-    const session = this.quizService.endStudySession();
+    const session = this.quizService.endStudySession(this.studySession!);
     
     if (this.timeInterval) {
       clearInterval(this.timeInterval);

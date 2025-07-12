@@ -74,9 +74,9 @@ export class QuizManager {
       // Traverse up to root
       while (currentNode) {
         reversePath.push(currentNode);
-        if (currentNode.parentId) {
+        if (currentNode.parent_id) {
           const folders = this.quizService.folders();
-          currentNode = this.findFolderById(folders, currentNode.parentId);
+          currentNode = this.findFolderById(folders, currentNode.parent_id);
         } else {
           currentNode = null;
         }
@@ -193,10 +193,10 @@ export class QuizManager {
 
   goBack(): void {
     const currentFolder = this.quizService.currentFolder();
-    if (currentFolder?.parentId) {
+    if (currentFolder?.parent_id) {
       // Navigate to parent folder
       const folders = this.quizService.folders();
-      const parent = this.findFolderById(folders, currentFolder.parentId);
+      const parent = this.findFolderById(folders, currentFolder.parent_id);
       this.navigateToFolder(parent);
     } else {
       this.navigateToFolder(null);

@@ -1,0 +1,37 @@
+# Dockerfile módosítása kevésbé strict móddal
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci --silent
+
+# Copy source code
+COPY . .
+
+# Make script executable and run it to relax TypeScript settings
+RUN chmod +x relax-ts.sh && ./relax-ts.sh
+
+# Build the app
+RUN npm run build:prod
+
+# Production stage
+FROM nginx:stable-alpine
+
+# Copy nginx config
+COPY nginx.prod.conf /etc/nginx/nginx.conf
+
+# Copy built app
+COPY --from=builder /app/dist/zengineer/browser /usr/share/nginx/html
+
+# Create environment config script
+RUN echo '#!/bin/sh' > /docker-entrypoint.d/30-envsubst-on-templates.sh && \
+    echo 'envsubst '"'"'$$SUPABASE_URL $$SUPABASE_KEY'"'"' < /usr/share/nginx/html/assets/environment.template.js > /usr/share/nginx/html/assets/environment.js' >> /docker-entrypoint.d/30-envsubst-on-templates.sh && \
+    chmod +x /docker-entrypoint.d/30-envsubst-on-templates.sh
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

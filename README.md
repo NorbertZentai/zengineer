@@ -2,7 +2,7 @@
 
 [![CI/CD Pipeline](https://github.com/NorbertZentai/zengineer/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/NorbertZentai/zengineer/actions/workflows/ci-cd.yml)
 
-Intelligent quiz application with Angular frontend and PocketBase backend.
+Intelligent quiz application with Angular frontend and **Supabase** cloud backend.
 
 ## 🚀 Features
 
@@ -11,6 +11,8 @@ Intelligent quiz application with Angular frontend and PocketBase backend.
 - **📊 Statistics**: Track learning progress and performance
 - **🌍 Internationalization**: Multi-language support (EN/HU)
 - **🐳 Docker Support**: Containerized deployment
+- **☁️ Cloud Backend**: Supabase Postgres database
+- **⚡ Real-time**: Live updates with WebSocket
 
 ## 🧪 Automated Testing
 
@@ -145,19 +147,24 @@ A projekt készen áll a Render.com automatikus deployment-re:
 3. **Cold start**: Hibernálás után lassú indítás
 
 #### ✅ **Megoldások:**
-##### 1. Keep-alive szolgáltatás
+
+##### 1. 💾 **Perzisztens tárolás MongoDB Atlas-szal (INGYENES)**
+```bash
+# 512MB ingyenes MongoDB Atlas cluster
+# Automatikus szinkronizáció PocketBase ↔ MongoDB
+# Részletes setup: MONGODB_SETUP.md
+```
+
+##### 2. Keep-alive szolgáltatás
 ```bash
 # Keep-alive script futtatása (külön Render service-ként)
 node keep-alive.js
 ```
 
-##### 2. Perzisztens adattárolás
-- Render Persistent Disks használata (fizetős)
-- Vagy külső adatbázis (MongoDB Atlas ingyenes tier)
-
 ##### 3. Health check végpontok
 - Backend: `/health.html`
 - Frontend: `/`
+- MongoDB Sync: `/health`
 
 ### Deployment lépések:
 

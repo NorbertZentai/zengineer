@@ -1,629 +1,487 @@
+// Supabase service - Teljes backend replacement
 import { Injectable, signal, computed } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import PocketBase from 'pocketbase';
+import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
 import { environment } from '../../environments/environment';
-
-export interface QuizCard {
-  id?: string;
-  front: string;
-  back: string;
-  difficulty: 'easy' | 'medium' | 'hard';
-  lastReviewed?: Date;
-  nextReview?: Date;
-  reviewCount: number;
-  successRate: number;
-  tags: string[];
-  created: Date;
-  updated: Date;
-}
 
 export interface Quiz {
   id?: string;
   name: string;
   description?: string;
-  color: string;
-  icon: string;
-  cards: QuizCard[];
-  folderId?: string;
-  isPublic: boolean;
-  tags: string[];
-  created: Date;
-  updated: Date;
-  studySettings: StudySettings;
+  color?: string;
+  icon?: string;
+  folder_id?: string;
+  user_id?: string;
+  cards?: QuizCard[];
+  tags?: string[];
+  created?: Date;
+  updated?: Date;
+  studySettings?: StudySettings;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface QuizCard {
+  id?: string;
+  quiz_id?: string;
+  question: string;
+  answer: string;
+  front: string; // kompatibilitás az UI-val
+  back: string; // kompatibilitás az UI-val
+  tags: string[]; // nem optional, alapértelmezett üres tömb
+  difficulty: 'easy' | 'medium' | 'hard'; // nem optional, alapértelmezett medium
+  reviewCount: number; // nem optional, alapértelmezett 0
+  successRate: number; // nem optional, alapértelmezett 0
+  nextReview?: Date;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface QuizFolder {
   id?: string;
   name: string;
-  description?: string;
-  color: string;
-  icon: string;
-  parentId?: string;
-  children: QuizFolder[];
-  quizzes: Quiz[];
-  created: Date;
-  updated: Date;
-}
-
-export interface StudySettings {
-  shuffleCards: boolean;
-  showBackFirst: boolean;
-  autoAdvance: boolean;
-  timeLimit?: number;
-  repetitionAlgorithm: 'simple' | 'spaced';
+  color?: string;
+  icon?: string;
+  parent_id?: string;
+  parentId?: string; // kompatibilitás
+  user_id?: string;
+  quizzes?: Quiz[];
+  children?: QuizFolder[];
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface StudySession {
   id?: string;
-  quizId: string;
-  startTime: Date;
-  endTime?: Date;
+  quiz_id?: string;
+  user_id?: string;
+  score: number;
+  total_questions: number;
   correctAnswers: number;
   totalAnswers: number;
-  cardsReviewed: string[];
-  settings: StudySettings;
+  cardsReviewed?: string[];
+  duration_seconds?: number;
+  completed_at?: string;
+}
+
+export interface StudySettings {
+  shuffleCards: boolean;
+  showHints: boolean;
+  timeLimit?: number;
 }
 
 export interface StudyStats {
   totalCards: number;
+  totalReviews: number;
+  averageScore: number;
+  averageSuccessRate: number;
+  streakDays: number;
   masteredCards: number;
   needsReview: number;
-  averageSuccessRate: number;
-  totalStudyTime: number;
-  streak: number;
-}
-
-export interface QuizError {
-  code: string;
-  message: string;
-  details?: any;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class QuizService {
-  private pb = new PocketBase(environment.apiUrl);
+  private supabase: SupabaseClient;
   
-  // Signals for reactive state management
-  private _folders = signal<QuizFolder[]>([]);
+  // Reactive state
+  user = signal<User | null>(null);
+  quizzes = signal<Quiz[]>([]);
+  folders = signal<QuizFolder[]>([]);
+  isLoading = signal(false);
+  
+  // Additional state for compatibility
   private _currentFolder = signal<QuizFolder | null>(null);
-  private _currentQuiz = signal<Quiz | null>(null);
-  private _studySession = signal<StudySession | null>(null);
-  private _isLoading = signal(false);
   private _searchQuery = signal('');
-  private _lastError = signal<QuizError | null>(null);
-
-  // Public readonly signals
-  folders = this._folders.asReadonly();
+  
+  // Public readonly signals for compatibility
   currentFolder = this._currentFolder.asReadonly();
-  currentQuiz = this._currentQuiz.asReadonly();
-  studySession = this._studySession.asReadonly();
-  isLoading = this._isLoading.asReadonly();
   searchQuery = this._searchQuery.asReadonly();
-  lastError = this._lastError.asReadonly();
-
-  // Computed values
+  
+  // Computed values for compatibility
   filteredQuizzes = computed(() => {
     const query = this._searchQuery().toLowerCase();
-    if (!query) return this._currentFolder()?.quizzes || [];
-    
-    return this._currentFolder()?.quizzes.filter(quiz => 
+    if (!query) return this.quizzes();
+    return this.quizzes().filter(quiz => 
       quiz.name.toLowerCase().includes(query) ||
-      quiz.tags.some(tag => tag.toLowerCase().includes(query))
-    ) || [];
+      quiz.description?.toLowerCase().includes(query)
+    );
   });
-
-  allQuizzes = computed(() => {
-    const allQuizzes: Quiz[] = [];
-    const collectQuizzes = (folders: QuizFolder[]) => {
-      folders.forEach(folder => {
-        allQuizzes.push(...folder.quizzes);
-        collectQuizzes(folder.children);
-      });
-    };
-    collectQuizzes(this._folders());
-    return allQuizzes;
-  });
+  
+  allQuizzes = this.quizzes.asReadonly();
 
   constructor() {
-    this.loadFolders();
-  }
+    this.supabase = createClient(
+      environment.supabaseUrl,
+      environment.supabaseKey
+    );
 
-  clearError(): void {
-    this._lastError.set(null);
-  }
-
-  private handleError(operation: string, error: any): QuizError {
-    const quizError: QuizError = {
-      code: error?.status?.toString() || 'UNKNOWN_ERROR',
-      message: error?.message || `Failed to ${operation}`,
-      details: error
-    };
-    
-    this._lastError.set(quizError);
-    console.error(`${operation} failed:`, error);
-    return quizError;
-  }
-
-  // Folder Management
-  async loadFolders(): Promise<void> {
-    this._isLoading.set(true);
-    this._lastError.set(null);
-    
-    try {
-      // Simulate API call - replace with actual PocketBase integration
-      const mockFolders: QuizFolder[] = [
-        {
-          id: '1',
-          name: 'Programozás',
-          color: '#1976d2',
-          icon: 'code',
-          children: [],
-          quizzes: [],
-          created: new Date(),
-          updated: new Date()
-        }
-      ];
-      this._folders.set(mockFolders);
-    } catch (error) {
-      this.handleError('load folders', error);
-      throw error;
-    } finally {
-      this._isLoading.set(false);
-    }
-  }
-
-  async createFolder(name: string, parentId?: string): Promise<QuizFolder> {
-    if (!name?.trim()) {
-      const error = new Error('Folder name is required');
-      this.handleError('create folder', error);
-      throw error;
-    }
-
-    try {
-      const newFolder: QuizFolder = {
-        id: Date.now().toString(),
-        name,
-        color: '#1976d2',
-        icon: 'folder',
-        parentId,
-        children: [],
-        quizzes: [],
-        created: new Date(),
-        updated: new Date()
-      };
-
-      if (parentId) {
-        this.addFolderToParent(newFolder, parentId);
+    // Listen to auth changes
+    this.supabase.auth.onAuthStateChange((event, session) => {
+      this.user.set(session?.user ?? null);
+      if (session?.user) {
+        this.loadUserData();
       } else {
-        this._folders.update(folders => [...folders, newFolder]);
+        this.clearUserData();
       }
-
-      return newFolder;
-    } catch (error) {
-      this.handleError('create folder', error);
-      throw error;
-    }
+    });
   }
 
-  async updateFolder(id: string, updates: Partial<QuizFolder>): Promise<void> {
-    if (!id) {
-      const error = new Error('Folder ID is required');
-      this.handleError('update folder', error);
-      throw error;
-    }
-
-    try {
-      this._folders.update(folders => 
-        this.updateFolderRecursive(folders, id, updates)
-      );
-    } catch (error) {
-      this.handleError('update folder', error);
-      throw error;
-    }
-  }
-
-  async deleteFolder(id: string): Promise<void> {
-    if (!id) {
-      const error = new Error('Folder ID is required');
-      this.handleError('delete folder', error);
-      throw error;
-    }
-
-    try {
-      this._folders.update(folders => 
-        this.removeFolderRecursive(folders, id)
-      );
-    } catch (error) {
-      this.handleError('delete folder', error);
-      throw error;
-    }
-  }
-
-  // Quiz Management
-  async createQuiz(name: string, folderId?: string): Promise<Quiz> {
-    if (!name?.trim()) {
-      const error = new Error('Quiz name is required');
-      this.handleError('create quiz', error);
-      throw error;
-    }
-
-    try {
-      const newQuiz: Quiz = {
-        id: Date.now().toString(),
-        name,
-        color: '#4caf50',
-        icon: 'quiz',
-        cards: [],
-        folderId,
-        isPublic: false,
-        tags: [],
-        created: new Date(),
-        updated: new Date(),
-        studySettings: {
-          shuffleCards: true,
-          showBackFirst: false,
-          autoAdvance: false,
-          repetitionAlgorithm: 'spaced'
-        }
-      };
-
-      if (folderId) {
-        this.addQuizToFolder(newQuiz, folderId);
+  // 🔐 AUTH METHODS
+  async signUp(email: string, password: string, name: string) {
+    const { data, error } = await this.supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { name }
       }
+    });
+    
+    if (error) throw error;
+    return data;
+  }
 
-      return newQuiz;
-    } catch (error) {
-      this.handleError('create quiz', error);
-      throw error;
+  async signIn(email: string, password: string) {
+    const { data, error } = await this.supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+    
+    if (error) throw error;
+    return data;
+  }
+
+  async signOut() {
+    const { error } = await this.supabase.auth.signOut();
+    if (error) throw error;
+    this.clearUserData();
+  }
+
+  // 📚 QUIZ METHODS
+  async loadQuizzes() {
+    this.isLoading.set(true);
+    try {
+      const { data, error } = await this.supabase
+        .from('quizzes')
+        .select(`
+          *,
+          quiz_cards (*)
+        `)
+        .eq('user_id', this.user()?.id);
+
+      if (error) throw error;
+      this.quizzes.set(data || []);
+    } finally {
+      this.isLoading.set(false);
     }
   }
 
-  async updateQuiz(id: string, updates: Partial<Quiz>): Promise<void> {
-    if (!id) {
-      const error = new Error('Quiz ID is required');
-      this.handleError('update quiz', error);
-      throw error;
-    }
+  async createQuiz(quiz: Omit<Quiz, 'id' | 'user_id' | 'created_at' | 'updated_at'>) {
+    const { data, error } = await this.supabase
+      .from('quizzes')
+      .insert({
+        ...quiz,
+        user_id: this.user()?.id
+      })
+      .select()
+      .single();
 
+    if (error) throw error;
+    await this.loadQuizzes(); // Refresh list
+    return data;
+  }
+
+  async updateQuiz(id: string, updates: Partial<Quiz>) {
+    const { data, error } = await this.supabase
+      .from('quizzes')
+      .update(updates)
+      .eq('id', id)
+      .eq('user_id', this.user()?.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    await this.loadQuizzes(); // Refresh list
+    return data;
+  }
+
+  async deleteQuiz(id: string) {
+    const { error } = await this.supabase
+      .from('quizzes')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', this.user()?.id);
+
+    if (error) throw error;
+    await this.loadQuizzes(); // Refresh list
+  }
+
+  // 📁 FOLDER METHODS
+  async loadFolders() {
+    this.isLoading.set(true);
     try {
-      this._folders.update(folders => 
-        this.updateQuizRecursive(folders, id, updates)
-      );
-    } catch (error) {
-      this.handleError('update quiz', error);
-      throw error;
+      const { data, error } = await this.supabase
+        .from('quiz_folders')
+        .select('*')
+        .eq('user_id', this.user()?.id);
+
+      if (error) throw error;
+      this.folders.set(data || []);
+    } finally {
+      this.isLoading.set(false);
     }
   }
 
-  async deleteQuiz(id: string): Promise<void> {
-    if (!id) {
-      const error = new Error('Quiz ID is required');
-      this.handleError('delete quiz', error);
-      throw error;
-    }
+  async createFolder(folder: Omit<QuizFolder, 'id' | 'user_id' | 'created_at' | 'updated_at'>) {
+    const { data, error } = await this.supabase
+      .from('quiz_folders')
+      .insert({
+        ...folder,
+        user_id: this.user()?.id
+      })
+      .select()
+      .single();
 
-    try {
-      this._folders.update(folders => 
-        this.removeQuizRecursive(folders, id)
-      );
-    } catch (error) {
-      this.handleError('delete quiz', error);
-      throw error;
-    }
+    if (error) throw error;
+    await this.loadFolders(); // Refresh list
+    return data;
   }
 
-  // Card Management
-  async addCard(quizId: string, card: Omit<QuizCard, 'id' | 'created' | 'updated'>): Promise<QuizCard> {
-    if (!quizId) {
-      const error = new Error('Quiz ID is required');
-      this.handleError('add card', error);
-      throw error;
-    }
-
-    if (!card.front?.trim() || !card.back?.trim()) {
-      const error = new Error('Card front and back are required');
-      this.handleError('add card', error);
-      throw error;
-    }
-
-    try {
-      const newCard: QuizCard = {
+  // 🃏 QUIZ CARDS METHODS
+  async addQuizCard(quizId: string, card: Omit<QuizCard, 'id' | 'quiz_id'>) {
+    const { data, error } = await this.supabase
+      .from('quiz_cards')
+      .insert({
         ...card,
-        id: Date.now().toString(),
-        created: new Date(),
-        updated: new Date()
-      };
+        quiz_id: quizId
+      })
+      .select()
+      .single();
 
-      this._folders.update(folders => 
-        this.addCardToQuiz(folders, quizId, newCard)
-      );
-
-      return newCard;
-    } catch (error) {
-      this.handleError('add card', error);
-      throw error;
-    }
+    if (error) throw error;
+    await this.loadQuizzes(); // Refresh quiz data
+    return data;
   }
 
-  async updateCard(quizId: string, cardId: string, updates: Partial<QuizCard>): Promise<void> {
-    if (!quizId || !cardId) {
-      const error = new Error('Quiz ID and card ID are required');
-      this.handleError('update card', error);
-      throw error;
-    }
+  async updateQuizCard(id: string, updates: Partial<QuizCard>) {
+    const { data, error } = await this.supabase
+      .from('quiz_cards')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
 
-    try {
-      this._folders.update(folders => 
-        this.updateCardInQuiz(folders, quizId, cardId, updates)
-      );
-    } catch (error) {
-      this.handleError('update card', error);
-      throw error;
-    }
+    if (error) throw error;
+    await this.loadQuizzes(); // Refresh quiz data
+    return data;
   }
 
-  async deleteCard(quizId: string, cardId: string): Promise<void> {
-    if (!quizId || !cardId) {
-      const error = new Error('Quiz ID and card ID are required');
-      this.handleError('delete card', error);
-      throw error;
-    }
+  async deleteQuizCard(id: string) {
+    const { error } = await this.supabase
+      .from('quiz_cards')
+      .delete()
+      .eq('id', id);
 
-    try {
-      this._folders.update(folders => 
-        this.removeCardFromQuiz(folders, quizId, cardId)
-      );
-    } catch (error) {
-      this.handleError('delete card', error);
-      throw error;
-    }
+    if (error) throw error;
+    await this.loadQuizzes(); // Refresh quiz data
   }
 
-  // Study Session Management
-  startStudySession(quiz: Quiz, settings?: Partial<StudySettings>): StudySession {
-    if (!quiz?.id) {
-      const error = new Error('Valid quiz is required to start study session');
-      this.handleError('start study session', error);
-      throw error;
-    }
-
-    if (!quiz.cards || quiz.cards.length === 0) {
-      const error = new Error('Quiz must have cards to start study session');
-      this.handleError('start study session', error);
-      throw error;
-    }
-
-    try {
-      const session: StudySession = {
-        id: Date.now().toString(),
-        quizId: quiz.id!,
-        startTime: new Date(),
-        correctAnswers: 0,
-        totalAnswers: 0,
-        cardsReviewed: [],
-        settings: { ...quiz.studySettings, ...settings }
-      };
-
-      this._studySession.set(session);
-      this._currentQuiz.set(quiz);
-      return session;
-    } catch (error) {
-      this.handleError('start study session', error);
-      throw error;
-    }
+  // 🔄 REAL-TIME SUBSCRIPTIONS
+  subscribeToQuizzes() {
+    return this.supabase
+      .channel('quizzes')
+      .on('postgres_changes', 
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'quizzes',
+          filter: `user_id=eq.${this.user()?.id}`
+        }, 
+        () => {
+          this.loadQuizzes(); // Auto-refresh on changes
+        }
+      )
+      .subscribe();
   }
 
-  updateStudySession(updates: Partial<StudySession>): void {
-    try {
-      this._studySession.update(session => 
-        session ? { ...session, ...updates } : null
-      );
-    } catch (error) {
-      this.handleError('update study session', error);
-      throw error;
-    }
+  // 🧹 UTILITY METHODS
+  private async loadUserData() {
+    await Promise.all([
+      this.loadQuizzes(),
+      this.loadFolders()
+    ]);
   }
 
-  endStudySession(): StudySession | null {
-    try {
-      const session = this._studySession();
-      if (session) {
-        this._studySession.update(s => s ? { ...s, endTime: new Date() } : null);
-        // Save session to backend here
-        this._studySession.set(null);
-      }
-      return session;
-    } catch (error) {
-      this.handleError('end study session', error);
-      throw error;
-    }
+  private clearUserData() {
+    this.quizzes.set([]);
+    this.folders.set([]);
   }
 
-  // Spaced Repetition Algorithm
-  calculateNextReview(card: QuizCard, success: boolean): Date {
-    const now = new Date();
-    let interval = 1; // days
-
-    if (success) {
-      // Successful review - increase interval
-      interval = Math.max(1, card.reviewCount * 2);
-    } else {
-      // Failed review - reset to short interval
-      interval = 1;
-    }
-
-    const nextReview = new Date(now);
-    nextReview.setDate(nextReview.getDate() + interval);
-    return nextReview;
-  }
-
-  getCardsNeedingReview(quiz: Quiz): QuizCard[] {
-    const now = new Date();
-    return quiz.cards.filter(card => 
-      !card.nextReview || card.nextReview <= now
-    );
-  }
-
-  // Statistics
-  getStudyStats(quiz: Quiz): StudyStats {
-    const totalCards = quiz.cards.length;
-    const masteredCards = quiz.cards.filter(card => 
-      card.successRate >= 0.8 && card.reviewCount >= 3
-    ).length;
-    const needsReview = this.getCardsNeedingReview(quiz).length;
-    const averageSuccessRate = totalCards > 0 
-      ? quiz.cards.reduce((sum, card) => sum + card.successRate, 0) / totalCards 
-      : 0;
-
-    return {
-      totalCards,
-      masteredCards,
-      needsReview,
-      averageSuccessRate,
-      totalStudyTime: 0, // Calculate from study sessions
-      streak: 0 // Calculate from study history
-    };
-  }
-
-  // Search and Filter
-  setSearchQuery(query: string): void {
-    this._searchQuery.set(query);
-  }
-
-  searchAllQuizzes(query: string): Quiz[] {
-    const allQuizzes = this.allQuizzes();
-    return allQuizzes.filter(quiz =>
-      quiz.name.toLowerCase().includes(query.toLowerCase()) ||
-      quiz.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase()))
-    );
-  }
-
-  // Navigation
+  // 🔧 COMPATIBILITY METHODS for existing components
   selectFolder(folder: QuizFolder | null): void {
     this._currentFolder.set(folder);
   }
-
-  selectQuiz(quiz: Quiz | null): void {
-    this._currentQuiz.set(quiz);
+  
+  selectQuiz(quiz: Quiz): void {
+    // Navigate to quiz or set current quiz if needed
+    console.log('Selected quiz:', quiz);
+  }
+  
+  setSearchQuery(query: string): void {
+    this._searchQuery.set(query);
+  }
+  
+  getCardsNeedingReview(quiz: Quiz): QuizCard[] {
+    // Mock implementation - would need real study session data
+    return quiz.cards?.slice(0, Math.floor(Math.random() * (quiz.cards.length + 1))) || [];
   }
 
-  // Helper methods
-  private addFolderToParent(folder: QuizFolder, parentId: string): void {
-    this._folders.update(folders => 
-      this.addFolderToParentRecursive(folders, folder, parentId)
-    );
+  // 📊 STATISTICS
+  async getQuizStats(quizId: string) {
+    const { data, error } = await this.supabase
+      .from('quiz_sessions')
+      .select('*')
+      .eq('quiz_id', quizId)
+      .eq('user_id', this.user()?.id);
+
+    if (error) throw error;
+    return data;
   }
 
-  private addQuizToFolder(quiz: Quiz, folderId: string): void {
-    this._folders.update(folders => 
-      this.addQuizToFolderRecursive(folders, quiz, folderId)
-    );
+  // CARD MANAGEMENT
+  async addCard(quizId: string, cardData: Partial<QuizCard>): Promise<QuizCard> {
+    const cardToInsert = {
+      quiz_id: quizId,
+      question: cardData.front || cardData.question || '',
+      answer: cardData.back || cardData.answer || '',
+      tags: cardData.tags || [],
+      difficulty: cardData.difficulty || 'medium',
+      reviewCount: 0,
+      successRate: 0
+    };
+
+    const { data, error } = await this.supabase
+      .from('quiz_cards')
+      .insert(cardToInsert)
+      .select()
+      .single();
+
+    if (error) throw error;
+    
+    // Transform data for UI compatibility
+    return {
+      ...data,
+      front: data.question,
+      back: data.answer
+    };
   }
 
-  private updateFolderRecursive(folders: QuizFolder[], id: string, updates: Partial<QuizFolder>): QuizFolder[] {
-    return folders.map(folder => {
-      if (folder.id === id) {
-        return { ...folder, ...updates, updated: new Date() };
-      }
-      return {
-        ...folder,
-        children: this.updateFolderRecursive(folder.children, id, updates)
-      };
+  async updateCard(quizId: string, cardId: string, updates: Partial<QuizCard>): Promise<QuizCard> {
+    const updateData: any = {};
+    
+    if (updates.front || updates.question) {
+      updateData.question = updates.front || updates.question;
+    }
+    if (updates.back || updates.answer) {
+      updateData.answer = updates.back || updates.answer;
+    }
+    if (updates.tags !== undefined) updateData.tags = updates.tags;
+    if (updates.difficulty !== undefined) updateData.difficulty = updates.difficulty;
+    if (updates.reviewCount !== undefined) updateData.reviewCount = updates.reviewCount;
+    if (updates.successRate !== undefined) updateData.successRate = updates.successRate;
+
+    const { data, error } = await this.supabase
+      .from('quiz_cards')
+      .update(updateData)
+      .eq('id', cardId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    
+    return {
+      ...data,
+      front: data.question,
+      back: data.answer
+    };
+  }
+
+  async deleteCard(quizId: string, cardId: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('quiz_cards')
+      .delete()
+      .eq('id', cardId);
+
+    if (error) throw error;
+  }
+
+  // STUDY SESSION MANAGEMENT
+  startStudySession(quiz: Quiz): StudySession {
+    return {
+      quiz_id: quiz.id,
+      user_id: this.user()?.id,
+      score: 0,
+      total_questions: quiz.cards?.length || 0,
+      correctAnswers: 0,
+      totalAnswers: 0,
+      cardsReviewed: []
+    };
+  }
+
+  updateStudySession(updates: Partial<StudySession>): void {
+    // For now, just log the update - in a real app, you'd save to state/database
+    console.log('Study session updated:', updates);
+  }
+
+  endStudySession(session: StudySession): Promise<StudySession> {
+    // Mock implementation - would save session to database
+    return Promise.resolve({
+      ...session,
+      completed_at: new Date().toISOString()
     });
   }
 
-  private removeFolderRecursive(folders: QuizFolder[], id: string): QuizFolder[] {
-    return folders.filter(folder => folder.id !== id).map(folder => ({
-      ...folder,
-      children: this.removeFolderRecursive(folder.children, id)
-    }));
+  calculateNextReview(card: QuizCard, isCorrect: boolean): Date {
+    const now = new Date();
+    const days = isCorrect ? 
+      Math.min(30, Math.pow(2, (card.reviewCount || 0))) : 
+      1;
+    
+    return new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
   }
 
-  private updateQuizRecursive(folders: QuizFolder[], id: string, updates: Partial<Quiz>): QuizFolder[] {
-    return folders.map(folder => ({
-      ...folder,
-      quizzes: folder.quizzes.map(quiz => 
-        quiz.id === id ? { ...quiz, ...updates, updated: new Date() } : quiz
-      ),
-      children: this.updateQuizRecursive(folder.children, id, updates)
-    }));
+  getStudyStats(quiz: Quiz): StudyStats {
+    const cards = quiz.cards || [];
+    const totalReviews = cards.reduce((sum, card) => sum + (card.reviewCount || 0), 0);
+    const averageScore = cards.length > 0 ? 
+      cards.reduce((sum, card) => sum + (card.successRate || 0), 0) / cards.length : 0;
+    const masteredCards = cards.filter(card => (card.successRate || 0) >= 0.9).length;
+    const needsReview = cards.filter(card => 
+      !card.nextReview || new Date(card.nextReview) <= new Date()
+    ).length;
+    
+    return {
+      totalCards: cards.length,
+      totalReviews,
+      averageScore,
+      averageSuccessRate: averageScore,
+      streakDays: 0, // Would calculate from real session data
+      masteredCards,
+      needsReview
+    };
   }
 
-  private removeQuizRecursive(folders: QuizFolder[], id: string): QuizFolder[] {
-    return folders.map(folder => ({
-      ...folder,
-      quizzes: folder.quizzes.filter(quiz => quiz.id !== id),
-      children: this.removeQuizRecursive(folder.children, id)
-    }));
-  }
+  // FOLDER MANAGEMENT
+  async updateFolder(folderId: string, updates: Partial<QuizFolder>): Promise<QuizFolder> {
+    const { data, error } = await this.supabase
+      .from('quiz_folders')
+      .update(updates)
+      .eq('id', folderId)
+      .select()
+      .single();
 
-  private addFolderToParentRecursive(folders: QuizFolder[], folder: QuizFolder, parentId: string): QuizFolder[] {
-    return folders.map(f => {
-      if (f.id === parentId) {
-        return { ...f, children: [...f.children, folder] };
-      }
-      return {
-        ...f,
-        children: this.addFolderToParentRecursive(f.children, folder, parentId)
-      };
-    });
-  }
-
-  private addQuizToFolderRecursive(folders: QuizFolder[], quiz: Quiz, folderId: string): QuizFolder[] {
-    return folders.map(folder => {
-      if (folder.id === folderId) {
-        return { ...folder, quizzes: [...folder.quizzes, quiz] };
-      }
-      return {
-        ...folder,
-        children: this.addQuizToFolderRecursive(folder.children, quiz, folderId)
-      };
-    });
-  }
-
-  private addCardToQuiz(folders: QuizFolder[], quizId: string, card: QuizCard): QuizFolder[] {
-    return folders.map(folder => ({
-      ...folder,
-      quizzes: folder.quizzes.map(quiz => 
-        quiz.id === quizId 
-          ? { ...quiz, cards: [...quiz.cards, card], updated: new Date() }
-          : quiz
-      ),
-      children: this.addCardToQuiz(folder.children, quizId, card)
-    }));
-  }
-
-  private updateCardInQuiz(folders: QuizFolder[], quizId: string, cardId: string, updates: Partial<QuizCard>): QuizFolder[] {
-    return folders.map(folder => ({
-      ...folder,
-      quizzes: folder.quizzes.map(quiz => 
-        quiz.id === quizId 
-          ? {
-              ...quiz,
-              cards: quiz.cards.map(card => 
-                card.id === cardId 
-                  ? { ...card, ...updates, updated: new Date() }
-                  : card
-              ),
-              updated: new Date()
-            }
-          : quiz
-      ),
-      children: this.updateCardInQuiz(folder.children, quizId, cardId, updates)
-    }));
-  }
-
-  private removeCardFromQuiz(folders: QuizFolder[], quizId: string, cardId: string): QuizFolder[] {
-    return folders.map(folder => ({
-      ...folder,
-      quizzes: folder.quizzes.map(quiz => 
-        quiz.id === quizId 
-          ? { ...quiz, cards: quiz.cards.filter(card => card.id !== cardId), updated: new Date() }
-          : quiz
-      ),
-      children: this.removeCardFromQuiz(folder.children, quizId, cardId)
-    }));
+    if (error) throw error;
+    return data;
   }
 }

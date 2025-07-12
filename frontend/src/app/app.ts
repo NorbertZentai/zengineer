@@ -33,8 +33,8 @@ export class App {
     const browserLang = this.translate.getBrowserLang();
     const langToUse = savedLang || (browserLang?.match(/en|hu/) ? browserLang : 'hu');
 
-    // Wait for translation files to load in Docker environment (when API URL starts with /)
-    if (environment.apiUrl.startsWith('/')) {
+    // Wait for translation files to load in Docker environment
+    if (window.location.pathname.startsWith('/')) {
       try {
         await this.translate.use(langToUse).toPromise();
         // Additional wait to ensure all translations are fully loaded
@@ -58,7 +58,7 @@ export class App {
   }
 
   isLoggedIn(): boolean {
-    return this.auth.isAuthenticated;
+    return this.auth.isAuthenticated();
   }
 
   onLangChange(event: Event) {

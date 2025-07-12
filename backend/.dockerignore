@@ -1,7 +1,0 @@
-pb_data
-.git
-.gitignore
-Dockerfile
-.dockerignore
-README.md
-*.md
