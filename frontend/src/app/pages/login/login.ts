@@ -27,6 +27,7 @@ export class Login {
   isSendingReset = false;
   resetEmailSent = false;
   forgotPasswordError: string | null = null;
+  isTestingConnection = false;
   
   // Validation errors
   validationErrors = {
@@ -198,5 +199,188 @@ export class Login {
     } finally {
       this.isSendingReset = false;
     }
+  }
+
+  async testConnection() {
+    this.isTestingConnection = true;
+    
+    console.log('=== BE/FE CONNECTION TEST START ===');
+    console.log('Timestamp:', new Date().toISOString());
+    console.log('User Agent:', navigator.userAgent);
+    console.log('Page URL:', window.location.href);
+    console.log('Protocol:', window.location.protocol);
+    console.log('Host:', window.location.host);
+    console.log('Port:', window.location.port);
+    
+    // Test environment detection
+    const currentEnv = this.detectEnvironment();
+    console.log('Detected Environment:', currentEnv);
+    
+    // Test translation service
+    console.log('Translation Service Status:', {
+      defaultLang: this.translate.getDefaultLang(),
+      currentLang: this.translate.currentLang,
+      availableLangs: this.translate.getLangs()
+    });
+    
+    try {
+      // Test 1: Basic API connectivity
+      console.log('\n--- TEST 1: Basic API Health Check ---');
+      const healthUrl = currentEnv.apiUrl + '/health';
+      console.log('Health check URL:', healthUrl);
+      
+      try {
+        const healthResponse = await fetch(healthUrl, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+        console.log('Health check status:', healthResponse.status);
+        console.log('Health check headers:', Object.fromEntries(healthResponse.headers.entries()));
+        
+        if (healthResponse.ok) {
+          const healthData = await healthResponse.text();
+          console.log('Health check response:', healthData);
+        } else {
+          console.log('Health check failed with status:', healthResponse.status);
+        }
+      } catch (healthError) {
+        console.log('Health check error:', healthError);
+      }
+      
+      // Test 2: Collections endpoint
+      console.log('\n--- TEST 2: Collections Endpoint ---');
+      const collectionsUrl = currentEnv.apiUrl + '/collections';
+      console.log('Collections URL:', collectionsUrl);
+      
+      try {
+        const collectionsResponse = await fetch(collectionsUrl, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+        console.log('Collections status:', collectionsResponse.status);
+        console.log('Collections headers:', Object.fromEntries(collectionsResponse.headers.entries()));
+        
+        if (collectionsResponse.ok) {
+          const collectionsData = await collectionsResponse.json();
+          console.log('Collections response:', collectionsData);
+        } else {
+          console.log('Collections failed with status:', collectionsResponse.status);
+          const errorText = await collectionsResponse.text();
+          console.log('Collections error text:', errorText);
+        }
+      } catch (collectionsError) {
+        console.log('Collections error:', collectionsError);
+      }
+      
+      // Test 3: Users collection info
+      console.log('\n--- TEST 3: Users Collection Info ---');
+      const usersUrl = currentEnv.apiUrl + '/collections/users';
+      console.log('Users collection URL:', usersUrl);
+      
+      try {
+        const usersResponse = await fetch(usersUrl, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+        console.log('Users collection status:', usersResponse.status);
+        console.log('Users collection headers:', Object.fromEntries(usersResponse.headers.entries()));
+        
+        if (usersResponse.ok) {
+          const usersData = await usersResponse.json();
+          console.log('Users collection response:', usersData);
+        } else {
+          console.log('Users collection failed with status:', usersResponse.status);
+          const errorText = await usersResponse.text();
+          console.log('Users collection error text:', errorText);
+        }
+      } catch (usersError) {
+        console.log('Users collection error:', usersError);
+      }
+      
+      // Test 4: Test registration endpoint
+      console.log('\n--- TEST 4: Test Registration Endpoint (without actual registration) ---');
+      const registerUrl = currentEnv.apiUrl + '/collections/users/records';
+      console.log('Registration URL:', registerUrl);
+      
+      try {
+        // Test with invalid data to see what error we get
+        const testRegisterResponse = await fetch(registerUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: 'test@invalid',
+            password: '123',
+            passwordConfirm: '123',
+            name: ''
+          })
+        });
+        console.log('Test registration status:', testRegisterResponse.status);
+        console.log('Test registration headers:', Object.fromEntries(testRegisterResponse.headers.entries()));
+        
+        const registerResponseText = await testRegisterResponse.text();
+        console.log('Test registration response:', registerResponseText);
+        
+        try {
+          const registerResponseJson = JSON.parse(registerResponseText);
+          console.log('Test registration parsed:', registerResponseJson);
+        } catch (parseError) {
+          console.log('Could not parse registration response as JSON');
+        }
+        
+      } catch (registerError) {
+        console.log('Test registration error:', registerError);
+      }
+      
+      // Test 5: Network info
+      console.log('\n--- TEST 5: Network Information ---');
+      console.log('Navigator online:', navigator.onLine);
+      console.log('Connection type:', (navigator as any).connection?.effectiveType || 'unknown');
+      console.log('Connection downlink:', (navigator as any).connection?.downlink || 'unknown');
+      
+      // Test 6: Local storage and cookies
+      console.log('\n--- TEST 6: Storage Information ---');
+      console.log('LocalStorage available:', typeof Storage !== 'undefined');
+      console.log('Remembered email:', localStorage.getItem('rememberedEmail'));
+      console.log('Language setting:', localStorage.getItem('lang'));
+      console.log('Cookies:', document.cookie);
+      
+      console.log('\n=== BE/FE CONNECTION TEST END ===');
+      
+    } catch (error) {
+      console.error('Connection test failed:', error);
+    } finally {
+      this.isTestingConnection = false;
+    }
+  }
+  
+  private detectEnvironment() {
+    const apiUrl = window.location.origin;
+    const isDocker = apiUrl.includes('localhost:3000') || apiUrl.includes(':3000');
+    const isDevelopment = apiUrl.includes('localhost:4200') || apiUrl.includes(':4200');
+    
+    let detectedApiUrl = '';
+    if (isDocker) {
+      detectedApiUrl = '/api'; // Docker nginx proxy
+    } else if (isDevelopment) {
+      detectedApiUrl = 'http://localhost:8080/api'; // Development direct
+    } else {
+      detectedApiUrl = '/api'; // Production
+    }
+    
+    return {
+      currentUrl: window.location.href,
+      apiUrl: detectedApiUrl,
+      isDocker,
+      isDevelopment,
+      isProduction: !isDocker && !isDevelopment
+    };
   }
 }

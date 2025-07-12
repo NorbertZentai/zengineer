@@ -83,6 +83,17 @@
       <a href="#" (click)="onForgotPassword($event)">{{ 'LOGIN.FORGOT_PASSWORD' | translate }}</a>
     </div>
     
+    <!-- Test Connection Button -->
+    <button 
+      type="button" 
+      class="test-connection-btn" 
+      (click)="testConnection()"
+      [disabled]="isTestingConnection"
+    >
+      <span *ngIf="!isTestingConnection">🔧 Test BE/FE Connection</span>
+      <span *ngIf="isTestingConnection">Testing...</span>
+    </button>
+    
     <div class="error general-error" *ngIf="errorMessage">
       {{ errorMessage | translate }}
     </div>
