@@ -100,10 +100,11 @@ jobs:
       - name: � Start application with Docker Compose
         run: |
           echo "Starting full application stack..."
-          docker compose up -d --build
+          cd infrastructure
+          docker-compose up -d --build
           sleep 45
           echo "Checking service status:"
-          docker compose ps
+          docker-compose ps
 
       - name: 🩺 Health checks
         run: |
@@ -207,7 +208,8 @@ jobs:
       - name: 🛑 Stop services
         run: |
           echo "Stopping services..."
-          docker compose down -v || echo "Failed to stop services"
+          cd infrastructure
+          docker-compose down -v || echo "Failed to stop services"
         if: always()
 
   smoke-tests:
@@ -284,7 +286,7 @@ jobs:
           fi
           
           # Check docker-compose configuration
-          if grep -q "Dockerfile.lenient" docker-compose.yml; then
+          if grep -q "Dockerfile.lenient" infrastructure/docker-compose.yml; then
             echo "✅ Docker compose uses lenient build"
           else
             echo "❌ Docker compose not configured for lenient build"

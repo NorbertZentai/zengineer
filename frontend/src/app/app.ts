@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
-import { AuthService } from './services/auth.service';
+import { AuthService } from './core/services/auth.service';
 import { Router } from '@angular/router';
 import { CommonModule  } from '@angular/common';
-import { NavbarComponent } from './components/navbar/navbar';
-import { ToastNotification } from './components/toast-notification/toast-notification';
+import { NavbarComponent } from './shared/components/navbar/navbar';
+import { ToastNotification } from './shared/components/toast-notification/toast-notification';
 import { environment } from '../environments/environment';
 
 @Component({

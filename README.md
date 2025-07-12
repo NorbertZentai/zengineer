@@ -2,37 +2,58 @@
 
 [![CI/CD Pipeline](https://github.com/NorbertZentai/zengineer/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/NorbertZentai/zengineer/actions/workflows/ci-cd.yml)
 
-Intelligent quiz application with Angular frontend and **Supabase** cloud backend.
+Intelligent quiz application with modern Angular frontend and **Supabase** cloud backend.
 
 ## 🚀 Features
 
 - **🔐 Authentication**: Complete user registration, login, and management
-- **📝 Quiz Management**: Create, edit, and organize quizzes
-- **📊 Statistics**: Track learning progress and performance
+- **📝 Quiz Management**: Create, edit, and organize quizzes with rich editor
+- **📊 Analytics**: Comprehensive statistics and progress tracking
+- **🎓 Study Mode**: Interactive learning with spaced repetition
 - **🌍 Internationalization**: Multi-language support (EN/HU)
-- **🐳 Docker Support**: Containerized deployment
-- **☁️ Cloud Backend**: Supabase Postgres database
-- **⚡ Real-time**: Live updates with WebSocket
+- **🐳 Docker Support**: Containerized deployment ready
+- **☁️ Cloud Backend**: Supabase Postgres with real-time features
+- **⚡ Modern Architecture**: Angular 20+ with standalone components
+
+## 📁 Project Structure
+
+```
+zengineer/
+├── 📚 docs/               # Documentation and guides
+├── 🛠️ tools/             # Development and testing tools
+├── 🏗️ infrastructure/    # Docker and deployment configs
+├── 🎭 frontend/          # Angular application
+│   └── src/app/
+│       ├── core/         # Services, guards, interceptors
+│       ├── shared/       # Reusable components, utils
+│       ├── features/     # Feature modules
+│       │   ├── auth/     # Authentication (login, register)
+│       │   ├── quiz/     # Quiz management & study
+│       │   └── dashboard/ # Main dashboard
+│       └── assets/       # Static files and i18n
+├── 📧 email-templates/   # Email templates
+└── 📜 scripts/          # Utility scripts
+```
 
 ## 🧪 Automated Testing
 
-This project includes comprehensive CI/CD pipeline with automated testing:
+Comprehensive CI/CD pipeline with multi-stage testing:
 
-### ✅ **Auth Integration Tests** (runs on every commit)
-- 🌐 Backend connectivity
-- 🧪 User registration 
-- 🔑 Login/logout functionality
-- 🗑️ User cleanup (delete)
+### ✅ **Integration Tests** (runs on every commit)
+- 🌐 Supabase connectivity and auth
+- 🔧 Frontend build verification
+- � Docker container orchestration
+- � Health checks and monitoring
 
-### ⚙️ **Frontend Unit Tests**
-- 📱 Angular component testing
-- 🔧 Service testing with mocking
-- 🧩 Dependency injection testing
+### ⚙️ **Unit Tests**
+- 📱 Angular component testing with TestBed
+- 🔧 Service testing with dependency injection
+- 🧩 Guard and interceptor testing
 
-### 🐳 **Docker Integration Tests**
-- 🏗️ Frontend build verification
-- 🔧 Backend container testing
-- 📦 Docker Compose orchestration
+### � **End-to-End Tests**
+- � User journey testing
+- 📝 Quiz creation and management flows
+- � Statistics and analytics validation
 
 ## 🛠️ Development
 
