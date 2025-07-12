@@ -1,6 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import PocketBase from 'pocketbase';
 import { environment } from '../../environments/environment';
+import { TranslateService } from '@ngx-translate/core';
 
 export interface AuthError {
   code: string;
@@ -13,6 +14,13 @@ export class AuthService {
   private pb = new PocketBase(environment.apiUrl);
   private _isLoading = signal(false);
   private _lastError = signal<AuthError | null>(null);
+
+  constructor(private translate: TranslateService) {}
+
+  // Helper method to get translated message
+  private getTranslatedMessage(key: string): string {
+    return this.translate.instant(key);
+  }
 
   // Public signals
   isLoading = this._isLoading.asReadonly();
@@ -34,7 +42,7 @@ export class AuthService {
     if (!email?.trim() || !password?.trim()) {
       this._lastError.set({
         code: 'INVALID_INPUT',
-        message: 'Email and password are required'
+        message: this.getTranslatedMessage('ERRORS.VALIDATION_ERROR')
       });
       return false;
     }
@@ -43,12 +51,42 @@ export class AuthService {
     this._lastError.set(null);
     
     try {
-      await this.pb.collection('users').authWithPassword(email, password);
+      // Workaround for PocketBase API change - use identity instead of email
+      const response = await fetch(`/api/collections/users/auth-with-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          identity: email,
+          password: password
+        })
+      });
+
+      if (!response.ok) {
+        let errorMessage = this.getTranslatedMessage('ERRORS.LOGIN_FAILED');
+        
+        if (response.status === 400) {
+          errorMessage = this.getTranslatedMessage('ERRORS.LOGIN_FAILED');
+        } else if (response.status === 401) {
+          errorMessage = this.getTranslatedMessage('ERRORS.LOGIN_FAILED');
+        } else if (response.status >= 500) {
+          errorMessage = this.getTranslatedMessage('ERRORS.SERVER_ERROR');
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      const authData = await response.json();
+      
+      // Manually set auth store
+      this.pb.authStore.save(authData.token, authData.record);
+      
       return true;
     } catch (err: any) {
       const error: AuthError = {
         code: err?.status?.toString() || 'LOGIN_FAILED',
-        message: err?.message || 'Login failed. Please check your credentials.',
+        message: err?.message || this.getTranslatedMessage('ERRORS.LOGIN_FAILED'),
         details: err
       };
       
@@ -64,7 +102,7 @@ export class AuthService {
     if (!email?.trim() || !password?.trim() || !name?.trim()) {
       this._lastError.set({
         code: 'INVALID_INPUT',
-        message: 'All fields are required'
+        message: this.getTranslatedMessage('ERRORS.VALIDATION_ERROR')
       });
       return false;
     }
@@ -74,7 +112,7 @@ export class AuthService {
     if (!emailRegex.test(email)) {
       this._lastError.set({
         code: 'INVALID_EMAIL',
-        message: 'Please enter a valid email address'
+        message: this.getTranslatedMessage('ERRORS.VALIDATION_ERROR')
       });
       return false;
     }
@@ -83,7 +121,7 @@ export class AuthService {
     if (password.length < 8) {
       this._lastError.set({
         code: 'WEAK_PASSWORD',
-        message: 'Password must be at least 8 characters long'
+        message: this.getTranslatedMessage('ERRORS.WEAK_PASSWORD')
       });
       return false;
     }
@@ -91,12 +129,11 @@ export class AuthService {
     const hasUppercase = /[A-Z]/.test(password);
     const hasLowercase = /[a-z]/.test(password);
     const hasNumber = /\d/.test(password);
-    const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
 
-    if (!hasUppercase || !hasLowercase || !hasNumber || !hasSpecial) {
+    if (!hasUppercase || !hasLowercase || !hasNumber) {
       this._lastError.set({
         code: 'WEAK_PASSWORD',
-        message: 'Password must contain uppercase, lowercase, number, and special character'
+        message: this.getTranslatedMessage('ERRORS.WEAK_PASSWORD')
       });
       return false;
     }
@@ -105,7 +142,7 @@ export class AuthService {
     if (name.trim().length < 2) {
       this._lastError.set({
         code: 'INVALID_NAME',
-        message: 'Name must be at least 2 characters long'
+        message: this.getTranslatedMessage('ERRORS.INVALID_NAME')
       });
       return false;
     }
@@ -113,7 +150,7 @@ export class AuthService {
     if (name.trim().length > 50) {
       this._lastError.set({
         code: 'INVALID_NAME',
-        message: 'Name can be maximum 50 characters long'
+        message: this.getTranslatedMessage('ERRORS.INVALID_NAME')
       });
       return false;
     }
@@ -122,32 +159,73 @@ export class AuthService {
     this._lastError.set(null);
     
     try {
-      await this.pb.collection('users').create({
-        email,
-        password,
-        passwordConfirm: password,
-        name: name.trim(),
+      // Use custom fetch for registration to match PocketBase API
+      const response = await fetch(`/api/collections/users/records`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          passwordConfirm: password,
+          name: name.trim(),
+        })
       });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Registration error response:', errorData);
+        
+        // Check for specific email uniqueness error
+        if (errorData.data?.email?.code === 'validation_not_unique') {
+          throw new Error('EMAIL_EXISTS');
+        }
+        
+        throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+      }
+
       return true;
     } catch (err: any) {
-      let errorMessage = 'Registration failed. Please try again.';
+      let errorMessage = this.getTranslatedMessage('ERRORS.REGISTRATION_FAILED');
+      let errorCode = 'REGISTRATION_FAILED';
       
-      // Handle specific PocketBase errors
+      console.error('Registration error:', err);
+      
+      // Handle specific error types
+      if (err.message === 'EMAIL_EXISTS') {
+        errorCode = 'EMAIL_EXISTS';
+        errorMessage = this.getTranslatedMessage('ERRORS.EMAIL_EXISTS');
+      } else if (err.message && err.message.includes('HTTP 400')) {
+        errorCode = 'VALIDATION_ERROR';
+        errorMessage = this.getTranslatedMessage('ERRORS.EMAIL_EXISTS');
+      } else if (err.message && err.message.includes('HTTP 422')) {
+        errorCode = 'VALIDATION_ERROR';
+        errorMessage = this.getTranslatedMessage('ERRORS.VALIDATION_ERROR');
+      } else if (err.message && err.message.includes('HTTP 409')) {
+        errorCode = 'EMAIL_EXISTS';
+        errorMessage = this.getTranslatedMessage('ERRORS.EMAIL_EXISTS');
+      } else if (err.message && err.message.includes('HTTP')) {
+        errorMessage = this.translate.instant('ERRORS.SERVER_ERROR');
+      }
+      
+      // Handle specific PocketBase errors (fallback for SDK errors)
       if (err?.data?.data) {
         const errors = err.data.data;
         if (errors.email) {
-          errorMessage = 'This email is already registered.';
+          errorCode = 'EMAIL_EXISTS';
+          errorMessage = this.translate.instant('ERRORS.EMAIL_EXISTS');
         } else if (errors.password) {
-          errorMessage = 'Password does not meet requirements.';
+          errorCode = 'WEAK_PASSWORD';
+          errorMessage = this.translate.instant('ERRORS.WEAK_PASSWORD');
         } else if (errors.name) {
-          errorMessage = 'Invalid name format.';
+          errorCode = 'INVALID_NAME';
+          errorMessage = this.translate.instant('ERRORS.INVALID_NAME');
         }
-      } else if (err?.message) {
-        errorMessage = err.message;
       }
       
       const error: AuthError = {
-        code: err?.status?.toString() || 'REGISTRATION_FAILED',
+        code: errorCode,
         message: errorMessage,
         details: err
       };

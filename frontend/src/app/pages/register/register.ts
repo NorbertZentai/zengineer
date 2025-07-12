@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { NotificationService } from '../../services/notification.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
@@ -46,7 +46,8 @@ export class Register {
   constructor(
     private auth: AuthService, 
     private router: Router,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private translate: TranslateService
   ) {}
 
   togglePasswordVisibility() {
@@ -183,7 +184,7 @@ export class Register {
     
     // Validate form
     if (!this.validateForm()) {
-      this.errorMessage = 'REGISTER.VALIDATION.FORM_INVALID';
+      this.errorMessage = this.translate.instant('REGISTER.VALIDATION.FORM_INVALID');
       return;
     }
     
@@ -200,14 +201,15 @@ export class Register {
       } else {
         // Use the error from AuthService if available
         const authError = this.auth.lastError();
-        const errorMsg = authError?.message || 'REGISTER.ERROR.GENERAL';
+        const errorMsg = authError?.message || this.translate.instant('REGISTER.ERROR.GENERAL');
         this.errorMessage = errorMsg;
-        this.notificationService.error(errorMsg, 'REGISTER.ERROR.TITLE');
+        this.notificationService.error(authError?.message || 'REGISTER.ERROR.GENERAL', 'REGISTER.ERROR.TITLE');
       }
     } catch (err: any) {
       console.error('Registration error:', err);
-      this.errorMessage = 'REGISTER.ERROR.GENERAL';
-      this.notificationService.error('REGISTER.ERROR.GENERAL', 'REGISTER.ERROR.TITLE');
+      const errorKey = 'REGISTER.ERROR.GENERAL';
+      this.errorMessage = this.translate.instant(errorKey);
+      this.notificationService.error(errorKey, 'REGISTER.ERROR.TITLE');
     } finally {
       this.isLoading = false;
     }

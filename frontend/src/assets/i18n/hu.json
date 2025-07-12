@@ -6,6 +6,16 @@
     "LOGOUT": "Kijelentkezés",
     "CLOSE": "Bezárás"
   },
+  "ERRORS": {
+    "REGISTRATION_FAILED": "A regisztráció sikertelen. Kérjük, próbálja újra.",
+    "EMAIL_EXISTS": "Ez az email cím már regisztrálva van. Használjon másik email címet vagy próbáljon bejelentkezni.",
+    "VALIDATION_ERROR": "Hibás adatok. Kérjük, ellenőrizze az adatokat és próbálja újra.",
+    "WEAK_PASSWORD": "A jelszó nem felel meg a követelményeknek.",
+    "INVALID_NAME": "Hibás névformátum.",
+    "SERVER_ERROR": "Szerverhiba. Kérjük, próbálja később.",
+    "LOGIN_FAILED": "A bejelentkezés sikertelen. Ellenőrizze az adatokat és próbálja újra.",
+    "NETWORK_ERROR": "Hálózati hiba. Ellenőrizze a kapcsolatot és próbálja újra."
+  },
   "NAV": {
     "DASHBOARD": "Kezdőlap",
     "QUIZ_MANAGER": "Kvízkezelő",
@@ -165,9 +175,7 @@
       "CORRECT_ANSWERS": "helyes válasz",
       "QUIZ_EXPORTED": "Kvíz exportálva",
       "EXPORT_ERROR": "Hiba történt az exportálás során",
-      "MOVE_NOT_IMPLEMENTED": "Az áthelyezés funkció még nem készült el",
-      "EXPORT_SUCCESS": "Kvíz sikeresen exportálva",
-      "IMPORT_SUCCESS": "Kvíz sikeresen importálva"
+      "MOVE_NOT_IMPLEMENTED": "Az áthelyezés funkció még nem készült el"
     },
     "CONFIRM": {
       "DELETE_FOLDER": "Biztosan törölni szeretnéd a",
@@ -175,29 +183,6 @@
       "DELETE_QUIZ": "Biztosan törölni szeretnéd a",
       "DELETE_QUIZ_WARNING": "kvízt?"
     }
-  },
-  "QUIZ_EDITOR": {
-    "TITLE": "Kvíz szerkesztő",
-    "NEW_CARD": "Új kártya",
-    "FRONT": "Előlap",
-    "BACK": "Hátlap",
-    "DIFFICULTY": "Nehézség",
-    "EASY": "Könnyű",
-    "MEDIUM": "Közepes",
-    "HARD": "Nehéz",
-    "SAVE": "Mentés",
-    "CANCEL": "Mégse",
-    "DELETE": "Törlés"
-  },
-  "STUDY_MODE": {
-    "TITLE": "Tanulás mód",
-    "SHOW_ANSWER": "Válasz megjelenítése",
-    "NEXT_CARD": "Következő kártya",
-    "AGAIN": "Újra",
-    "GOOD": "Jó",
-    "EASY": "Könnyű",
-    "PROGRESS": "Haladás",
-    "CARDS_LEFT": "kártya van hátra"
   },
   "DASHBOARD": {
     "TITLE": "Irányítópult",

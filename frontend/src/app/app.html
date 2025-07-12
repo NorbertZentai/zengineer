@@ -1,5 +1,12 @@
-<app-navbar />
+<div *ngIf="translationsLoaded; else loadingTemplate">
+  <app-navbar />
+  <router-outlet />
+  <app-toast-notification />
+</div>
 
-<router-outlet />
-
-<app-toast-notification />
+<ng-template #loadingTemplate>
+  <div class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Loading translations...</p>
+  </div>
+</ng-template>

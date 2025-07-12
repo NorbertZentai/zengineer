@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { CommonModule  } from '@angular/common';
 import { NavbarComponent } from './components/navbar/navbar';
 import { ToastNotification } from './components/toast-notification/toast-notification';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -16,19 +17,39 @@ import { ToastNotification } from './components/toast-notification/toast-notific
 })
 export class App {
   protected title = 'zengineer';
+  public translationsLoaded = false;
 
   constructor(private translate: TranslateService, private auth: AuthService, private router: Router) {
+    this.initializeTranslations();
+  }
+
+  async initializeTranslations() {
     // Initialize languages
-    translate.addLangs(['en', 'hu']);
-    translate.setDefaultLang('hu');
+    this.translate.addLangs(['en', 'hu']);
+    this.translate.setDefaultLang('hu');
 
     // Determine language to use
     const savedLang = localStorage.getItem('lang');
-    const browserLang = translate.getBrowserLang();
+    const browserLang = this.translate.getBrowserLang();
     const langToUse = savedLang || (browserLang?.match(/en|hu/) ? browserLang : 'hu');
 
-    // Set the language
-    translate.use(langToUse);
+    // Wait for translation files to load in Docker environment (when API URL starts with /)
+    if (environment.apiUrl.startsWith('/')) {
+      try {
+        await this.translate.use(langToUse).toPromise();
+        // Additional wait to ensure all translations are fully loaded
+        await new Promise(resolve => setTimeout(resolve, 500));
+        this.translationsLoaded = true;
+      } catch (error) {
+        console.warn('Translation loading failed, falling back to default:', error);
+        this.translate.use('hu');
+        this.translationsLoaded = true;
+      }
+    } else {
+      // Standard loading for development
+      this.translate.use(langToUse);
+      this.translationsLoaded = true;
+    }
   }
 
   logout() {

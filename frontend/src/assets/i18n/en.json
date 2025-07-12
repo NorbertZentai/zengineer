@@ -6,6 +6,16 @@
     "LOGOUT": "Logout",
     "CLOSE": "Close"
   },
+  "ERRORS": {
+    "REGISTRATION_FAILED": "Registration failed. Please try again.",
+    "EMAIL_EXISTS": "This email address is already registered. Please use a different email or try logging in.",
+    "VALIDATION_ERROR": "Invalid data provided. Please check your input and try again.",
+    "WEAK_PASSWORD": "Password does not meet requirements.",
+    "INVALID_NAME": "Invalid name format.",
+    "SERVER_ERROR": "Server error. Please try again later.",
+    "LOGIN_FAILED": "Login failed. Please check your credentials and try again.",
+    "NETWORK_ERROR": "Network error. Please check your connection and try again."
+  },
   "NAV": {
     "DASHBOARD": "Dashboard",
     "QUIZ_MANAGER": "Quiz Manager",
