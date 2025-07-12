@@ -46,7 +46,7 @@ export class QuizStatsComponent {
 
   getDifficultyDistribution() {
     const distribution = { easy: 0, medium: 0, hard: 0 };
-    this.quiz.cards.forEach(card => {
+    this.quiz.cards?.forEach(card => {
       distribution[card.difficulty]++;
     });
     return distribution;
@@ -54,7 +54,7 @@ export class QuizStatsComponent {
 
   getTagDistribution() {
     const tagCount: { [key: string]: number } = {};
-    this.quiz.cards.forEach(card => {
+    this.quiz.cards?.forEach(card => {
       card.tags.forEach(tag => {
         tagCount[tag] = (tagCount[tag] || 0) + 1;
       });
@@ -64,7 +64,8 @@ export class QuizStatsComponent {
       .slice(0, 10); // Top 10 tags
   }
 
-  formatDate(date: Date): string {
+  formatDate(date: Date | undefined): string {
+    if (!date) return 'N/A';
     return new Intl.DateTimeFormat('hu-HU', {
       year: 'numeric',
       month: 'short',

@@ -133,7 +133,9 @@ export class Login {
       } else {
         // Use the error from AuthService if available
         const authError = this.auth.lastError();
-        const errorMsg = authError?.message || 'LOGIN.ERROR.GENERAL';
+        const errorMsg = (authError && typeof authError === 'object' && 'message' in authError) 
+          ? (authError as any).message 
+          : 'LOGIN.ERROR.GENERAL';
         this.errorMessage = errorMsg;
         this.notificationService.error(errorMsg, 'LOGIN.ERROR.TITLE');
       }

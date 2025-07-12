@@ -7,6 +7,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { QuizService, Quiz, QuizCard, StudySession } from '../../services/quiz.service';
+import { safeArray, safeAccess } from '../../utils/safe-access';
 
 type StudyMode = 'classic' | 'review' | 'hard_cards';
 
@@ -94,20 +95,21 @@ export class StudyModeComponent {
     
     switch (this.studyMode()) {
       case 'classic':
-        cards = [...this.quiz.cards];
+        cards = [...safeArray(this.quiz.cards)];
         break;
       case 'review':
         cards = this.quizService.getCardsNeedingReview(this.quiz);
         break;
       case 'hard_cards':
-        cards = this.quiz.cards.filter(card => 
+        cards = safeArray(this.quiz.cards).filter(card => 
           card.difficulty === 'hard' || card.successRate < 0.6
         );
         break;
     }
     
     // Shuffle cards if enabled in settings
-    if (this.quiz.studySettings.shuffleCards) {
+    const studySettings = this.quiz.studySettings;
+    if (studySettings?.shuffleCards) {
       cards = this.shuffleArray(cards);
     }
     
@@ -166,7 +168,7 @@ export class StudyModeComponent {
     this.quizService.updateStudySession({
       totalAnswers: this.studyStats().total,
       correctAnswers: this.correctAnswers(),
-      cardsReviewed: [...(this.studySession?.cardsReviewed || []), card.id!]
+      cardsReviewed: [...safeArray(this.studySession?.cardsReviewed), card.id!]
     });
     
     // Move to next card or finish
@@ -185,7 +187,10 @@ export class StudyModeComponent {
 
   private finishStudy(): void {
     this.showResult.set(true);
-    const session = this.quizService.endStudySession(this.studySession!);
+    
+    if (this.studySession) {
+      const session = this.quizService.endStudySession(this.studySession);
+    }
     
     if (this.timeInterval) {
       clearInterval(this.timeInterval);

@@ -161,7 +161,7 @@
               <mat-icon>event</mat-icon>
               <div class="info-details">
                 <span class="info-label">Létrehozva</span>
-                <span class="info-value">{{ formatDate(quiz.created) }}</span>
+                <span class="info-value">{{ quiz.created ? formatDate(quiz.created) : 'N/A' }}</span>
               </div>
             </div>
 
@@ -169,7 +169,7 @@
               <mat-icon>update</mat-icon>
               <div class="info-details">
                 <span class="info-label">Utolsó módosítás</span>
-                <span class="info-value">{{ formatDate(quiz.updated) }}</span>
+                <span class="info-value">{{ quiz.updated ? formatDate(quiz.updated) : 'N/A' }}</span>
               </div>
             </div>
 
@@ -181,7 +181,7 @@
               </div>
             </div>
 
-            <div class="info-item" *ngIf="quiz.tags.length > 0">
+            <div class="info-item" *ngIf="quiz.tags && quiz.tags.length > 0">
               <mat-icon>local_offer</mat-icon>
               <div class="info-details">
                 <span class="info-label">Címkék</span>

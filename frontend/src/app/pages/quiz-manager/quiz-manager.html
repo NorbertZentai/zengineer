@@ -165,7 +165,7 @@
                 <mat-icon>edit</mat-icon>
                 {{ 'QUIZ_MANAGER.ACTIONS.EDIT_CARDS' | translate }}
               </button>
-              <button mat-menu-item (click)="startStudyMode(quiz)" [disabled]="quiz.cards.length === 0">
+              <button mat-menu-item (click)="startStudyMode(quiz)" [disabled]="(quiz.cards?.length ?? 0) === 0">
                 <mat-icon>school</mat-icon>
                 {{ 'QUIZ_MANAGER.ACTIONS.STUDY' | translate }}
               </button>
@@ -190,7 +190,7 @@
               <div class="stat-row">
                 <span class="stat">
                   <mat-icon>style</mat-icon>
-                  {{ quiz.cards.length }} {{ 'QUIZ_MANAGER.STATS.CARDS' | translate }}
+                  {{ quiz.cards?.length ?? 0 }} {{ 'QUIZ_MANAGER.STATS.CARDS' | translate }}
                 </span>
                 <span class="stat" *ngIf="quizService.getCardsNeedingReview(quiz).length > 0">
                   <mat-icon>schedule</mat-icon>
@@ -199,7 +199,7 @@
               </div>
             </div>
             
-            <div class="quiz-tags" *ngIf="quiz.tags.length > 0">
+            <div class="quiz-tags" *ngIf="(quiz.tags?.length ?? 0) > 0">
               <mat-chip *ngFor="let tag of quiz.tags" class="tag-chip">{{ tag }}</mat-chip>
             </div>
           </mat-card-content>
@@ -209,7 +209,7 @@
               mat-button 
               color="primary"
               (click)="startStudyMode(quiz)"
-              [disabled]="quiz.cards.length === 0">
+              [disabled]="(quiz.cards?.length ?? 0) === 0">
               <mat-icon>school</mat-icon>
               {{ 'QUIZ_MANAGER.ACTIONS.STUDY' | translate }}
             </button>
