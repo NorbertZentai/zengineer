@@ -135,31 +135,62 @@ A projekt készen áll a Render.com automatikus deployment-re:
 4. Environment variables automatically configured
 ```
 
-### 🐳 **Docker Deployment** (Local/Development)
+### 🌐 Render.com Deployment
 
+### Problémák és megoldások az ingyenes verzióban
+
+#### 🚨 **Ismert problémák:**
+1. **Hibernálás**: 15 perc inaktivitás után a szolgáltatások leállnak
+2. **Adatvesztés**: Container újraindításkor az adatok elvesznek
+3. **Cold start**: Hibernálás után lassú indítás
+
+#### ✅ **Megoldások:**
+##### 1. Keep-alive szolgáltatás
 ```bash
-# Helyi Docker környezet
-npm run docker:rebuild
-
-# Docker logs követése
-npm run docker:logs
+# Keep-alive script futtatása (külön Render service-ként)
+node keep-alive.js
 ```
 
-### ⚙️ **Build Konfigurációk**
+##### 2. Perzisztens adattárolás
+- Render Persistent Disks használata (fizetős)
+- Vagy külső adatbázis (MongoDB Atlas ingyenes tier)
 
-- **Production** (Render.com): `npm run build:prod` 
-  - `environment.prod.ts` → `https://zengineer-backend.onrender.com`
-- **Docker** (Helyi): `npm run build:docker`
-  - `environment.docker.ts` → `/api` proxy
-- **Development**: `npm start`
-  - `environment.ts` → `http://localhost:8090`
+##### 3. Health check végpontok
+- Backend: `/health.html`
+- Frontend: `/`
 
-The application automatically builds and deploys via GitHub Actions:
+### Deployment lépések:
 
-1. **Code Push** → Triggers CI/CD pipeline
-2. **Tests Run** → Auth, frontend, and integration tests
-3. **Build** → Docker images created
-4. **Deploy** → Automatic deployment (when configured)
+1. **Backend deploy:**
+   ```bash
+   # Render.com-on új Web Service
+   # Repository: https://github.com/NorbertZentai/zengineer
+   # Build Command: docker build -f backend/Dockerfile backend
+   # Start Command: /pb/pocketbase serve --http=0.0.0.0:8080
+   ```
+
+2. **Frontend deploy:**
+   ```bash
+   # Render.com-on új Web Service  
+   # Build Command: docker build -f frontend/Dockerfile frontend
+   ```
+
+3. **Keep-alive service (opcionális):**
+   ```bash
+   # Render.com-on új Web Service
+   # Build Command: cp keepalive-package.json package.json && npm install
+   # Start Command: npm start
+   ```
+
+### Environment változók:
+```
+# Backend
+PB_CORS_ORIGINS=https://zengineer-frontend.onrender.com,https://zengineer.cv
+PORT=8080
+
+# Frontend  
+BACKEND_URL=https://zengineer-backend.onrender.com
+```
 
 ## 🏗️ Architecture
 

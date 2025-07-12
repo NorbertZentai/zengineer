@@ -1,0 +1,13 @@
+{
+  "name": "zengineer-keepalive",
+  "version": "1.0.0",
+  "description": "Keep-alive service for Render.com free tier",
+  "main": "keep-alive.js",
+  "scripts": {
+    "start": "node keep-alive.js"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
