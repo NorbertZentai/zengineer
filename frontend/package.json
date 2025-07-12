@@ -10,7 +10,10 @@
     "build:lenient": "ng build --configuration lenient",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "ng lint"
+    "test:ci": "ng test --watch=false --browsers=ChromeHeadless --code-coverage",
+    "test:integration": "ng test --include='**/tests/**/*.spec.ts' --watch=false --browsers=ChromeHeadless",
+    "lint": "ng lint",
+    "lint:fix": "ng lint --fix"
   },
   "prettier": {
     "overrides": [

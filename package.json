@@ -1,17 +1,20 @@
 {
   "name": "zengineer",
   "version": "1.0.0",
-  "main": "test-auth.js",
+  "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "node test-auth.js",
-    "test:auth": "node test-auth.js",
-    "test:ci": "node test-auth.js",
+    "test": "bash test-suite.sh",
+    "test:suite": "bash test-suite.sh",
+    "test:frontend": "cd frontend && npm run test:ci",
+    "test:integration": "cd frontend && npm run test:integration",
     "docker:build": "docker-compose build",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:rebuild": "docker-compose down && docker-compose build --no-cache && docker-compose up -d",
-    "docker:logs": "docker-compose logs -f"
+    "docker:logs": "docker-compose logs -f",
+    "build:prod": "cd frontend && npm run build:prod",
+    "build:lenient": "cd frontend && npm run build:lenient"
   },
   "repository": {
     "type": "git",
