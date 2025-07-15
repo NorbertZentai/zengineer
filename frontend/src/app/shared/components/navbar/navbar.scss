@@ -110,6 +110,23 @@ nav {
     color: var(--primary);
     vertical-align: middle;
   }
+  
+  .auth-loading {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    
+    mat-icon {
+      animation: spin 1s linear infinite;
+      color: var(--navbar-link);
+      font-size: 1.2rem;
+    }
+  }
+  
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
 }
 
 @media (max-width: 700px) {

@@ -7,6 +7,7 @@ import { environment } from '../../../environments/environment';
 })
 export class AuthService {
   private supabase: SupabaseClient;
+  private initPromise: Promise<void>;
   
   // Reactive state
   user = signal<User | null>(null);
@@ -17,13 +18,14 @@ export class AuthService {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
     
     // Initialize auth state
-    this.initializeAuth();
+    this.initPromise = this.initializeAuth();
   }
 
   private async initializeAuth() {
-    const { data: { user } } = await this.supabase.auth.getUser();
-    this.user.set(user);
-    this.isAuthenticated.set(!!user);
+    // Check for existing session on page load/refresh
+    const { data: { session } } = await this.supabase.auth.getSession();
+    this.user.set(session?.user ?? null);
+    this.isAuthenticated.set(!!session?.user);
     
     // Listen for auth changes
     this.supabase.auth.onAuthStateChange((event, session) => {
@@ -83,21 +85,44 @@ export class AuthService {
     if (error) throw error;
   }
 
+  // Method to ensure initialization is complete
+  async waitForInit(): Promise<void> {
+    return this.initPromise;
+  }
+
   // Kompatibilitási metódusok a régi API-val
   get currentUser() {
     return this.user();
   }
 
   async login(email: string, password: string) {
-    return await this.signIn(email, password);
+    try {
+      const result = await this.signIn(email, password);
+      return !!result;
+    } catch (error) {
+      console.error('Login error:', error);
+      return false;
+    }
   }
 
   async register(email: string, password: string) {
-    return await this.signUp(email, password);
+    try {
+      const result = await this.signUp(email, password);
+      return !!result;
+    } catch (error) {
+      console.error('Register error:', error);
+      return false;
+    }
   }
 
   async logout() {
-    return await this.signOut();
+    try {
+      await this.signOut();
+      return true;
+    } catch (error) {
+      console.error('Logout error:', error);
+      return false;
+    }
   }
 
   lastError() {

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -12,8 +12,9 @@ import { MatIconModule } from '@angular/material/icon';
   templateUrl: './navbar.html',
   styleUrls: ['./navbar.scss']
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
   currentTheme: 'light' | 'dark' = 'light';
+  authInitialized = false;
 
   constructor(
     private auth: AuthService,
@@ -21,17 +22,21 @@ export class NavbarComponent {
     public translate: TranslateService
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.currentTheme = (localStorage.getItem('theme') as 'light' | 'dark') || 'light';
     this.setTheme(this.currentTheme);
+    
+    // Wait for auth initialization
+    await this.auth.waitForInit();
+    this.authInitialized = true;
   }
 
   isLoggedIn(): boolean {
-    return this.auth.isAuthenticated();
+    return this.authInitialized && this.auth.isAuthenticated();
   }
 
-  logout() {
-    this.auth.logout();
+  async logout() {
+    await this.auth.logout();
     this.router.navigateByUrl('/login');
   }
 

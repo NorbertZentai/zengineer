@@ -21,19 +21,29 @@
     </a>
   </div>
   <div class="navbar-right">
-    <ng-container *ngIf="isLoggedIn(); else guestLinks">
-      <button class="icon-btn" (click)="logout()" [attr.aria-label]="'COMMON.LOGOUT' | translate">
-        <mat-icon>logout</mat-icon>
-      </button>
+    <!-- Show loading indicator while auth is initializing -->
+    <ng-container *ngIf="!authInitialized">
+      <div class="auth-loading">
+        <mat-icon>refresh</mat-icon>
+      </div>
     </ng-container>
-    <ng-template #guestLinks>
-      <a class="icon-btn" routerLink="/login" [attr.aria-label]="'COMMON.LOGIN' | translate">
-        <mat-icon>login</mat-icon>
-      </a>
-      <a class="icon-btn" routerLink="/register" [attr.aria-label]="'COMMON.REGISTER' | translate">
-        <mat-icon>person_add</mat-icon>
-      </a>
-    </ng-template>
+    
+    <!-- Show auth buttons after initialization -->
+    <ng-container *ngIf="authInitialized">
+      <ng-container *ngIf="isLoggedIn(); else guestLinks">
+        <button class="icon-btn" (click)="logout()" [attr.aria-label]="'COMMON.LOGOUT' | translate">
+          <mat-icon>logout</mat-icon>
+        </button>
+      </ng-container>
+      <ng-template #guestLinks>
+        <a class="icon-btn" routerLink="/login" [attr.aria-label]="'COMMON.LOGIN' | translate">
+          <mat-icon>login</mat-icon>
+        </a>
+        <a class="icon-btn" routerLink="/register" [attr.aria-label]="'COMMON.REGISTER' | translate">
+          <mat-icon>person_add</mat-icon>
+        </a>
+      </ng-template>
+    </ng-container>
     <select class="lang-switch" [value]="translate.currentLang" (change)="changeLang($event)">
       <option value="hu">HU</option>
       <option value="en">EN</option>
