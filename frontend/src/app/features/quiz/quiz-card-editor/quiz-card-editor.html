@@ -8,14 +8,62 @@
       <span class="card-count">{{ cards().length }} kártya</span>
     </div>
     <div class="header-actions">
+      <button 
+        mat-button 
+        [color]="bulkEditMode() ? 'warn' : 'primary'"
+        (click)="toggleBulkEditMode()">
+        <mat-icon>{{ bulkEditMode() ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+        {{ bulkEditMode() ? 'Kijelölés befejezése' : 'Tömeges műveletek' }}
+      </button>
+      
       <button mat-button (click)="exportCards()">
         <mat-icon>download</mat-icon>
         Exportálás
       </button>
-      <button mat-button>
+      
+      <button mat-button onclick="document.getElementById('import-file').click()">
         <mat-icon>upload</mat-icon>
-        <input type="file" accept=".json" (change)="importCards($event)" style="display: none">
         Importálás
+      </button>
+      <input 
+        id="import-file"
+        type="file" 
+        accept=".json,.csv,.txt" 
+        (change)="importCards($event)" 
+        style="display: none">
+    </div>
+  </div>
+
+  <!-- Bulk Operations Toolbar -->
+  <div class="bulk-operations-toolbar" *ngIf="bulkEditMode()">
+    <div class="bulk-selection">
+      <mat-checkbox 
+        [checked]="selectAllChecked()"
+        [indeterminate]="selectedCards().size > 0 && !selectAllChecked()"
+        (change)="toggleSelectAll()">
+        {{ selectedCards().size > 0 ? selectedCards().size + ' kijelölve' : 'Összes kijelölése' }}
+      </mat-checkbox>
+    </div>
+    
+    <div class="bulk-actions" *ngIf="selectedCards().size > 0">
+      <button mat-button color="warn" (click)="bulkDelete()">
+        <mat-icon>delete</mat-icon>
+        Törlés
+      </button>
+      
+      <div class="custom-form-field bulk-difficulty">
+        <label class="field-label">Nehézség megváltoztatása</label>
+        <select class="custom-select" (change)="bulkUpdateDifficulty($any($event.target).value)">
+          <option value="">Válassz nehézséget</option>
+          <option value="easy">Könnyű</option>
+          <option value="medium">Közepes</option>
+          <option value="hard">Nehéz</option>
+        </select>
+      </div>
+      
+      <button mat-button (click)="showBulkTagsDialog()">
+        <mat-icon>local_offer</mat-icon>
+        Címkék hozzáadása
       </button>
     </div>
   </div>
@@ -26,27 +74,33 @@
       <div class="tab-content">
         <!-- Filters -->
         <div class="filters-section">
-          <mat-form-field appearance="outline" class="search-field">
-            <mat-label>Keresés kártyákban...</mat-label>
+          <div class="custom-form-field search-field has-icon">
+            <label class="field-label">Keresés kártyákban...</label>
             <input 
-              matInput 
+              type="text"
+              class="custom-input"
               [value]="searchQuery()"
               (input)="onSearch($any($event.target).value)"
               placeholder="Szöveg vagy címke">
-            <mat-icon matSuffix>search</mat-icon>
-          </mat-form-field>
+            <mat-icon class="input-icon">search</mat-icon>
+          </div>
           
-          <mat-form-field appearance="outline" class="difficulty-filter">
-            <mat-label>Nehézség</mat-label>
-            <mat-select 
+          <div class="custom-form-field difficulty-filter">
+            <label class="field-label">Nehézség</label>
+            <select 
+              class="custom-select"
               [value]="selectedDifficulty()"
-              (selectionChange)="onDifficultyFilter($event.value)">
-              <mat-option value="all">Összes</mat-option>
-              <mat-option value="easy">Könnyű</mat-option>
-              <mat-option value="medium">Közepes</mat-option>
-              <mat-option value="hard">Nehéz</mat-option>
-            </mat-select>
-          </mat-form-field>
+              (change)="onDifficultyFilter($any($event.target).value)">
+              <option value="all">Összes</option>
+              <option value="easy">Könnyű</option>
+              <option value="medium">Közepes</option>
+              <option value="hard">Nehéz</option>
+            </select>
+          </div>
+          
+          <div class="filter-summary" *ngIf="selectedCards().size > 0">
+            <span class="selected-count">{{ selectedCards().size }} kártya kijelölve</span>
+          </div>
         </div>
 
         <!-- Cards List -->
@@ -54,9 +108,18 @@
           <div 
             *ngFor="let card of filteredCards(); let i = index; trackBy: trackByCardId"
             class="card-item"
+            [class.selected]="selectedCards().has(card.id!)"
             cdkDrag>
             
             <div class="card-content" *ngIf="editingCardIndex() !== i">
+              <!-- Bulk selection checkbox -->
+              <mat-checkbox 
+                *ngIf="bulkEditMode()"
+                class="card-checkbox"
+                [checked]="selectedCards().has(card.id!)"
+                (change)="toggleCardSelection(card.id!)">
+              </mat-checkbox>
+              
               <div class="card-drag-handle" cdkDragHandle>
                 <mat-icon>drag_indicator</mat-icon>
               </div>
@@ -95,7 +158,7 @@
                 </div>
               </div>
               
-              <div class="card-actions">
+              <div class="card-actions" *ngIf="!bulkEditMode()">
                 <button 
                   mat-icon-button 
                   (click)="startEditCard(i)"
@@ -120,34 +183,34 @@
             
             <!-- Edit Form -->
             <div class="card-edit-form" *ngIf="editingCardIndex() === i">
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Kérdés</mat-label>
+              <div class="custom-form-field full-width">
+                <label class="field-label">Kérdés</label>
                 <textarea 
-                  matInput 
+                  class="custom-textarea"
                   [value]="card.front"
                   #frontInput
                   rows="2">
                 </textarea>
-              </mat-form-field>
+              </div>
               
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Válasz</mat-label>
+              <div class="custom-form-field full-width">
+                <label class="field-label">Válasz</label>
                 <textarea 
-                  matInput 
+                  class="custom-textarea"
                   [value]="card.back"
                   #backInput
                   rows="2">
                 </textarea>
-              </mat-form-field>
+              </div>
               
-              <mat-form-field appearance="outline">
-                <mat-label>Nehézség</mat-label>
-                <mat-select [value]="card.difficulty" #difficultyInput>
-                  <mat-option value="easy">Könnyű</mat-option>
-                  <mat-option value="medium">Közepes</mat-option>
-                  <mat-option value="hard">Nehéz</mat-option>
-                </mat-select>
-              </mat-form-field>
+              <div class="custom-form-field">
+                <label class="field-label">Nehézség</label>
+                <select class="custom-select" [value]="card.difficulty" #difficultyInput>
+                  <option value="easy">Könnyű</option>
+                  <option value="medium">Közepes</option>
+                  <option value="hard">Nehéz</option>
+                </select>
+              </div>
               
               <div class="edit-actions">
                 <button 
@@ -156,7 +219,7 @@
                   (click)="saveEditCard(card, {
                     front: frontInput.value,
                     back: backInput.value,
-                    difficulty: difficultyInput.value
+                    difficulty: $any(difficultyInput.value)
                   })">
                   <mat-icon>check</mat-icon>
                   Mentés
@@ -181,6 +244,16 @@
             Hozd létre az első kártyát az "Új kártya" fülön!
           </p>
         </div>
+        
+        <!-- Import Templates Info -->
+        <div class="import-help" *ngIf="cards().length === 0">
+          <h4>Támogatott import formátumok:</h4>
+          <ul>
+            <li><strong>JSON:</strong> Teljes kártya adatok metaadatokkal</li>
+            <li><strong>CSV:</strong> Kérdés,Válasz,Nehézség,Címkék formátumban</li>
+            <li><strong>TXT:</strong> Egyszerű kérdés-válasz párok soronként</li>
+          </ul>
+        </div>
       </div>
     </mat-tab>
 
@@ -188,38 +261,39 @@
     <mat-tab label="Új kártya">
       <div class="tab-content">
         <div class="new-card-form">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Kérdés / Előlap</mat-label>
+          <div class="custom-form-field full-width">
+            <label class="field-label">Kérdés / Előlap</label>
             <textarea 
-              matInput 
+              class="custom-textarea"
               [value]="newCardFront()"
               (input)="newCardFront.set($any($event.target).value)"
               placeholder="Add meg a kérdést vagy a kártya előlapját"
               rows="3">
             </textarea>
-          </mat-form-field>
+          </div>
           
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Válasz / Hátlap</mat-label>
+          <div class="custom-form-field full-width">
+            <label class="field-label">Válasz / Hátlap</label>
             <textarea 
-              matInput 
+              class="custom-textarea"
               [value]="newCardBack()"
               (input)="newCardBack.set($any($event.target).value)"
               placeholder="Add meg a választ vagy a kártya hátlapját"
               rows="3">
             </textarea>
-          </mat-form-field>
+          </div>
           
-          <mat-form-field appearance="outline">
-            <mat-label>Nehézség</mat-label>
-            <mat-select 
+          <div class="custom-form-field">
+            <label class="field-label">Nehézség</label>
+            <select 
+              class="custom-select"
               [value]="newCardDifficulty()"
-              (selectionChange)="newCardDifficulty.set($event.value)">
-              <mat-option value="easy">Könnyű</mat-option>
-              <mat-option value="medium">Közepes</mat-option>
-              <mat-option value="hard">Nehéz</mat-option>
-            </mat-select>
-          </mat-form-field>
+              (change)="newCardDifficulty.set($any($event.target).value)">
+              <option value="easy">Könnyű</option>
+              <option value="medium">Közepes</option>
+              <option value="hard">Nehéz</option>
+            </select>
+          </div>
           
           <div class="tags-section">
             <h4>Címkék</h4>
@@ -233,14 +307,14 @@
               </mat-chip>
             </div>
             
-            <mat-form-field appearance="outline" class="tag-input">
-              <mat-label>Új címke</mat-label>
+            <div class="custom-form-field tag-input">
+              <label class="field-label">Új címke</label>
               <input 
-                matInput 
+                class="custom-input"
                 #tagInput
                 placeholder="Írj egy címkét és nyomj Enter-t"
                 (keydown.enter)="addTagToNewCard(tagInput.value); tagInput.value = ''">
-            </mat-form-field>
+            </div>
             
             <div class="selected-tags" *ngIf="newCardTags().length > 0">
               <span class="label">Kiválasztott címkék:</span>

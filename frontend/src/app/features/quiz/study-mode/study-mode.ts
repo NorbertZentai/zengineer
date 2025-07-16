@@ -1,8 +1,6 @@
-import { Component, Inject, signal, computed, effect } from '@angular/core';
+import { Component, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
@@ -18,16 +16,13 @@ type StudyMode = 'classic' | 'review' | 'hard_cards';
   styleUrls: ['./study-mode.scss'],
   imports: [
     CommonModule,
-    MatDialogModule,
     MatButtonModule,
-    MatIconModule,
     MatProgressBarModule,
     MatCardModule,
     MatChipsModule
   ]
 })
 export class StudyModeComponent {
-  quiz: Quiz;
   studySession: StudySession | null = null;
   
   // Study state
@@ -74,12 +69,28 @@ export class StudyModeComponent {
   elapsedTime = signal(0);
   private timeInterval?: any;
 
+  // Sample quiz data - replace with actual quiz input
+  quiz: Quiz = {
+    id: '1',
+    name: 'Sample Quiz',
+    description: 'A sample quiz for demonstration',
+    cards: [],
+    tags: [],
+    color: '#667eea',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    folder_id: '',
+    project_id: '',
+    visibility: 'private',
+    difficulty_level: 2,
+    estimated_time: 30,
+    study_modes: ['flashcard'],
+    language: 'en'
+  };
+
   constructor(
-    private dialogRef: MatDialogRef<StudyModeComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { quiz: Quiz },
     private quizService: QuizService
   ) {
-    this.quiz = data.quiz;
     this.initializeStudyMode();
     this.startTimer();
   }
@@ -107,11 +118,8 @@ export class StudyModeComponent {
         break;
     }
     
-    // Shuffle cards if enabled in settings
-    const studySettings = this.quiz.studySettings;
-    if (studySettings?.shuffleCards) {
-      cards = this.shuffleArray(cards);
-    }
+    // Shuffle cards (always shuffle for now since studySettings doesn't exist in database)
+    cards = this.shuffleArray(cards);
     
     this.studyCards.set(cards);
     this.studySession = this.quizService.startStudySession(this.quiz);
@@ -257,7 +265,8 @@ export class StudyModeComponent {
     }
     
     const result = completed ? this.studySession : null;
-    this.dialogRef.close(result);
+    // TODO: Implement proper study mode exit
+    console.log('Study session result:', result);
   }
 
   exitStudy(): void {

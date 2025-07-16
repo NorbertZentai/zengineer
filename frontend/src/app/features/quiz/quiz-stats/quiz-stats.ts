@@ -22,20 +22,35 @@ import { QuizService, Quiz, StudyStats } from '../../../core/services/quiz.servi
   ]
 })
 export class QuizStatsComponent {
-  quiz: Quiz;
+  // Sample quiz data - replace with actual quiz input
+  quiz: Quiz = {
+    id: '1',
+    name: 'Sample Quiz',
+    description: 'A sample quiz for demonstration',
+    cards: [],
+    tags: [],
+    color: '#667eea',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    folder_id: '',
+    project_id: '',
+    visibility: 'private',
+    difficulty_level: 2,
+    estimated_time: 30,
+    study_modes: ['flashcard'],
+    language: 'en'
+  };
+  
   stats: StudyStats;
 
   constructor(
-    private dialogRef: MatDialogRef<QuizStatsComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { quiz: Quiz },
     private quizService: QuizService
   ) {
-    this.quiz = data.quiz;
     this.stats = this.quizService.getStudyStats(this.quiz);
   }
 
   close(): void {
-    this.dialogRef.close();
+    console.log('TODO: Close stats dialog');
   }
 
   getProgressColor(percentage: number): string {
@@ -64,6 +79,15 @@ export class QuizStatsComponent {
       .slice(0, 10); // Top 10 tags
   }
 
+  // Helper method to extract tags from quiz cards
+  getQuizTags(quiz: Quiz): string[] {
+    const allTags = new Set<string>();
+    quiz.cards?.forEach(card => {
+      card.tags?.forEach(tag => allTags.add(tag));
+    });
+    return Array.from(allTags);
+  }
+
   formatDate(date: Date | undefined): string {
     if (!date) return 'N/A';
     return new Intl.DateTimeFormat('hu-HU', {
@@ -73,5 +97,10 @@ export class QuizStatsComponent {
       hour: '2-digit',
       minute: '2-digit'
     }).format(date);
+  }
+
+  formatDateString(dateString: string | undefined): string {
+    if (!dateString) return 'N/A';
+    return this.formatDate(new Date(dateString));
   }
 }

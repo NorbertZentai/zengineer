@@ -1,3 +1,12 @@
+// =============================================================================
+// ZENGINEER QUIZ MANAGER - MAIN STYLES
+// =============================================================================
+
+// Import all our SCSS modules using modern @use syntax
+@use 'scss/variables' as *;
+@use 'scss/mixins' as *;
+@use 'scss/utilities' as *;
+
 /* Universal Theme System for Zengineer Quiz Manager */
 
 // =============================================================================
@@ -5,178 +14,222 @@
 // =============================================================================
 :root,
 :root[data-theme='light'] {
-  // Base Colors
-  --primary: #1976d2;
-  --primary-light: #42a5f5;
-  --primary-dark: #1565c0;
-  --secondary: #dc004e;
-  --accent: #00acc1;
+  // Primary Brand Colors
+  --primary: #{$primary};
+  --primary-light: #{$primary-light};
+  --primary-dark: #{$primary-dark};
+  --primary-gradient: #{$gradient-primary};
   
-  // Backgrounds
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8f9fa;
-  --bg-tertiary: #f1f3f4;
+  --secondary: #{$secondary};
+  --secondary-light: #{$secondary-light};
+  --secondary-dark: #{$secondary-dark};
+  
+  --accent: #{$accent};
+  --accent-light: #{$accent-light};
+  --accent-dark: #{$accent-dark};
+  
+  // Background Colors
+  --bg-primary: #{$white};
+  --bg-secondary: #{$gray-50};
+  --bg-tertiary: #{$gray-100};
+  --bg-quaternary: #{$gray-200};
+  --bg-card: #{$white};
   --bg-overlay: rgba(0, 0, 0, 0.5);
-  --bg-gradient: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  --bg-gradient-primary: #{$gradient-background};
+  --bg-gradient-card: #{$gradient-card};
+  --bg-gradient-header: #{$gradient-header};
   
   // Text Colors
-  --text-primary: #2c3e50;
-  --text-secondary: #495057;
-  --text-muted: #6c757d;
-  --text-light: #adb5bd;
-  --text-inverse: #ffffff;
+  --text-primary: #{$gray-800};
+  --text-secondary: #{$gray-700};
+  --text-muted: #{$gray-600};
+  --text-light: #{$gray-500};
+  --text-inverse: #{$white};
+  --text-on-primary: #{$white};
+  --text-on-secondary: #{$white};
+  --text-accent: #{$primary};
   
   // Border Colors
-  --border-primary: #e9ecef;
-  --border-secondary: #dee2e6;
+  --border-primary: #{$gray-300};
+  --border-secondary: #{$gray-400};
+  --border-light: #{$gray-100};
   --border-accent: var(--primary);
-  
-  // Status Colors
-  --success: #28a745;
-  --success-light: #d4edda;
-  --warning: #ffc107;
-  --warning-light: #fff3cd;
-  --error: #dc3545;
-  --error-light: #f8d7da;
-  --info: #17a2b8;
-  --info-light: #d1ecf1;
+  --border-focus: var(--primary);
   
   // Interactive States
-  --hover-bg: rgba(25, 118, 210, 0.04);
-  --active-bg: rgba(25, 118, 210, 0.08);
-  --focus-ring: rgba(25, 118, 210, 0.25);
+  --hover-bg: rgba(102, 126, 234, 0.04);
+  --hover-border: rgba(102, 126, 234, 0.3);
+  --active-bg: rgba(102, 126, 234, 0.08);
+  --focus-ring: rgba(102, 126, 234, 0.25);
+  --selected-bg: #{$quiz-selected-bg};
+  
+  // Status Colors
+  --success: #{$success};
+  --success-light: #{$success-light};
+  --success-dark: #{$success-dark};
+  --warning: #{$warning};
+  --warning-light: #{$warning-light};
+  --warning-dark: #{$warning-dark};
+  --error: #{$error};
+  --error-light: #{$error-light};
+  --error-dark: #{$error-dark};
+  --info: #{$info};
+  --info-light: #{$info-light};
+  --info-dark: #{$info-dark};
+  
+  // Difficulty Colors
+  --difficulty-easy: #{$difficulty-easy};
+  --difficulty-easy-light: #{$difficulty-easy-light};
+  --difficulty-medium: #{$difficulty-medium};
+  --difficulty-medium-light: #{$difficulty-medium-light};
+  --difficulty-hard: #{$difficulty-hard};
+  --difficulty-hard-light: #{$difficulty-hard-light};
   
   // Shadows
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
-  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.16);
+  --shadow-xs: #{$shadow-xs};
+  --shadow-sm: #{$shadow-sm};
+  --shadow-md: #{$shadow-md};
+  --shadow-lg: #{$shadow-lg};
+  --shadow-xl: #{$shadow-xl};
+  --shadow-primary: #{$shadow-primary};
+  --shadow-success: #{$shadow-success};
+  --shadow-warning: #{$shadow-warning};
+  --shadow-error: #{$shadow-error};
   
-  // Quiz Specific Colors
-  --quiz-card-bg: #ffffff;
-  --quiz-card-border: #e9ecef;
-  --quiz-card-hover: #f8f9fa;
-  --quiz-tag-bg: rgba(25, 118, 210, 0.1);
-  --quiz-tag-text: var(--primary);
-  --quiz-stat-icon: var(--primary);
-  --quiz-progress-bg: #e9ecef;
-  --quiz-progress-fill: var(--primary);
+  // Component Specific
+  --navbar-bg: #{$navbar-bg};
+  --navbar-border: #{$navbar-border};
+  --card-bg: #{$card-bg};
+  --input-bg: #{$input-bg};
+  --input-border: #{$input-border};
+  --button-primary-bg: var(--primary-gradient);
+  --button-secondary-bg: var(--bg-quaternary);
   
-  // Navigation
-  --navbar-bg: #ffffff;
-  --navbar-border: #e9ecef;
-  --navbar-link: #495057;
-  --navbar-link-hover: var(--primary);
-  --navbar-link-active: var(--primary);
-  --navbar-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  // Quiz Specific
+  --quiz-card-bg: #{$quiz-card-bg};
+  --quiz-card-border: #{$quiz-card-border};
+  --quiz-card-hover: #{$quiz-card-hover-bg};
+  --quiz-selected-bg: #{$quiz-selected-bg};
+  --quiz-selected-border: var(--border-accent);
   
-  // Forms & Inputs
-  --input-bg: #ffffff;
-  --input-border: #ced4da;
-  --input-focus: var(--primary);
-  --input-placeholder: #6c757d;
-  
-  // Buttons
-  --btn-primary-bg: var(--primary);
-  --btn-primary-text: #ffffff;
-  --btn-primary-hover: var(--primary-dark);
-  --btn-secondary-bg: #6c757d;
-  --btn-secondary-text: #ffffff;
-  --btn-secondary-hover: #5a6268;
-  
-  // Dialog & Modal
-  --dialog-bg: #ffffff;
-  --dialog-backdrop: rgba(0, 0, 0, 0.5);
-  --dialog-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  // 📁 Folder Specific
+  --folder-card-bg: #{$folder-card-bg};
+  --folder-card-border: rgba(102, 126, 234, 0.15);
+  --folder-card-hover: linear-gradient(135deg, #f8f9ff 0%, #f0f7ff 100%);
+  --folder-icon: #{$folder-icon-color};
+  --folder-accent: #{$folder-accent};
+  --folder-accent-light: #64b5f6;
 }
 
 // =============================================================================
 // DARK THEME
 // =============================================================================
 :root[data-theme='dark'] {
-  // Base Colors
-  --primary: #42a5f5;
-  --primary-light: #64b5f6;
-  --primary-dark: #1976d2;
-  --secondary: #f06292;
-  --accent: #26c6da;
+  // Primary Brand Colors (adjusted for dark)
+  --primary: #{$primary-light};
+  --primary-light: #b8c7f6;
+  --primary-dark: #{$primary};
+  --primary-gradient: linear-gradient(135deg, #{$primary-light} 0%, #{$secondary-light} 100%);
   
-  // Backgrounds
-  --bg-primary: #1a1a1a;
-  --bg-secondary: #2d3748;
-  --bg-tertiary: #4a5568;
-  --bg-overlay: rgba(0, 0, 0, 0.8);
-  --bg-gradient: linear-gradient(135deg, #1a1a1a 0%, #2d3748 100%);
+  --secondary: #{$secondary-light};
+  --secondary-light: #b896d1;
+  --secondary-dark: #{$secondary};
+  
+  --accent: #{$accent-light};
+  --accent-light: #81c784;
+  --accent-dark: #{$accent};
+  
+  // Background Colors
+  --bg-primary: #{$dark-bg-primary};
+  --bg-secondary: #{$dark-bg-secondary};
+  --bg-tertiary: #{$dark-bg-tertiary};
+  --bg-quaternary: #383838;
+  --bg-card: #{$dark-bg-card};
+  --bg-overlay: rgba(0, 0, 0, 0.7);
+  --bg-gradient-primary: linear-gradient(135deg, #{$dark-bg-secondary} 0%, #{$dark-bg-tertiary} 100%);
+  --bg-gradient-card: linear-gradient(135deg, #{$dark-bg-card} 0%, #2a2a3a 100%);
+  --bg-gradient-header: linear-gradient(135deg, #{$primary-light} 0%, #{$secondary-light} 100%);
   
   // Text Colors
-  --text-primary: #e2e8f0;
-  --text-secondary: #cbd5e0;
-  --text-muted: #a0aec0;
-  --text-light: #718096;
-  --text-inverse: #1a202c;
+  --text-primary: #{$dark-text-primary};
+  --text-secondary: #{$dark-text-secondary};
+  --text-muted: #{$dark-text-muted};
+  --text-light: #777777;
+  --text-inverse: #{$dark-bg-primary};
+  --text-on-primary: #{$dark-bg-primary};
+  --text-on-secondary: #{$dark-bg-primary};
+  --text-accent: #{$primary-light};
   
   // Border Colors
-  --border-primary: #4a5568;
-  --border-secondary: #2d3748;
+  --border-primary: #{$dark-border-primary};
+  --border-secondary: #{$dark-border-secondary};
+  --border-light: #353535;
   --border-accent: var(--primary);
-  
-  // Status Colors
-  --success: #48bb78;
-  --success-light: rgba(72, 187, 120, 0.2);
-  --warning: #ed8936;
-  --warning-light: rgba(237, 137, 54, 0.2);
-  --error: #f56565;
-  --error-light: rgba(245, 101, 101, 0.2);
-  --info: #4299e1;
-  --info-light: rgba(66, 153, 225, 0.2);
+  --border-focus: var(--primary);
   
   // Interactive States
-  --hover-bg: rgba(66, 165, 245, 0.08);
-  --active-bg: rgba(66, 165, 245, 0.16);
-  --focus-ring: rgba(66, 165, 245, 0.4);
+  --hover-bg: rgba(143, 167, 243, 0.08);
+  --hover-border: rgba(143, 167, 243, 0.4);
+  --active-bg: rgba(143, 167, 243, 0.12);
+  --focus-ring: rgba(143, 167, 243, 0.3);
+  --selected-bg: linear-gradient(135deg, #2a2a3a 0%, #353545 100%);
   
-  // Shadows
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
-  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.6);
+  // Status Colors (adjusted for dark)
+  --success: #4caf50;
+  --success-light: #2d5016;
+  --success-dark: #66bb6a;
+  --warning: #ffb74d;
+  --warning-light: #5d4e00;
+  --warning-dark: #ffc107;
+  --error: #f44336;
+  --error-light: #5d1a1d;
+  --error-dark: #ef5350;
+  --info: #29b6f6;
+  --info-light: #014c5e;
+  --info-dark: #4fc3f7;
   
-  // Quiz Specific Colors
-  --quiz-card-bg: #2d3748;
-  --quiz-card-border: #4a5568;
-  --quiz-card-hover: #4a5568;
-  --quiz-tag-bg: rgba(66, 165, 245, 0.2);
-  --quiz-tag-text: var(--primary);
-  --quiz-stat-icon: var(--primary);
-  --quiz-progress-bg: #4a5568;
-  --quiz-progress-fill: var(--primary);
+  // Difficulty Colors (adjusted)
+  --difficulty-easy: #66bb6a;
+  --difficulty-easy-light: #2d5016;
+  --difficulty-medium: #ffb74d;
+  --difficulty-medium-light: #5d4e00;
+  --difficulty-hard: #ef5350;
+  --difficulty-hard-light: #5d1a1d;
   
-  // Navigation
-  --navbar-bg: #1a1a1a;
-  --navbar-border: #2d3748;
-  --navbar-link: #cbd5e0;
-  --navbar-link-hover: var(--primary);
-  --navbar-link-active: var(--primary);
-  --navbar-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+  // Shadows (enhanced for dark)
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 12px 40px rgba(0, 0, 0, 0.6);
+  --shadow-primary: 0 4px 12px rgba(143, 167, 243, 0.4);
+  --shadow-success: 0 4px 12px rgba(76, 175, 80, 0.4);
+  --shadow-warning: 0 4px 12px rgba(255, 183, 77, 0.4);
+  --shadow-error: 0 4px 12px rgba(244, 67, 54, 0.4);
   
-  // Forms & Inputs
-  --input-bg: #2d3748;
-  --input-border: #4a5568;
-  --input-focus: var(--primary);
-  --input-placeholder: #a0aec0;
+  // Component Specific
+  --navbar-bg: var(--bg-secondary);
+  --navbar-border: var(--border-primary);
+  --card-bg: var(--bg-card);
+  --input-bg: var(--bg-tertiary);
+  --input-border: var(--border-primary);
+  --button-primary-bg: var(--primary-gradient);
+  --button-secondary-bg: var(--bg-quaternary);
   
-  // Buttons
-  --btn-primary-bg: var(--primary);
-  --btn-primary-text: #1a202c;
-  --btn-primary-hover: var(--primary-light);
-  --btn-secondary-bg: #4a5568;
-  --btn-secondary-text: #e2e8f0;
-  --btn-secondary-hover: #718096;
+  // Quiz Specific
+  --quiz-card-bg: var(--bg-card);
+  --quiz-card-border: var(--border-primary);
+  --quiz-card-hover: rgba(143, 167, 243, 0.02);
+  --quiz-selected-bg: var(--selected-bg);
+  --quiz-selected-border: var(--border-accent);
   
-  // Dialog & Modal
-  --dialog-bg: #2d3748;
-  --dialog-backdrop: rgba(0, 0, 0, 0.8);
-  --dialog-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+  // 📁 Folder Specific
+  --folder-card-bg: linear-gradient(135deg, #121212 0%, #1e1e1e 100%);
+  --folder-card-border: rgba(143, 167, 243, 0.15);
+  --folder-card-hover: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
+  --folder-icon: #90caf9;
+  --folder-accent: #90caf9;
+  --folder-accent-light: #bbdefb;
 }
 
 // =============================================================================
@@ -309,18 +362,143 @@ body {
   border: 1px solid var(--quiz-card-border) !important;
 }
 
-// Override Material Form Fields
+// Override Material Form Fields - ENHANCED WITH PROPER PADDING
 .mat-mdc-form-field {
+  width: 100% !important;
+  
   .mat-mdc-text-field-wrapper {
     background: var(--input-bg) !important;
+    border: 2px solid var(--border-primary) !important;
+    border-radius: 8px !important;
+    transition: all 0.2s ease !important;
+    
+    &:hover:not(.mdc-text-field--disabled) {
+      border-color: var(--hover-border) !important;
+      background: var(--hover-bg) !important;
+    }
+    
+    &.mdc-text-field--focused {
+      border-color: var(--primary) !important;
+      background: var(--bg-primary) !important;
+      box-shadow: 0 0 0 3px var(--focus-ring) !important;
+    }
+    
+    &.mdc-text-field--invalid {
+      border-color: var(--error) !important;
+      
+      &.mdc-text-field--focused {
+        box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.25) !important;
+      }
+    }
+    
+    // CRITICAL: Fix input padding and layout
+    .mdc-text-field__input,
+    .mat-mdc-input-element {
+      padding: 20px 16px 20px 16px !important;
+      font-size: 16px !important;
+      line-height: 1.5 !important;
+      color: var(--text-primary) !important;
+      background: transparent !important;
+      border: none !important;
+      outline: none !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      
+      &::placeholder {
+        color: var(--text-muted) !important;
+        font-size: 16px !important;
+        opacity: 0.8 !important;
+      }
+    }
+    
+    // Special handling for textarea
+    textarea.mdc-text-field__input,
+    textarea.mat-mdc-input-element {
+      padding: 16px !important;
+      min-height: 100px !important;
+      resize: vertical !important;
+      font-family: inherit !important;
+      line-height: 1.5 !important;
+    }
+    
+    // Fix for floating label positioning
+    .mdc-floating-label {
+      left: 16px !important;
+      right: auto !important;
+      
+      &--float-above {
+        transform: translateY(-50%) scale(0.75) !important;
+      }
+    }
   }
   
+  // Form field input control wrapper
   .mat-mdc-form-field-input-control {
     color: var(--text-primary) !important;
+    
+    input, textarea {
+      padding: 20px 16px !important;
+      font-size: 16px !important;
+      line-height: 1.5 !important;
+      color: var(--text-primary) !important;
+      
+      &::placeholder {
+        color: var(--text-muted) !important;
+        font-size: 16px !important;
+      }
+    }
   }
   
-  .mat-mdc-form-field-input-control::placeholder {
-    color: var(--input-placeholder) !important;
+  // Labels
+  .mat-mdc-form-field-label {
+    color: var(--text-secondary) !important;
+    font-weight: 500 !important;
+    font-size: 16px !important;
+    
+    &.mdc-floating-label--required::after {
+      color: var(--error) !important;
+    }
+    
+    &.mdc-floating-label--float-above {
+      font-size: 12px !important;
+    }
+  }
+  
+  // Error and hint messages
+  .mat-mdc-form-field-error {
+    color: var(--error) !important;
+    font-size: 14px !important;
+    margin-top: 4px !important;
+  }
+  
+  .mat-mdc-form-field-hint {
+    color: var(--text-muted) !important;
+    font-size: 14px !important;
+  }
+  
+  // Select specific styling
+  &.mat-mdc-select {
+    .mat-mdc-select-trigger {
+      padding: 20px 16px !important;
+      font-size: 16px !important;
+      line-height: 1.5 !important;
+      color: var(--text-primary) !important;
+      min-height: auto !important;
+      
+      .mat-mdc-select-value {
+        color: var(--text-primary) !important;
+        font-size: 16px !important;
+      }
+      
+      .mat-mdc-select-placeholder {
+        color: var(--text-muted) !important;
+        font-size: 16px !important;
+      }
+      
+      .mat-mdc-select-arrow {
+        color: var(--text-secondary) !important;
+      }
+    }
   }
 }
 
@@ -417,3 +595,805 @@ body {
 .animate-slide-up { animation: slideInUp var(--transition-normal); }
 .animate-slide-down { animation: slideInDown var(--transition-normal); }
 .animate-pulse { animation: pulse 2s infinite; }
+
+// Global Input and Textarea Improvements
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+textarea,
+select {
+  padding: 12px 16px !important;
+  font-size: 16px !important;
+  line-height: 1.5 !important;
+  border-radius: 8px !important;
+  border: 2px solid var(--border-primary) !important;
+  background: var(--input-bg) !important;
+  color: var(--text-primary) !important;
+  transition: all 0.2s ease !important;
+  
+  &:focus {
+    outline: none !important;
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px var(--focus-ring) !important;
+  }
+  
+  &::placeholder {
+    color: var(--text-muted) !important;
+    font-size: 16px !important;
+  }
+  
+  &:disabled {
+    background: var(--bg-tertiary) !important;
+    color: var(--text-muted) !important;
+    cursor: not-allowed !important;
+  }
+}
+
+textarea {
+  min-height: 100px !important;
+  resize: vertical !important;
+  font-family: inherit !important;
+}
+
+// Enhanced Material Dialog overrides
+::ng-deep .mat-mdc-dialog-container {
+  .mat-mdc-dialog-content {
+    .mat-mdc-form-field {
+      width: 100% !important;
+      margin-bottom: 16px !important;
+      
+      .mat-mdc-text-field-wrapper {
+        .mdc-text-field__input,
+        .mat-mdc-input-element {
+          padding: 16px !important;
+          font-size: 16px !important;
+          line-height: 1.5 !important;
+        }
+      }
+    }
+  }
+}
+
+// Fix for specific component overrides
+::ng-deep .quiz-form,
+::ng-deep .create-quiz-dialog,
+::ng-deep .folder-dialog {
+  .mat-mdc-form-field {
+    .mat-mdc-text-field-wrapper {
+      .mdc-text-field__input,
+      .mat-mdc-input-element {
+        padding: 16px !important;
+        font-size: 16px !important;
+        min-height: auto !important;
+      }
+      
+      textarea.mat-mdc-input-element {
+        padding: 16px !important;
+        min-height: 100px !important;
+      }
+    }
+  }
+}
+
+// ============================================================================= 
+// COMPREHENSIVE INPUT PADDING FIXES FOR ENTIRE APPLICATION
+// =============================================================================
+
+// Global Material Design Component Overrides
+::ng-deep {
+  // Fix all Material Form Fields globally
+  .mat-mdc-form-field {
+    .mat-mdc-text-field-wrapper {
+      .mdc-text-field__input,
+      .mat-mdc-input-element,
+      input:not([type="checkbox"]):not([type="radio"]),
+      textarea {
+        padding: 16px !important;
+        font-size: 16px !important;
+        line-height: 1.5 !important;
+        border-radius: 8px !important;
+        
+        &::placeholder {
+          font-size: 16px !important;
+          opacity: 0.7 !important;
+        }
+      }
+      
+      textarea {
+        min-height: 100px !important;
+        resize: vertical !important;
+        font-family: inherit !important;
+      }
+    }
+    
+    .mat-mdc-form-field-input-control {
+      input, textarea, select {
+        padding: 16px !important;
+        font-size: 16px !important;
+        line-height: 1.5 !important;
+      }
+    }
+    
+    // Select field specific fixes
+    &.mat-mdc-select {
+      .mat-mdc-select-trigger {
+        padding: 16px !important;
+        font-size: 16px !important;
+        line-height: 1.5 !important;
+        min-height: auto !important;
+        
+        .mat-mdc-select-value,
+        .mat-mdc-select-placeholder {
+          font-size: 16px !important;
+          line-height: 1.5 !important;
+        }
+      }
+    }
+  }
+  
+  // Dialog specific overrides
+  .mat-mdc-dialog-container {
+    .mat-mdc-form-field {
+      .mat-mdc-text-field-wrapper {
+        .mdc-text-field__input,
+        .mat-mdc-input-element {
+          padding: 16px !important;
+          font-size: 16px !important;
+        }
+      }
+    }
+  }
+  
+  // Menu and autocomplete specific fixes
+  .mat-mdc-menu-panel,
+  .mat-mdc-autocomplete-panel {
+    .mat-mdc-option {
+      padding: 12px 16px !important;
+      font-size: 16px !important;
+      line-height: 1.5 !important;
+    }
+  }
+  
+  // Chip input fixes
+  .mat-mdc-chip-input {
+    input {
+      padding: 12px 16px !important;
+      font-size: 16px !important;
+    }
+  }
+  
+  // Date picker input fixes
+  .mat-datepicker-input {
+    padding: 16px !important;
+    font-size: 16px !important;
+  }
+  
+  // Specific component overrides
+  .quiz-manager-container,
+  .card-editor-container,
+  .study-mode-container,
+  .auth-container,
+  .dashboard-container {
+    .mat-mdc-form-field {
+      .mat-mdc-text-field-wrapper {
+        .mdc-text-field__input,
+        .mat-mdc-input-element {
+          padding: 16px !important;
+          font-size: 16px !important;
+          line-height: 1.5 !important;
+        }
+      }
+    }
+  }
+}
+
+// Native input elements fallback
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not(.mat-mdc-input-element),
+textarea:not(.mat-mdc-input-element),
+select:not(.mat-mdc-select-trigger) {
+  padding: 16px !important;
+  font-size: 16px !important;
+  line-height: 1.5 !important;
+  border-radius: 8px !important;
+  border: 2px solid var(--border-primary) !important;
+  background: var(--input-bg) !important;
+  color: var(--text-primary) !important;
+  transition: all 0.2s ease !important;
+  
+  &:focus {
+    outline: none !important;
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px var(--focus-ring) !important;
+  }
+  
+  &::placeholder {
+    color: var(--text-muted) !important;
+    font-size: 16px !important;
+  }
+}
+
+// ============================================================================= 
+// MOBILE-FRIENDLY INPUT IMPROVEMENTS
+// =============================================================================
+
+// Mobile specific input improvements
+@media (max-width: 768px) {
+  ::ng-deep .mat-mdc-form-field {
+    .mat-mdc-text-field-wrapper {
+      .mdc-text-field__input,
+      .mat-mdc-input-element {
+        padding: 20px 16px !important;
+        font-size: 16px !important; // Prevents zoom on iOS
+        line-height: 1.4 !important;
+      }
+    }
+    
+    .mat-mdc-select-trigger {
+      padding: 20px 16px !important;
+      font-size: 16px !important;
+    }
+  }
+  
+  // Native inputs on mobile
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+  textarea,
+  select {
+    padding: 20px 16px !important;
+    font-size: 16px !important; // Prevents zoom on iOS Safari
+    line-height: 1.4 !important;
+    border-radius: 12px !important;
+    
+    &::placeholder {
+      font-size: 16px !important;
+    }
+  }
+  
+  // Touch-friendly sizing
+  .mat-mdc-button,
+  .mat-mdc-icon-button {
+    min-height: 48px !important;
+    min-width: 48px !important;
+  }
+}
+
+// High DPI display improvements
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  ::ng-deep .mat-mdc-form-field {
+    .mat-mdc-text-field-wrapper {
+      .mdc-text-field__input,
+      .mat-mdc-input-element {
+        -webkit-font-smoothing: antialiased !important;
+        -moz-osx-font-smoothing: grayscale !important;
+      }
+    }
+  }
+}
+
+// ============================================================================= 
+// FORCE MATERIAL INPUT PADDING - HIGHEST PRIORITY OVERRIDES
+// =============================================================================
+
+// Absolute priority overrides for all Material inputs
+::ng-deep {
+  // Force padding on ALL Material input elements
+  .mat-mdc-form-field .mdc-text-field__input,
+  .mat-mdc-form-field .mat-mdc-input-element,
+  .mat-mdc-input-element,
+  .mdc-text-field__input {
+    padding: 20px 16px 20px 16px !important;
+    font-size: 16px !important;
+    line-height: 1.5 !important;
+    color: var(--text-primary) !important;
+    background: transparent !important;
+    border: none !important;
+    box-sizing: border-box !important;
+    
+    &::placeholder {
+      color: var(--text-muted) !important;
+      font-size: 16px !important;
+      opacity: 0.8 !important;
+    }
+  }
+  
+  // Force padding on textareas
+  .mat-mdc-form-field textarea.mdc-text-field__input,
+  .mat-mdc-form-field textarea.mat-mdc-input-element,
+  textarea.mat-mdc-input-element,
+  textarea.mdc-text-field__input {
+    padding: 16px !important;
+    min-height: 100px !important;
+    resize: vertical !important;
+    font-family: inherit !important;
+  }
+  
+  // Force padding on select triggers
+  .mat-mdc-select-trigger,
+  .mat-mdc-form-field .mat-mdc-select-trigger {
+    padding: 20px 16px 20px 16px !important;
+    font-size: 16px !important;
+    line-height: 1.5 !important;
+    min-height: auto !important;
+    
+    .mat-mdc-select-value,
+    .mat-mdc-select-placeholder {
+      font-size: 16px !important;
+      line-height: 1.5 !important;
+    }
+  }
+  
+  // Fix for MDC text field wrapper
+  .mdc-text-field:not(.mdc-text-field--outlined):not(.mdc-text-field--textarea) {
+    .mdc-text-field__input {
+      padding-left: 16px !important;
+      padding-right: 16px !important;
+      padding-top: 20px !important;
+      padding-bottom: 20px !important;
+    }
+  }
+  
+  // Fix for outlined text fields
+  .mdc-text-field--outlined {
+    .mdc-text-field__input {
+      padding: 16px !important;
+    }
+  }
+  
+  // Force styles for dialogs and specific containers
+  .mat-mdc-dialog-container,
+  .quiz-manager-container,
+  .card-editor-container {
+    .mat-mdc-form-field {
+      .mdc-text-field__input,
+      .mat-mdc-input-element {
+        padding: 20px 16px !important;
+        font-size: 16px !important;
+      }
+      
+      .mat-mdc-select-trigger {
+        padding: 20px 16px !important;
+        font-size: 16px !important;
+      }
+    }
+  }
+}
+
+// ============================================================================= 
+// ULTRA-SPECIFIC MATERIAL BORDER REMOVAL - NUCLEAR OPTION
+// =============================================================================
+
+// Remove ALL possible Material Design borders and outlines
+::ng-deep {
+  // Target every possible Material component border
+  .mdc-text-field,
+  .mat-mdc-form-field,
+  .mat-mdc-text-field-wrapper,
+  .mdc-text-field__input,
+  .mat-mdc-input-element {
+    
+    // Remove ALL borders
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    
+    // Remove pseudo-elements that create borders
+    &:before,
+    &:after {
+      content: none !important;
+      display: none !important;
+      border: none !important;
+      background: none !important;
+    }
+  }
+  
+  // Specifically target the wrapper to provide clean styling
+  .mat-mdc-text-field-wrapper {
+    // Override everything and provide our own clean styling
+    background: var(--input-bg) !important;
+    border: 2px solid var(--border-primary) !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+    position: relative !important;
+    overflow: hidden !important;
+    
+    // Remove any internal elements that might create borders
+    * {
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+      
+      &:before,
+      &:after {
+        display: none !important;
+      }
+    }
+    
+    // Ensure input is completely clean
+    .mdc-text-field__input,
+    .mat-mdc-input-element {
+      background: transparent !important;
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+      padding: 20px 16px !important;
+      font-size: 16px !important;
+      color: var(--text-primary) !important;
+      width: 100% !important;
+      
+      &:focus,
+      &:active,
+      &:hover {
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+      }
+    }
+    
+    // Hover state
+    &:hover:not(.mdc-text-field--disabled) {
+      border-color: var(--hover-border) !important;
+      background: var(--hover-bg) !important;
+    }
+    
+    // Focus state
+    &.mdc-text-field--focused {
+      border-color: var(--primary) !important;
+      background: var(--bg-primary) !important;
+      box-shadow: 0 0 0 3px var(--focus-ring) !important;
+    }
+  }
+  
+  // Remove ALL Material Design component outlines and ripples
+  .mdc-notched-outline,
+  .mdc-notched-outline__leading,
+  .mdc-notched-outline__notch,
+  .mdc-notched-outline__trailing,
+  .mdc-line-ripple,
+  .mat-mdc-form-field-ripple,
+  .mat-mdc-form-field-focus-overlay,
+  .mdc-text-field__ripple,
+  .mat-mdc-form-field-underline {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+  }
+  
+  // Force clean appearance on inputs
+  input.mat-mdc-input-element,
+  textarea.mat-mdc-input-element,
+  input.mdc-text-field__input,
+  textarea.mdc-text-field__input {
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    border: none !important;
+// =============================================================================
+
+// Fix for Material dialogs specifically
+::ng-deep .mat-mdc-dialog-container {
+  .mat-mdc-dialog-content {
+    .mat-mdc-form-field {
+      width: 100% !important;
+      margin-bottom: 16px !important;
+      
+      .mat-mdc-text-field-wrapper {
+        background: var(--input-bg) !important;
+        border: 2px solid var(--border-primary) !important;
+        border-radius: 8px !important;
+        
+        .mdc-text-field__input,
+        .mat-mdc-input-element {
+          padding: 20px 16px !important;
+          font-size: 16px !important;
+          line-height: 1.5 !important;
+          color: var(--text-primary) !important;
+          background: transparent !important;
+          border: none !important;
+          
+          &::placeholder {
+            color: var(--text-muted) !important;
+            font-size: 16px !important;
+          }
+        }
+        
+        textarea.mdc-text-field__input,
+        textarea.mat-mdc-input-element {
+          padding: 16px !important;
+          min-height: 100px !important;
+        }
+      }
+      
+      &.mat-mdc-select .mat-mdc-select-trigger {
+        padding: 20px 16px !important;
+        font-size: 16px !important;
+        min-height: auto !important;
+      }
+    }
+  }
+}
+
+// Fix for create folder/quiz dialogs specifically
+::ng-deep .create-quiz-dialog,
+::ng-deep .folder-dialog,
+::ng-deep .mat-mdc-dialog-container .create-form {
+  .mat-mdc-form-field {
+    .mat-mdc-text-field-wrapper {
+      .mdc-text-field__input,
+      .mat-mdc-input-element {
+        padding: 24px 20px !important;
+        font-size: 16px !important;
+        font-weight: 400 !important;
+        color: var(--text-primary) !important;
+        
+        &::placeholder {
+          color: var(--text-muted) !important;
+          font-size: 16px !important;
+          font-weight: 400 !important;
+        }
+      }
+    }
+  }
+}
+
+// Global input element override for maximum compatibility
+input.mat-mdc-input-element,
+textarea.mat-mdc-input-element,
+input.mdc-text-field__input,
+textarea.mdc-text-field__input {
+  padding: 20px 16px !important;
+  font-size: 16px !important;
+  line-height: 1.5 !important;
+  color: var(--text-primary) !important;
+  
+  &::placeholder {
+    color: var(--text-muted) !important;
+    font-size: 16px !important;
+  }
+}
+
+textarea.mat-mdc-input-element,
+textarea.mdc-text-field__input {
+  padding: 16px !important;
+  min-height: 100px !important;
+}
+
+// ============================================================================= 
+// AGGRESSIVE BORDER AND OUTLINE REMOVAL
+// =============================================================================
+
+// Nuclear option: Remove ALL possible borders and outlines
+::ng-deep * {
+  // Target all Material components
+  &[class*="mdc-"],
+  &[class*="mat-mdc-"] {
+    &:before,
+    &:after {
+      border: none !important;
+    }
+  }
+}
+
+// Specific Material component border removal
+::ng-deep {
+  // Remove borders from all possible Material elements
+  .mdc-notched-outline,
+  .mdc-notched-outline__leading,
+  .mdc-notched-outline__notch,
+  .mdc-notched-outline__trailing,
+  .mdc-line-ripple,
+  .mat-mdc-form-field-ripple,
+  .mat-mdc-form-field-focus-overlay,
+  .mdc-text-field__ripple {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
+  
+  // Force hide any remaining underlines or borders
+  .mat-mdc-form-field-underline,
+  .mat-mdc-form-field-subscript-wrapper::before,
+  .mat-mdc-form-field-subscript-wrapper::after {
+    display: none !important;
+  }
+  
+  // Clean input appearance
+  .mat-mdc-input-element,
+  .mdc-text-field__input {
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+  
+  // Clean select appearance
+  .mat-mdc-select-trigger {
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  
+  // Override any focus states that might add borders
+  .mat-mdc-form-field:not(.mat-form-field-disabled) {
+    .mat-mdc-text-field-wrapper:hover {
+      .mdc-text-field__input,
+      .mat-mdc-input-element {
+        border: none !important;
+        outline: none !important;
+      }
+    }
+    
+    &.mat-form-field-focused {
+      .mat-mdc-text-field-wrapper {
+        .mdc-text-field__input,
+        .mat-mdc-input-element {
+          border: none !important;
+          outline: none !important;
+        }
+      }
+    }
+  }
+}
+
+// ============================================================================= 
+// CLEAN INPUT STYLING - FINAL POLISH
+// =============================================================================
+
+// Final cleanup for the cleanest possible input appearance
+::ng-deep .mat-mdc-form-field {
+  // Ensure clean wrapper styling
+  .mat-mdc-text-field-wrapper {
+    // Clean, modern appearance
+    background: var(--input-bg) !important;
+    border: 2px solid var(--border-primary) !important;
+    border-radius: 8px !important;
+    transition: all 0.2s ease !important;
+    box-shadow: none !important;
+    
+    // Hover state
+    &:hover:not(.mdc-text-field--disabled) {
+      border-color: var(--hover-border) !important;
+      background: var(--hover-bg) !important;
+      box-shadow: none !important;
+    }
+    
+    // Focus state
+    &.mdc-text-field--focused {
+      border-color: var(--primary) !important;
+      background: var(--bg-primary) !important;
+      box-shadow: 0 0 0 3px var(--focus-ring) !important;
+    }
+    
+    // Error state
+    &.mdc-text-field--invalid {
+      border-color: var(--error) !important;
+      
+      &.mdc-text-field--focused {
+        box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.25) !important;
+      }
+    }
+    
+    // Disabled state
+    &.mdc-text-field--disabled {
+      background: var(--bg-tertiary) !important;
+      border-color: var(--border-light) !important;
+      opacity: 0.6 !important;
+    }
+  }
+  
+  // Clean label positioning
+  .mat-mdc-form-field-label {
+    &.mdc-floating-label {
+      left: 16px !important;
+      color: var(--text-secondary) !important;
+      
+      &--float-above {
+        transform: translateY(-50%) scale(0.75) !important;
+        color: var(--primary) !important;
+      }
+    }
+  }
+}
+
+// Ensure no conflicting styles from other sources
+::ng-deep {
+  .mat-mdc-form-field,
+  .mdc-text-field {
+    // Remove any Material elevation/shadows
+    box-shadow: none !important;
+    
+    // Ensure consistent typography
+    font-family: var(--font-family) !important;
+  }
+}
+
+// ============================================================================= 
+// DIALOG SPECIFIC BORDER REMOVAL
+// =============================================================================
+
+// Target dialogs specifically (where the screenshot seems to be from)
+::ng-deep .mat-mdc-dialog-container {
+  .mat-mdc-form-field {
+    // Complete border removal for dialog inputs
+    .mat-mdc-text-field-wrapper {
+      background: var(--input-bg) !important;
+      border: 2px solid var(--border-primary) !important;
+      border-radius: 8px !important;
+      box-shadow: none !important;
+      overflow: hidden !important;
+      
+      // Remove ALL internal styling elements
+      .mdc-text-field__input,
+      .mat-mdc-input-element {
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        padding: 20px 16px !important;
+        font-size: 16px !important;
+        color: var(--text-primary) !important;
+        
+        &::placeholder {
+          color: var(--text-muted) !important;
+          font-size: 16px !important;
+        }
+        
+        &:focus,
+        &:active,
+        &:hover {
+          border: none !important;
+          outline: none !important;
+          box-shadow: none !important;
+        }
+      }
+      
+      // Remove any pseudo-elements
+      &:before,
+      &:after {
+        display: none !important;
+      }
+      
+      // Remove all child elements that might create borders
+      * {
+        &:before,
+        &:after {
+          display: none !important;
+        }
+      }
+      
+      // Focus state for dialog inputs
+      &.mdc-text-field--focused {
+        border-color: var(--primary) !important;
+        box-shadow: 0 0 0 3px var(--focus-ring) !important;
+      }
+    }
+  }
+}
+
+// Target specific form creation dialogs
+::ng-deep .create-quiz-dialog,
+::ng-deep .folder-dialog {
+  .mat-mdc-form-field .mat-mdc-text-field-wrapper {
+    // Ultra-clean styling for create dialogs
+    background: var(--input-bg) !important;
+    border: 2px solid var(--border-primary) !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+    
+    .mdc-text-field__input,
+    .mat-mdc-input-element {
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      padding: 24px 20px !important;
+      font-size: 16px !important;
+      color: var(--text-primary) !important;
+    }
+  }
+}}
+}

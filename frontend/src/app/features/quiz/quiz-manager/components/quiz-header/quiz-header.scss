@@ -1,0 +1,208 @@
+@use '../../../../../../scss/variables' as *;
+@use '../../../../../../scss/mixins' as *;
+
+.quiz-header {
+  position: sticky;
+  top: 0;
+  z-index: $z-index-sticky;
+  @include glassmorphism(0.1, 20px);
+  padding: $spacing-4 $spacing-8;
+  box-shadow: $shadow-lg;
+
+  @include dark-theme {
+    @include glassmorphism(0.15, 20px);
+    background: rgba($dark-bg-secondary, 0.8);
+    border-bottom: 1px solid rgba($dark-border-primary, 0.3);
+  }
+
+  @include mobile {
+    padding: $spacing-3 $spacing-4;
+  }
+
+  .header-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: $spacing-8;
+    align-items: center;
+
+    @include mobile {
+      grid-template-columns: 1fr;
+      gap: $spacing-4;
+    }
+
+    .nav-section {
+      @include flex-center;
+      gap: $spacing-4;
+
+      @include mobile {
+        justify-content: space-between;
+        width: 100%;
+      }
+
+      .nav-back-btn {
+        width: 48px;
+        height: 48px;
+        border-radius: $radius-xl;
+        @include glassmorphism(0.2, 10px);
+        color: $white;
+        transition: all $transition-slow cubic-bezier(0.4, 0, 0.2, 1);
+        @include flex-center;
+
+        @include dark-theme {
+          color: $dark-text-primary;
+          background: rgba($dark-bg-primary, 0.3);
+        }
+        cursor: pointer;
+
+        @include mobile {
+          width: 40px;
+          height: 40px;
+        }
+
+        &:hover {
+          @include glassmorphism(0.3, 10px);
+          transform: translateY(-2px);
+          box-shadow: $shadow-xl;
+          
+          @include dark-theme {
+            background: rgba($dark-bg-primary, 0.5);
+          }
+        }
+      }
+
+      .breadcrumb {
+        .breadcrumb-container {
+          @include flex-center;
+          gap: $spacing-2;
+
+          @include mobile {
+            gap: $spacing-1;
+          }
+
+          .home-btn {
+            color: rgba($white, 0.8);
+            transition: all $transition-base ease;
+
+            @include dark-theme {
+              color: rgba($dark-text-secondary, 0.8);
+            }
+
+            &:hover {
+              color: $white;
+              @include glassmorphism(0.1, 10px);
+              
+              @include dark-theme {
+                color: $dark-text-primary;
+                background: rgba($dark-bg-primary, 0.1);
+              }
+            }
+          }
+
+          .breadcrumb-path {
+            @include flex-center;
+            gap: $spacing-2;
+
+            @include mobile {
+              gap: $spacing-1;
+              font-size: $font-size-sm;
+            }
+
+            .path-separator {
+              color: rgba($white, 0.6);
+              font-size: $font-size-lg;
+
+              @include dark-theme {
+                color: rgba($dark-text-tertiary, 0.6);
+              }
+
+              @include mobile {
+                font-size: $font-size-base;
+              }
+            }
+
+            .breadcrumb-item {
+              @include flex-center;
+
+              .path-button {
+                @include flex-center;
+                gap: $spacing-2;
+                color: rgba($white, 0.8);
+                border-radius: $radius-md;
+                padding: $spacing-2 $spacing-3;
+                transition: all $transition-base ease;
+
+                @include dark-theme {
+                  color: rgba($dark-text-secondary, 0.8);
+                }
+
+                @include mobile {
+                  padding: $spacing-1 $spacing-2;
+                  gap: $spacing-1;
+                }
+
+                .item-icon {
+                  font-size: $font-size-lg;
+
+                  @include mobile {
+                    font-size: $font-size-base;
+                  }
+                }
+
+                .item-text {
+                  font-weight: $font-weight-medium;
+
+                  @include mobile {
+                    font-size: $font-size-sm;
+                  }
+                }
+
+                &:hover {
+                  @include glassmorphism(0.1, 10px);
+                  color: $white;
+                  
+                  @include dark-theme {
+                    background: rgba($dark-bg-primary, 0.1);
+                    color: $dark-text-primary;
+                  }
+                }
+              }
+
+              &.current {
+                .current-item {
+                  @include flex-center;
+                  gap: $spacing-2;
+                  color: $white;
+                  font-weight: $font-weight-semibold;
+
+                  @include dark-theme {
+                    color: $dark-text-primary;
+                  }
+
+                  @include mobile {
+                    gap: $spacing-1;
+                  }
+
+                  .current-icon {
+                    font-size: $font-size-lg;
+
+                    @include mobile {
+                      font-size: $font-size-base;
+                    }
+                  }
+
+                  .current-text {
+                    @include mobile {
+                      font-size: $font-size-sm;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

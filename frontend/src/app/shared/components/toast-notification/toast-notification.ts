@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
 import { TranslateModule } from '@ngx-translate/core';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { NotificationService, ToastMessage } from '../../../core/services/notification.service';
@@ -11,7 +10,7 @@ import { Subscription } from 'rxjs';
   selector: 'app-toast-notification',
   templateUrl: './toast-notification.html',
   styleUrls: ['./toast-notification.scss'],
-  imports: [CommonModule, MatIconModule, TranslateModule],
+  imports: [CommonModule, TranslateModule],
   animations: [
     trigger('slideIn', [
       transition(':enter', [
@@ -42,16 +41,6 @@ export class ToastNotification implements OnInit, OnDestroy {
   
   removeToast(id: string) {
     this.notificationService.remove(id);
-  }
-  
-  getIcon(type: string): string {
-    switch (type) {
-      case 'success': return 'check_circle';
-      case 'error': return 'error';
-      case 'warning': return 'warning';
-      case 'info': return 'info';
-      default: return 'notifications';
-    }
   }
   
   trackByFn(index: number, item: ToastMessage): string {

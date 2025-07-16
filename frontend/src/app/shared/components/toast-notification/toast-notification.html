@@ -6,8 +6,7 @@
     [@slideIn]
   >
     <div class="toast-content">
-      <div class="toast-icon">
-        <mat-icon>{{ getIcon(toast.type) }}</mat-icon>
+      <div class="toast-icon" [class]="'toast-icon-' + toast.type">
       </div>
       <div class="toast-body">
         <div class="toast-title" *ngIf="toast.title">
@@ -22,7 +21,6 @@
         (click)="removeToast(toast.id)"
         [attr.aria-label]="'COMMON.CLOSE' | translate"
       >
-        <mat-icon>close</mat-icon>
       </button>
     </div>
     <div class="toast-progress" *ngIf="!toast.persistent && toast.duration">

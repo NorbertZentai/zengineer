@@ -26,3 +26,5 @@ backend/pb_data/*.db-wal
 
 # Logs
 *.log
+
+.fake

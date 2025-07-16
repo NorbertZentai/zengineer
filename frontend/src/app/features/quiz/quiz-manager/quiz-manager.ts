@@ -1,20 +1,19 @@
 import { Component, computed, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatCardModule } from '@angular/material/card';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { QuizService, Quiz, QuizFolder, QuizCard, StudySession } from '../../../core/services/quiz.service';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonToggleModule, MatButtonToggleChange } from '@angular/material/button-toggle';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { QuizService, Quiz, QuizFolder, QuizCard, StudySession, Project } from '../../../core/services/quiz.service';
 import { QuizCardEditorComponent } from '../quiz-card-editor/quiz-card-editor';
 import { StudyModeComponent } from '../study-mode/study-mode';
 import { QuizStatsComponent } from '../quiz-stats/quiz-stats';
@@ -27,24 +26,23 @@ export type SortBy = 'name' | 'created' | 'updated' | 'cards';
   standalone: true,
   selector: 'app-quiz-manager',
   templateUrl: './quiz-manager.html',
-  styleUrls: ['./quiz-manager.scss'],
+  styleUrls: ['./quiz-manager-simple.scss'],
   imports: [
     CommonModule, 
     FormsModule, 
     ReactiveFormsModule,
-    MatIconModule, 
-    MatButtonModule,
-    MatInputModule,
-    MatFormFieldModule,
+    TranslateModule,
+    MatIconModule,
     MatCardModule,
-    MatChipsModule,
-    MatProgressBarModule,
     MatMenuModule,
-    MatTooltipModule,
     MatDividerModule,
-    MatDialogModule,
-    MatSnackBarModule,
-    TranslateModule
+    MatChipsModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonToggleModule,
+    MatTooltipModule,
+    MatProgressSpinnerModule
   ],
 })
 export class QuizManager {
@@ -53,6 +51,7 @@ export class QuizManager {
   private _sortBy = signal<SortBy>('name');
   private _sortAscending = signal(true);
   private _selectedTags = signal<string[]>([]);
+  private _isDarkTheme = signal(false);
   
   // UI state
   showCreateDialog = signal(false);
@@ -64,27 +63,18 @@ export class QuizManager {
   
   // Breadcrumb navigation
   breadcrumb = computed(() => {
-    const current = this.quizService.currentFolder();
-    const path: QuizFolder[] = [];
+    const currentProject = this.quizService.currentProject();
+    const currentFolder = this.quizService.currentFolder();
+    const path: (Project | QuizFolder)[] = [];
     
-    if (current) {
-      // Build full breadcrumb path from root to current
-      let currentNode: QuizFolder | null = current;
-      const reversePath: QuizFolder[] = [];
-      
-      // Traverse up to root
-      while (currentNode) {
-        reversePath.push(currentNode);
-        if (currentNode.parent_id) {
-          const folders = this.quizService.folders();
-          currentNode = this.findFolderById(folders, currentNode.parent_id);
-        } else {
-          currentNode = null;
-        }
-      }
-      
-      // Reverse to get root-to-current order
-      path.push(...reversePath.reverse());
+    // Add project to path
+    if (currentProject) {
+      path.push(currentProject);
+    }
+    
+    // Add current folder if exists
+    if (currentFolder) {
+      path.push(currentFolder);
     }
     
     return path;
@@ -97,9 +87,10 @@ export class QuizManager {
     // Filter by tags
     const selectedTags = this._selectedTags();
     if (selectedTags.length > 0) {
-      quizzes = quizzes.filter((quiz: Quiz) => 
-        selectedTags.some(tag => safeArray(quiz.tags).includes(tag))
-      );
+      quizzes = quizzes.filter((quiz: Quiz) => {
+        const quizTags = this.getQuizTags(quiz);
+        return selectedTags.some(tag => quizTags.includes(tag));
+      });
     }
     
     // Sort
@@ -113,10 +104,10 @@ export class QuizManager {
           comparison = a.name.localeCompare(b.name);
           break;
         case 'created':
-          comparison = (a.created?.getTime() || 0) - (b.created?.getTime() || 0);
+          comparison = (new Date(a.created_at || 0).getTime()) - (new Date(b.created_at || 0).getTime());
           break;
         case 'updated':
-          comparison = (a.updated?.getTime() || 0) - (b.updated?.getTime() || 0);
+          comparison = (new Date(a.updated_at || 0).getTime()) - (new Date(b.updated_at || 0).getTime());
           break;
         case 'cards':
           comparison = safeArray(a.cards).length - safeArray(b.cards).length;
@@ -128,11 +119,60 @@ export class QuizManager {
     return quizzes;
   });
 
+  displayedFolders = computed(() => {
+    const currentProject = this.quizService.currentProject();
+    const allFolders = this.quizService.folders();
+    
+    console.log('displayedFolders computed - currentProject:', currentProject);
+    console.log('displayedFolders computed - allFolders:', allFolders);
+    
+    // Get folders that belong to the current project
+    const projectFolders = allFolders.filter((folder: QuizFolder) => {
+      return currentProject ? folder.project_id === currentProject.id : false;
+    });
+    
+    console.log('projectFolders:', projectFolders);
+    
+    // Apply search filter if active
+    const searchQuery = this.quizService.searchQuery().toLowerCase();
+    let filteredFolders = projectFolders;
+    
+    if (searchQuery) {
+      filteredFolders = projectFolders.filter((folder: QuizFolder) => 
+        folder.name.toLowerCase().includes(searchQuery)
+      );
+    }
+    
+    // Sort by name
+    const sortBy = this._sortBy();
+    const ascending = this._sortAscending();
+    
+    filteredFolders.sort((a: QuizFolder, b: QuizFolder) => {
+      let comparison = 0;
+      switch (sortBy) {
+        case 'name':
+          comparison = a.name.localeCompare(b.name);
+          break;
+        case 'created':
+          comparison = (new Date(a.created_at || 0).getTime()) - (new Date(b.created_at || 0).getTime());
+          break;
+        case 'updated':
+          comparison = (new Date(a.updated_at || 0).getTime()) - (new Date(b.updated_at || 0).getTime());
+          break;
+        default:
+          comparison = a.name.localeCompare(b.name);
+      }
+      return ascending ? comparison : -comparison;
+    });
+    
+    return filteredFolders;
+  });
+
   // All available tags
   availableTags = computed(() => {
     const allTags = new Set<string>();
     this.quizService.allQuizzes().forEach((quiz: Quiz) => {
-      safeArray(quiz.tags).forEach((tag: string) => allTags.add(tag));
+      this.getQuizTags(quiz).forEach((tag: string) => allTags.add(tag));
     });
     return Array.from(allTags).sort();
   });
@@ -158,6 +198,9 @@ export class QuizManager {
     'music_note', 'sports', 'restaurant', 'flight', 'directions_car'
   ];
 
+  // Sort options  
+  sortOptions: SortBy[] = ['name', 'created', 'updated', 'cards'];
+
   // Color options
   colorOptions = [
     '#1976d2', '#388e3c', '#f57c00', '#d32f2f', '#7b1fa2',
@@ -166,8 +209,6 @@ export class QuizManager {
 
   constructor(
     public quizService: QuizService,
-    private dialog: MatDialog,
-    private snackBar: MatSnackBar,
     private translate: TranslateService
   ) {
     // Load initial data
@@ -176,6 +217,9 @@ export class QuizManager {
         // Loading state - could show spinner
       }
     });
+    
+    // Initialize theme
+    this.loadThemePreference();
   }
 
   // Public getters for template
@@ -183,6 +227,34 @@ export class QuizManager {
   get sortBy() { return this._sortBy; }
   get sortAscending() { return this._sortAscending; }
   get selectedTags() { return this._selectedTags; }
+  get isDarkTheme() { return this._isDarkTheme; }
+
+  // Theme management methods
+  private loadThemePreference(): void {
+    const savedTheme = localStorage.getItem('quiz-manager-theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const isDark = savedTheme ? savedTheme === 'dark' : prefersDark;
+    
+    this._isDarkTheme.set(isDark);
+    this.applyTheme(isDark);
+  }
+
+  toggleTheme(): void {
+    const newTheme = !this._isDarkTheme();
+    this._isDarkTheme.set(newTheme);
+    this.applyTheme(newTheme);
+    localStorage.setItem('quiz-manager-theme', newTheme ? 'dark' : 'light');
+  }
+
+  private applyTheme(isDark: boolean): void {
+    const body = document.body;
+    if (isDark) {
+      body.setAttribute('data-theme', 'dark');
+    } else {
+      body.removeAttribute('data-theme');
+    }
+  }
+
   // Navigation methods
   navigateToFolder(folder: QuizFolder | null): void {
     this.quizService.selectFolder(folder);
@@ -194,18 +266,20 @@ export class QuizManager {
 
   goBack(): void {
     const currentFolder = this.quizService.currentFolder();
-    if (currentFolder?.parent_id) {
-      // Navigate to parent folder
-      const folders = this.quizService.folders();
-      const parent = this.findFolderById(folders, currentFolder.parent_id);
-      this.navigateToFolder(parent);
-    } else {
+    if (currentFolder) {
+      // Ha van folder, menjünk vissza a projekthez
       this.navigateToFolder(null);
+    } else {
+      // Ha nincs folder, menjünk vissza a projekt választáshoz
+      this.quizService.selectProject(null);
     }
   }
 
   // View mode controls
-  setViewMode(mode: ViewMode): void {
+  setViewMode(mode: ViewMode): void;
+  setViewMode(event: MatButtonToggleChange): void;
+  setViewMode(modeOrEvent: ViewMode | MatButtonToggleChange): void {
+    const mode = typeof modeOrEvent === 'string' ? modeOrEvent : modeOrEvent.value as ViewMode;
     this._viewMode.set(mode);
   }
 
@@ -252,6 +326,11 @@ export class QuizManager {
     this.resetCreateForm();
   }
 
+  showCreateProjectDialog(): void {
+    // TODO: Implement project creation dialog
+    console.log('Projekt létrehozás még nem implementált');
+  }
+
   async confirmCreate(): Promise<void> {
     const name = this.createName().trim();
     if (!name) return;
@@ -262,41 +341,41 @@ export class QuizManager {
       if (this.createType() === 'folder') {
         await this.quizService.createFolder({
           name,
-          parent_id: currentFolder?.id
+          description: this.createDescription(),
+          color: this.selectedColor(),
+          visibility: 'private',
+          tags: [],
+          order_index: 0,
+          project_id: this.quizService.currentProject()?.id || ''
         });
-        this.snackBar.open(
-          this.translate.instant('QUIZ_MANAGER.MESSAGES.FOLDER_CREATED'), 
-          this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
-          { duration: 3000 }
-        );
+        // TODO: Show notification: Folder created successfully
       } else {
         const quiz = await this.quizService.createQuiz({
           name,
+          color: this.selectedColor(),
+          visibility: 'private',
+          tags: [],
+          difficulty_level: 1,
+          estimated_time: 10,
+          study_modes: ['flashcard'],
+          language: 'hu',
+          project_id: this.quizService.currentProject()?.id,
           folder_id: currentFolder?.id
         });
         
         // Update quiz with additional properties
         await this.quizService.updateQuiz(quiz.id!, {
           description: this.createDescription(),
-          color: this.selectedColor(),
-          icon: this.selectedIcon()
+          color: this.selectedColor()
         });
         
-        this.snackBar.open(
-          this.translate.instant('QUIZ_MANAGER.MESSAGES.QUIZ_CREATED'), 
-          this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
-          { duration: 3000 }
-        );
+        console.log('Quiz created successfully');
       }
       
       this.cancelCreate();
     } catch (error) {
       console.error('Error creating item:', error);
-      this.snackBar.open(
-        this.translate.instant('QUIZ_MANAGER.MESSAGES.CREATE_ERROR'), 
-        this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
-        { duration: 3000 }
-      );
+      console.log('Error creating item');
     }
   }
 
@@ -316,37 +395,30 @@ export class QuizManager {
   async updateFolder(folder: QuizFolder, updates: Partial<QuizFolder>): Promise<void> {
     try {
       await this.quizService.updateFolder(folder.id!, updates);
-      this.snackBar.open(
-        this.translate.instant('QUIZ_MANAGER.MESSAGES.FOLDER_UPDATED'), 
-        this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
-        { duration: 2000 }
-      );
+      console.log('Folder updated successfully');
     } catch (error) {
       console.error('Error updating folder:', error);
-      this.snackBar.open(
-        this.translate.instant('QUIZ_MANAGER.MESSAGES.UPDATE_ERROR'), 
-        this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
-        { duration: 3000 }
-      );
+      console.log('Error updating folder');
     }
   }
 
   async updateQuiz(quiz: Quiz, updates: Partial<Quiz>): Promise<void> {
     try {
       await this.quizService.updateQuiz(quiz.id!, updates);
-      this.snackBar.open(
-        this.translate.instant('QUIZ_MANAGER.MESSAGES.QUIZ_UPDATED'), 
-        this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
-        { duration: 2000 }
-      );
+      console.log('Quiz updated successfully');
     } catch (error) {
       console.error('Error updating quiz:', error);
-      this.snackBar.open(
-        this.translate.instant('QUIZ_MANAGER.MESSAGES.UPDATE_ERROR'), 
-        this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
-        { duration: 3000 }
-      );
+      console.log('Error updating quiz');
     }
+  }
+
+  // Folder edit operations
+  editFolder(folder: QuizFolder): void {
+    this.createType.set('folder');
+    this.createName.set(folder.name);
+    this.selectedColor.set(folder.color || '#2196f3');
+    this.selectedIcon.set('folder'); // Fix ikon
+    this.showCreateDialog.set(true);
   }
 
   // Delete operations
@@ -355,18 +427,10 @@ export class QuizManager {
     if (confirm(confirmMessage)) {
       try {
         await this.quizService.deleteFolder(folder.id!);
-        this.snackBar.open(
-          this.translate.instant('QUIZ_MANAGER.MESSAGES.FOLDER_DELETED'), 
-          this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
-          { duration: 2000 }
-        );
+        console.log('Folder deleted successfully');
       } catch (error) {
         console.error('Error deleting folder:', error);
-        this.snackBar.open(
-          this.translate.instant('QUIZ_MANAGER.MESSAGES.DELETE_ERROR'), 
-          this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
-          { duration: 3000 }
-        );
+        console.log('Error deleting folder');
       }
     }
   }
@@ -376,82 +440,66 @@ export class QuizManager {
     if (confirm(confirmMessage)) {
       try {
         await this.quizService.deleteQuiz(quiz.id!);
-        this.snackBar.open(
-          this.translate.instant('QUIZ_MANAGER.MESSAGES.QUIZ_DELETED'), 
-          this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
-          { duration: 2000 }
-        );
+        console.log('Quiz deleted successfully');
       } catch (error) {
         console.error('Error deleting quiz:', error);
-        this.snackBar.open(
-          this.translate.instant('QUIZ_MANAGER.MESSAGES.DELETE_ERROR'), 
-          this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
-          { duration: 3000 }
-        );
+        console.log('Error deleting quiz');
       }
     }
   }
 
   // Card operations
   openCardEditor(quiz: Quiz): void {
-    const dialogRef = this.dialog.open(QuizCardEditorComponent, {
-      width: '800px',
-      maxHeight: '90vh',
-      data: { quiz }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        // Cards were updated, refresh might be needed
-      }
-    });
+    // TODO: Implement card editor functionality without Material Dialog
+    console.log('Opening card editor for quiz:', quiz.name);
   }
 
   // Study mode
   startStudyMode(quiz: Quiz): void {
     if (safeArray(quiz.cards).length === 0) {
-      this.snackBar.open(
-        this.translate.instant('QUIZ_MANAGER.MESSAGES.NO_CARDS'), 
-        this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
-        { duration: 3000 }
-      );
+      console.log('No cards available for study mode');
       return;
     }
 
-    const dialogRef = this.dialog.open(StudyModeComponent, {
-      width: '100%',
-      height: '100%',
-      maxWidth: '100vw',
-      maxHeight: '100vh',
-      panelClass: 'fullscreen-dialog',
-      data: { quiz }
-    });
-
-    dialogRef.afterClosed().subscribe((result: StudySession | null) => {
-      if (result) {
-        this.snackBar.open(
-          `${this.translate.instant('QUIZ_MANAGER.MESSAGES.STUDY_COMPLETE')} ${result.correctAnswers}/${result.totalAnswers} ${this.translate.instant('QUIZ_MANAGER.MESSAGES.CORRECT_ANSWERS')}`,
-          this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'),
-          { duration: 5000 }
-        );
-      }
-    });
+    // TODO: Implement study mode functionality without Material Dialog
+    console.log('Starting study mode for quiz:', quiz.name);
   }
 
   // Statistics
   showQuizStats(quiz: Quiz): void {
-    this.dialog.open(QuizStatsComponent, {
-      width: '600px',
-      data: { quiz }
-    });
+    // TODO: Implement quiz stats functionality without Material Dialog
+    console.log('Showing stats for quiz:', quiz.name);
+  }
+
+  showQuizAnalytics(quiz: Quiz): void {
+    // TODO: Implement analytics dialog
+    console.log('Analytics for quiz:', quiz);
+    console.log('Részletes elemzés funkció fejlesztés alatt');
   }
 
   // Utility methods
+  getQuizTags(quiz: Quiz): string[] {
+    const tags = new Set<string>();
+    safeArray(quiz.cards).forEach((card: QuizCard) => {
+      safeArray(card.tags).forEach((tag: string) => tags.add(tag));
+    });
+    return Array.from(tags);
+  }
+
+  getSortLabel(sort: SortBy): string {
+    const labels = {
+      'name': 'Név',
+      'created': 'Létrehozva',
+      'updated': 'Módosítva',
+      'cards': 'Kártyák'
+    };
+    return labels[sort] || sort;
+  }
+
   private findFolderById(folders: QuizFolder[], id: string): QuizFolder | null {
     for (const folder of folders) {
       if (folder.id === id) return folder;
-      const found = this.findFolderById(safeArray(folder.children), id);
-      if (found) return found;
+      // Az új struktúrában nincsenek children, csak project_id alapján hierarchia
     }
     return null;
   }
@@ -477,18 +525,10 @@ export class QuizManager {
       a.click();
       
       URL.revokeObjectURL(url);
-      this.snackBar.open(
-        this.translate.instant('QUIZ_MANAGER.MESSAGES.QUIZ_EXPORTED'), 
-        this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
-        { duration: 2000 }
-      );
+      console.log('Quiz exported successfully');
     } catch (error) {
       console.error('Error exporting quiz:', error);
-      this.snackBar.open(
-        this.translate.instant('QUIZ_MANAGER.MESSAGES.EXPORT_ERROR'), 
-        this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'), 
-        { duration: 3000 }
-      );
+      console.log('Error exporting quiz');
     }
   }
 
@@ -521,11 +561,7 @@ export class QuizManager {
       }
       
       // For now, just show a message
-      this.snackBar.open(
-        `${this.translate.instant('QUIZ_MANAGER.MESSAGES.MOVE_NOT_IMPLEMENTED')}`,
-        this.translate.instant('QUIZ_MANAGER.CREATE_DIALOG.CLOSE'),
-        { duration: 3000 }
-      );
+      console.log('Move functionality not implemented yet');
     } catch (error) {
       console.error('Error handling drop:', error);
     }

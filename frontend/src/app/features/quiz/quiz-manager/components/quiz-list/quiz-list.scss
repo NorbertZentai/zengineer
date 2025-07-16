@@ -1,0 +1,67 @@
+@use '../../../../../../scss/variables' as *;
+@use '../../../../../../scss/mixins' as *;
+
+// Base styles that apply to all screen sizes
+.quiz-list-container {
+  width: 100%;
+
+  @include dark-theme {
+    background: $dark-bg-primary;
+    color: $dark-text-primary;
+  }
+  
+  .folders-section,
+  .quizzes-section {
+    margin-bottom: $spacing-8;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  
+  .item-card {
+    @include card-interactive;
+    position: relative;
+    transition: all $transition-base;
+
+    @include dark-theme {
+      background: $dark-bg-secondary;
+      border-color: $dark-border-primary;
+      color: $dark-text-primary;
+    }
+    
+    // Shared card states
+    &:hover {
+      .action-btn {
+        opacity: 1;
+      }
+    }
+    
+    // Danger action styling
+    .danger-action {
+      color: $error;
+      
+      @include dark-theme {
+        color: $error-light;
+      }
+      
+      mat-icon {
+        color: $error;
+        
+        @include dark-theme {
+          color: $error-light;
+        }
+      }
+    }
+  }
+  
+  // Loading and empty states are responsive by default
+  .loading-container,
+  .empty-state {
+    @include animation-fade-in;
+    
+    @include dark-theme {
+      color: $dark-text-secondary;
+    }
+  }
+}

@@ -1,0 +1,191 @@
+<!-- Filter Container -->
+<div class="quiz-filter-container">
+  
+  <!-- Main Filter Bar -->
+  <div class="main-filter-bar">
+    
+    <!-- Search Section -->
+    <div class="search-section">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Keresés kvízekben és mappákban</mat-label>
+        <mat-icon matPrefix>search</mat-icon>
+        <input 
+          matInput 
+          [value]="filters.searchQuery"
+          (input)="onSearchChange($any($event.target).value)"
+          placeholder="Írj be egy keresőszót...">
+        <button 
+          *ngIf="filters.searchQuery" 
+          matSuffix 
+          mat-icon-button 
+          (click)="onSearchChange('')"
+          matTooltip="Keresés törlése">
+          <mat-icon>clear</mat-icon>
+        </button>
+      </mat-form-field>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <!-- View Mode Toggle -->
+      <mat-button-toggle-group 
+        [value]="filters.viewMode"
+        (change)="onViewModeChange($event.value)"
+        class="view-toggle">
+        <mat-button-toggle value="grid" matTooltip="Rács nézet">
+          <mat-icon>grid_view</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="list" matTooltip="Lista nézet">
+          <mat-icon>view_list</mat-icon>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+
+      <!-- Sort Controls -->
+      <div class="sort-controls">
+        <mat-form-field appearance="outline" class="sort-field">
+          <mat-label>Rendezés</mat-label>
+          <mat-select 
+            [value]="filters.sortBy"
+            (selectionChange)="onSortChange($event.value)">
+            <mat-option *ngFor="let option of sortOptions" [value]="option.value">
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        
+        <button 
+          mat-icon-button
+          (click)="onSortDirectionToggle()"
+          [matTooltip]="filters.sortDirection === 'asc' ? 'Növekvő sorrend' : 'Csökkenő sorrend'"
+          class="sort-direction-btn">
+          <mat-icon>{{ filters.sortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+        </button>
+      </div>
+
+      <!-- Advanced Filters Toggle -->
+      <button 
+        mat-button
+        (click)="toggleAdvancedFilters()"
+        class="advanced-filter-btn"
+        [class.active]="showAdvancedFilters()">
+        <mat-icon>tune</mat-icon>
+        <span>Szűrők</span>
+        <mat-icon class="expand-icon">{{ showAdvancedFilters() ? 'expand_less' : 'expand_more' }}</mat-icon>
+      </button>
+
+      <!-- Create Actions -->
+      <div class="create-actions">
+        <button 
+          mat-stroked-button
+          (click)="onCreateFolder()"
+          class="create-folder-btn">
+          <mat-icon>create_new_folder</mat-icon>
+          <span class="desktop-only">Mappa</span>
+        </button>
+        
+        <button 
+          mat-raised-button
+          color="primary"
+          (click)="onCreateQuiz()"
+          class="create-quiz-btn">
+          <mat-icon>add</mat-icon>
+          <span class="desktop-only">Kvíz</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Advanced Filters Panel -->
+  <div class="advanced-filters" *ngIf="showAdvancedFilters()" [@slideDown]>
+    
+    <!-- Active Filters Display -->
+    <div class="active-filters" *ngIf="hasActiveFilters">
+      <div class="filters-header">
+        <span class="filters-label">Aktív szűrők:</span>
+        <button 
+          mat-button
+          (click)="clearFilters()"
+          class="clear-filters-btn">
+          <mat-icon>clear_all</mat-icon>
+          <span>Összes törlése</span>
+        </button>
+      </div>
+      
+      <div class="filter-chips">
+        <!-- Search Query Chip -->
+        <mat-chip-set *ngIf="filters.searchQuery">
+          <mat-chip 
+            removable
+            (removed)="onSearchChange('')">
+            <mat-icon matChipAvatar>search</mat-icon>
+            "{{ filters.searchQuery }}"
+            <mat-icon matChipRemove>cancel</mat-icon>
+          </mat-chip>
+        </mat-chip-set>
+        
+        <!-- Difficulty Chip -->
+        <mat-chip-set *ngIf="filters.difficulty !== null">
+          <mat-chip 
+            removable
+            (removed)="onDifficultyChange(null)">
+            <mat-icon matChipAvatar>bar_chart</mat-icon>
+            {{ selectedDifficultyLabel }}
+            <mat-icon matChipRemove>cancel</mat-icon>
+          </mat-chip>
+        </mat-chip-set>
+        
+        <!-- Tag Chips -->
+        <mat-chip-set *ngIf="filters.selectedTags.length > 0">
+          <mat-chip 
+            *ngFor="let tag of filters.selectedTags"
+            removable
+            (removed)="onTagRemove(tag)">
+            <mat-icon matChipAvatar>label</mat-icon>
+            {{ tag }}
+            <mat-icon matChipRemove>cancel</mat-icon>
+          </mat-chip>
+        </mat-chip-set>
+      </div>
+    </div>
+
+    <!-- Filter Options -->
+    <div class="filter-options">
+      
+      <!-- Difficulty Filter -->
+      <div class="filter-group">
+        <label class="filter-label">
+          <mat-icon>bar_chart</mat-icon>
+          Nehézség
+        </label>
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-select 
+            [value]="filters.difficulty"
+            (selectionChange)="onDifficultyChange($event.value)">
+            <mat-option *ngFor="let option of difficultyOptions" [value]="option.value">
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Tags Filter -->
+      <div class="filter-group" *ngIf="availableTags.length > 0">
+        <label class="filter-label">
+          <mat-icon>label</mat-icon>
+          Címkék
+        </label>
+        <div class="tag-selection">
+          <mat-chip-set>
+            <mat-chip 
+              *ngFor="let tag of availableTags" 
+              [class.selected]="filters.selectedTags.includes(tag)"
+              (click)="onTagToggle(tag)"
+              selectable>
+              {{ tag }}
+            </mat-chip>
+          </mat-chip-set>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -19,8 +19,15 @@
   "NAV": {
     "DASHBOARD": "Kezdőlap",
     "QUIZ_MANAGER": "Kvízkezelő",
-    "PROFILE": "Profil",
+    "LIBRARY": "Könyvtár",
+    "ANALYTICS": "Analitika",
     "ABOUT": "Névjegy",
+    "FEATURES": "Funkciók",
+    "PROFILE": "Profil",
+    "SETTINGS": "Beállítások",
+    "LOGOUT": "Kijelentkezés",
+    "LOGIN": "Bejelentkezés",
+    "REGISTER": "Regisztráció",
     "CONTACT": "Kapcsolat"
   },
   "LOGIN": {

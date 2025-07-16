@@ -2,8 +2,8 @@
   <!-- Header -->
   <div class="study-header">
     <div class="header-left">
-      <button mat-icon-button (click)="exitStudy()" class="exit-btn">
-        <mat-icon>close</mat-icon>
+      <button class="exit-btn" (click)="exitStudy()">
+        <span class="close-icon"></span>
       </button>
       <h2>{{ quiz.name }}</h2>
     </div>
@@ -12,24 +12,24 @@
       <!-- Study Mode Selector -->
       <div class="mode-selector">
         <button 
-          mat-button
+          class="mode-btn"
           [class.active]="studyMode() === 'classic'"
           (click)="changeStudyMode('classic')">
-          <mat-icon>quiz</mat-icon>
+          <span class="quiz-icon"></span>
           Összes kártya
         </button>
         <button 
-          mat-button
+          class="mode-btn"
           [class.active]="studyMode() === 'review'"
           (click)="changeStudyMode('review')">
-          <mat-icon>schedule</mat-icon>
+          <span class="schedule-icon"></span>
           Ismétlendő
         </button>
         <button 
-          mat-button
+          class="mode-btn"
           [class.active]="studyMode() === 'hard_cards'"
           (click)="changeStudyMode('hard_cards')">
-          <mat-icon>trending_up</mat-icon>
+          <span class="trending-up-icon"></span>
           Nehéz kártyák
         </button>
       </div>
@@ -37,7 +37,7 @@
     
     <div class="header-right">
       <div class="timer">
-        <mat-icon>schedule</mat-icon>
+        <span class="schedule-icon"></span>
         {{ formatTime(elapsedTime()) }}
       </div>
     </div>
@@ -53,11 +53,11 @@
         {{ studyStats().accuracy.toFixed(0) }}% pontosság
       </span>
     </div>
-    <mat-progress-bar 
-      mode="determinate" 
-      [value]="progress()"
-      class="study-progress">
-    </mat-progress-bar>
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill study-progress" 
+           [style.width.%]="progress()">
+      </div>
+    </div>
   </div>
   
   <!-- Study Card -->
@@ -69,7 +69,7 @@
         {{ getCardDifficultyLabel(card.difficulty) }}
       </span>
       <div class="card-tags" *ngIf="card.tags.length > 0">
-        <mat-chip *ngFor="let tag of card.tags">{{ tag }}</mat-chip>
+        <span class="tag-chip" *ngFor="let tag of card.tags">{{ tag }}</span>
       </div>
     </div>
     
@@ -80,7 +80,7 @@
         <div class="card-face card-front">
           <div class="card-content">
             <div class="flip-hint" *ngIf="!isFlipped()">
-              <mat-icon>touch_app</mat-icon>
+              <span class="touch-icon"></span>
               Kattints a válasz megtekintéséhez
             </div>
             <div class="card-text">{{ card.front }}</div>
@@ -97,37 +97,32 @@
     <!-- Action Buttons -->
     <div class="study-actions" *ngIf="isFlipped()">
       <button 
-        mat-raised-button 
-        color="warn"
         class="action-btn wrong-btn"
         (click)="answerCard(false)">
-        <mat-icon>close</mat-icon>
+        <span class="close-icon"></span>
         Nem tudtam
       </button>
       <button 
-        mat-raised-button 
         class="action-btn skip-btn"
         (click)="skipCard()">
-        <mat-icon>skip_next</mat-icon>
+        <span class="skip-icon"></span>
         Kihagyás
       </button>
       <button 
-        mat-raised-button 
-        color="primary"
         class="action-btn correct-btn"
         (click)="answerCard(true)">
-        <mat-icon>check</mat-icon>
+        <span class="check-icon"></span>
         Tudtam
       </button>
     </div>
     
     <div class="card-controls" *ngIf="!isFlipped()">
-      <button mat-button (click)="resetCard()">
-        <mat-icon>refresh</mat-icon>
+      <button class="control-btn" (click)="resetCard()">
+        <span class="refresh-icon"></span>
         Újra
       </button>
-      <button mat-button (click)="flipCard()">
-        <mat-icon>flip</mat-icon>
+      <button class="control-btn" (click)="flipCard()">
+        <span class="flip-icon"></span>
         Válasz mutatása
       </button>
     </div>
@@ -136,17 +131,17 @@
   <!-- Stats Panel -->
   <div class="stats-panel">
     <div class="stat-item correct">
-      <mat-icon>check_circle</mat-icon>
+      <span class="check-circle-icon"></span>
       <span class="stat-value">{{ studyStats().correct }}</span>
       <span class="stat-label">Helyes</span>
     </div>
     <div class="stat-item wrong">
-      <mat-icon>cancel</mat-icon>
+      <span class="cancel-icon"></span>
       <span class="stat-value">{{ studyStats().wrong }}</span>
       <span class="stat-label">Helytelen</span>
     </div>
     <div class="stat-item remaining">
-      <mat-icon>schedule</mat-icon>
+      <span class="schedule-icon"></span>
       <span class="stat-value">{{ studyStats().remaining }}</span>
       <span class="stat-label">Hátra</span>
     </div>
@@ -156,7 +151,7 @@
 <!-- Results Screen -->
 <div class="results-container" *ngIf="showResult()">
   <div class="results-header">
-    <mat-icon class="results-icon">emoji_events</mat-icon>
+    <span class="results-icon trophy-icon"></span>
     <h2>Tanulás befejezve!</h2>
   </div>
   
@@ -186,15 +181,15 @@
     
     <div class="performance-message">
       <div *ngIf="studyStats().accuracy >= 90" class="excellent">
-        <mat-icon>star</mat-icon>
+        <span class="star-icon"></span>
         <span>Kiváló teljesítmény! Nagyon jól megy!</span>
       </div>
       <div *ngIf="studyStats().accuracy >= 70 && studyStats().accuracy < 90" class="good">
-        <mat-icon>thumb_up</mat-icon>
+        <span class="thumb-up-icon"></span>
         <span>Jó munka! Még egy kis gyakorlás és tökéletes lesz!</span>
       </div>
       <div *ngIf="studyStats().accuracy < 70" class="needs-work">
-        <mat-icon>school</mat-icon>
+        <span class="school-icon"></span>
         <span>Még van mit gyakorolni. Ne add fel, a következő alkalommal jobban fog menni!</span>
       </div>
     </div>
@@ -202,14 +197,13 @@
   
   <div class="results-actions">
     <button 
-      mat-raised-button 
-      color="primary"
+      class="result-btn primary-btn"
       (click)="restartStudy()">
-      <mat-icon>refresh</mat-icon>
+      <span class="refresh-icon"></span>
       Újra tanulás
     </button>
-    <button mat-button (click)="close(true)">
-      <mat-icon>check</mat-icon>
+    <button class="result-btn secondary-btn" (click)="close(true)">
+      <span class="check-icon"></span>
       Befejezés
     </button>
   </div>
@@ -217,7 +211,7 @@
 
 <!-- Empty State -->
 <div class="empty-study" *ngIf="studyCards().length === 0 && !showResult()">
-  <mat-icon class="empty-icon">quiz</mat-icon>
+  <span class="empty-icon quiz-icon"></span>
   <h3>Nincsenek tanulható kártyák</h3>
   <p *ngIf="studyMode() === 'review'">
     Jelenleg nincsenek ismétlendő kártyák. Próbáld ki a "Összes kártya" módot!
@@ -227,12 +221,11 @@
   </p>
   <div class="empty-actions">
     <button 
-      mat-raised-button 
-      color="primary"
+      class="empty-btn primary-btn"
       (click)="changeStudyMode('classic')">
       Összes kártya tanulása
     </button>
-    <button mat-button (click)="close(false)">
+    <button class="empty-btn secondary-btn" (click)="close(false)">
       Bezárás
     </button>
   </div>

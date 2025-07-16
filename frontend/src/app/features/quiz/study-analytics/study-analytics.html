@@ -1,0 +1,292 @@
+<div class="analytics-container">
+  <div class="analytics-header">
+    <h2>
+      <span class="header-icon analytics-icon"></span>
+      {{ quiz.name }} - Tanulási statisztikák
+    </h2>
+    <button class="close-btn" (click)="close()">
+      <span class="close-icon"></span>
+    </button>
+  </div>
+
+  <div class="loading-state" *ngIf="isLoading()">
+    <div class="loading-bar"></div>
+    <p>Statisztikák betöltése...</p>
+  </div>
+
+  <div class="analytics-content" *ngIf="!isLoading() && analytics()">
+    <div class="tab-group">
+      <!-- Overview Tab -->
+      <div class="tab-panel active" id="overview-tab">
+        <div class="tab-content">
+          <!-- Key Metrics -->
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div class="metric-content">
+                <div class="metric-icon school-icon"></div>
+                <div class="metric-value">{{ analytics()!.totalSessions }}</div>
+                <div class="metric-label">Tanulási alkalom</div>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-content">
+                <div class="metric-icon schedule-icon"></div>
+                <div class="metric-value">{{ formatDuration(analytics()!.totalTimeSpent) }}</div>
+                <div class="metric-label">Összes időráfordítás</div>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-content">
+                <div class="metric-icon trending-up-icon"></div>
+                <div class="metric-value">{{ analytics()!.overallProgress.toFixed(1) }}%</div>
+                <div class="metric-label">Átlagos teljesítmény</div>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-content">
+                <div class="metric-icon star-icon"></div>
+                <div class="metric-value">{{ analytics()!.masteredCards }}</div>
+                <div class="metric-label">Elsajátított kártyák</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Progress Overview -->
+          <div class="progress-card">
+            <div class="card-header">
+              <div class="card-title">Haladás részletei</div>
+            </div>
+            <div class="card-content">
+              <div class="progress-item">
+                <div class="progress-label">
+                  <span>Elsajátított kártyák</span>
+                  <span class="progress-value">{{ analytics()!.masteredCards }} / {{ analytics()!.totalCards }}</span>
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar-fill" 
+                       [style.width.%]="(analytics()!.masteredCards / analytics()!.totalCards) * 100"
+                       [style.background-color]="getProgressColor((analytics()!.masteredCards / analytics()!.totalCards) * 100)">
+                  </div>
+                </div>
+              </div>
+
+              <div class="progress-item">
+                <div class="progress-label">
+                  <span>Figyelmet igénylő kártyák</span>
+                  <span class="progress-value">{{ analytics()!.strugglingCards }}</span>
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar-fill warn-color" 
+                       [style.width.%]="(analytics()!.strugglingCards / analytics()!.totalCards) * 100">
+                  </div>
+                </div>
+              </div>
+
+              <div class="progress-item">
+                <div class="progress-label">
+                  <span>Átlagos tanulási alkalom hossza</span>
+                  <span class="progress-value">{{ formatDuration(analytics()!.averageSessionLength) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Difficulty Distribution -->
+          <div class="distribution-card">
+            <div class="card-header">
+              <div class="card-title">Nehézség szerint megoszlás</div>
+            </div>
+            <div class="card-content">
+              <div class="difficulty-stats">
+                <div class="difficulty-item easy">
+                  <div class="difficulty-count">{{ analytics()!.difficultyDistribution.easy }}</div>
+                  <div class="difficulty-label">Könnyű</div>
+                  <div class="difficulty-bar">
+                    <div class="difficulty-fill" 
+                         [style.width.%]="(analytics()!.difficultyDistribution.easy / analytics()!.totalCards) * 100">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="difficulty-item medium">
+                  <div class="difficulty-count">{{ analytics()!.difficultyDistribution.medium }}</div>
+                  <div class="difficulty-label">Közepes</div>
+                  <div class="difficulty-bar">
+                    <div class="difficulty-fill" 
+                         [style.width.%]="(analytics()!.difficultyDistribution.medium / analytics()!.totalCards) * 100">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="difficulty-item hard">
+                  <div class="difficulty-count">{{ analytics()!.difficultyDistribution.hard }}</div>
+                  <div class="difficulty-label">Nehéz</div>
+                  <div class="difficulty-bar">
+                    <div class="difficulty-fill" 
+                         [style.width.%]="(analytics()!.difficultyDistribution.hard / analytics()!.totalCards) * 100">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Performance Tab -->
+      <div class="tab-panel" id="performance-tab">
+        <div class="tab-content">
+          <!-- Struggling Cards -->
+          <div class="cards-section" *ngIf="strugglingCards().length > 0">
+            <div class="card-header">
+              <div class="card-title">
+                <span class="warning-icon"></span>
+                Figyelmet igénylő kártyák ({{ strugglingCards().length }})
+              </div>
+            </div>
+            <div class="card-content">
+              <div class="card-analytics-list">
+                <div 
+                  *ngFor="let cardAnalytics of strugglingCards()" 
+                  class="card-analytics-item struggling">
+                  <div class="card-content">
+                    <div class="card-question">{{ cardAnalytics.card.front }}</div>
+                    <div class="card-stats">
+                      <span class="stat success-rate">
+                        <span class="trending-down-icon"></span>
+                        {{ (cardAnalytics.card.successRate * 100).toFixed(0) }}% siker
+                      </span>
+                      <span class="stat review-count">
+                        <span class="refresh-icon"></span>
+                        {{ cardAnalytics.totalReviews }} ismétlés
+                      </span>
+                      <span class="stat last-reviewed">
+                        <span class="schedule-icon"></span>
+                        {{ formatDate(cardAnalytics.lastReviewed) }}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="card-trend">
+                    <span class="trend-icon" [style.color]="getTrendColor(cardAnalytics.difficultyTrend)">
+                      {{ getTrendIcon(cardAnalytics.difficultyTrend) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mastered Cards -->
+          <div class="cards-section" *ngIf="masteredCards().length > 0">
+            <div class="card-header">
+              <div class="card-title">
+                <span class="star-icon primary-color"></span>
+                Elsajátított kártyák ({{ masteredCards().length }})
+              </div>
+            </div>
+            <div class="card-content">
+              <div class="card-analytics-list mastered-list">
+                <div 
+                  *ngFor="let cardAnalytics of masteredCards().slice(0, 10)" 
+                  class="card-analytics-item mastered">
+                  <div class="card-content">
+                    <div class="card-question">{{ cardAnalytics.card.front }}</div>
+                    <div class="card-stats">
+                      <span class="stat success-rate">
+                        <span class="trending-up-icon"></span>
+                        {{ (cardAnalytics.card.successRate * 100).toFixed(0) }}% siker
+                      </span>
+                      <span class="stat review-count">
+                        <span class="refresh-icon"></span>
+                        {{ cardAnalytics.totalReviews }} ismétlés
+                      </span>
+                    </div>
+                  </div>
+                  <div class="mastery-badge">
+                    <span class="check-circle-icon"></span>
+                  </div>
+                </div>
+              </div>
+              <div class="show-more" *ngIf="masteredCards().length > 10">
+                <small>És még {{ masteredCards().length - 10 }} kártya...</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity Tab -->
+      <div class="tab-panel" id="activity-tab">
+        <div class="tab-content">
+          <div class="activity-card">
+            <div class="card-header">
+              <div class="card-title">Utoljára átnézett kártyák</div>
+            </div>
+            <div class="card-content">
+              <div class="activity-list" *ngIf="recentActivity().length > 0; else noActivity">
+                <div 
+                  *ngFor="let cardAnalytics of recentActivity()" 
+                  class="activity-item">
+                  <div class="activity-content">
+                    <div class="card-question">{{ cardAnalytics.card.front }}</div>
+                    <div class="activity-meta">
+                      <span class="activity-date">{{ formatDate(cardAnalytics.lastReviewed) }}</span>
+                      <span class="success-chip" 
+                            [style.background-color]="getProgressColor(cardAnalytics.card.successRate * 100)">
+                        {{ (cardAnalytics.card.successRate * 100).toFixed(0) }}% siker
+                      </span>
+                    </div>
+                  </div>
+                  <div class="activity-trend">
+                    <span class="trend-icon" [style.color]="getTrendColor(cardAnalytics.difficultyTrend)">
+                      {{ getTrendIcon(cardAnalytics.difficultyTrend) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <ng-template #noActivity>
+                <div class="no-activity">
+                  <span class="history-icon"></span>
+                  <p>Még nincsenek átnézett kártyák</p>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+
+          <!-- Weekly Progress -->
+          <div class="weekly-progress-card" *ngIf="analytics()!.weeklyProgress.length > 0">
+            <div class="card-header">
+              <div class="card-title">Heti teljesítmény trend</div>
+            </div>
+            <div class="card-content">
+              <div class="weekly-chart">
+                <div 
+                  *ngFor="let week of analytics()!.weeklyProgress" 
+                  class="week-item">
+                  <div class="week-bar">
+                    <div 
+                      class="week-fill" 
+                      [style.height.%]="week.score"
+                      [style.background-color]="getProgressColor(week.score)">
+                    </div>
+                  </div>
+                  <div class="week-label">{{ week.week.substring(5) }}</div>
+                  <div class="week-score">{{ week.score.toFixed(0) }}%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="!isLoading() && !analytics()">
+    <span class="analytics-icon"></span>
+    <h3>Nincs elérhető statisztika</h3>
+    <p>Kezdj el tanulni a kártyákkal, hogy lásd a haladásod!</p>
+  </div>
+</div>

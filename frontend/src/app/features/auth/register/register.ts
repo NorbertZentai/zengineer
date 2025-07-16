@@ -5,14 +5,13 @@ import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   standalone: true,
   selector: 'app-register',
   templateUrl: './register.html',
   styleUrls: ['./register.scss'],
-  imports: [CommonModule, FormsModule, TranslateModule, MatIconModule, RouterModule],
+  imports: [CommonModule, FormsModule, TranslateModule, RouterModule],
 })
 export class Register {
   email = '';

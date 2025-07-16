@@ -1,0 +1,144 @@
+<!-- Bulk Selection Header -->
+<div class="bulk-header" *ngIf="bulkEditMode">
+  <div class="bulk-controls">
+    <mat-checkbox
+      [checked]="selectAllChecked"
+      [indeterminate]="selectedCards.size > 0 && selectedCards.size < cards.length"
+      (change)="onSelectAll($event.checked)">
+      {{ selectedCards.size > 0 ? selectedCards.size + ' kiválasztva' : 'Összes kiválasztása' }}
+    </mat-checkbox>
+  </div>
+</div>
+
+<!-- Cards Container -->
+<div class="cards-container" cdkDropList (cdkDropListDropped)="onCardsReorder($event)">
+  
+  <!-- Individual Card -->
+  <div 
+    *ngFor="let card of cards; trackBy: trackByCardId; let i = index"
+    class="card-item"
+    [class.selected]="isCardSelected(card.id!)"
+    cdkDrag>
+    
+    <!-- Drag Handle -->
+    <div class="drag-handle" cdkDragHandle>
+      <mat-icon>drag_indicator</mat-icon>
+    </div>
+    
+    <!-- Selection Checkbox -->
+    <div class="card-selection" *ngIf="bulkEditMode">
+      <mat-checkbox
+        [checked]="isCardSelected(card.id!)"
+        (change)="onCardSelect(card.id!)">
+      </mat-checkbox>
+    </div>
+    
+    <!-- Card Content -->
+    <div class="card-content" (click)="onCardEdit(i)">
+      
+      <!-- Card Front/Back -->
+      <div class="card-sides">
+        <div class="card-front">
+          <label class="side-label">Előlap:</label>
+          <div class="side-content">{{ card.front }}</div>
+        </div>
+        
+        <div class="card-divider">
+          <mat-icon>arrow_forward</mat-icon>
+        </div>
+        
+        <div class="card-back">
+          <label class="side-label">Hátlap:</label>
+          <div class="side-content">{{ card.back }}</div>
+        </div>
+      </div>
+      
+      <!-- Card Metadata -->
+      <div class="card-metadata">
+        
+        <!-- Difficulty -->
+        <div class="metadata-item difficulty">
+          <mat-icon [style.color]="getDifficultyInfo(card.difficulty).color">
+            bar_chart
+          </mat-icon>
+          <span [style.color]="getDifficultyInfo(card.difficulty).color">
+            {{ getDifficultyInfo(card.difficulty).label }}
+          </span>
+        </div>
+        
+        <!-- Review Stats -->
+        <div class="metadata-item stats" *ngIf="card.reviewCount || card.successRate">
+          <div class="stat-group">
+            <mat-icon>refresh</mat-icon>
+            <span>{{ card.reviewCount || 0 }} ismétlés</span>
+          </div>
+          
+          <div class="stat-group" *ngIf="card.successRate !== undefined">
+            <mat-icon [style.color]="getSuccessRateColor(card.successRate)">
+              trending_up
+            </mat-icon>
+            <span [style.color]="getSuccessRateColor(card.successRate)">
+              {{ formatSuccessRate(card.successRate) }} siker
+            </span>
+          </div>
+        </div>
+        
+        <!-- Tags -->
+        <div class="metadata-item tags" *ngIf="card.tags && card.tags.length > 0">
+          <mat-chip-set>
+            <mat-chip *ngFor="let tag of card.tags.slice(0, 3)">
+              {{ tag }}
+            </mat-chip>
+            <mat-chip *ngIf="card.tags.length > 3" class="more-tags">
+              +{{ card.tags.length - 3 }}
+            </mat-chip>
+          </mat-chip-set>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Card Actions -->
+    <div class="card-actions">
+      <button 
+        mat-icon-button
+        [matMenuTriggerFor]="cardMenu"
+        class="action-btn"
+        matTooltip="Műveletek">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      
+      <mat-menu #cardMenu="matMenu">
+        <button mat-menu-item (click)="onCardEdit(i)">
+          <mat-icon>edit</mat-icon>
+          <span>Szerkesztés</span>
+        </button>
+        <button mat-menu-item (click)="onCardSelect(card.id!)" *ngIf="!bulkEditMode">
+          <mat-icon>check_circle</mat-icon>
+          <span>Kiválasztás</span>
+        </button>
+        <mat-divider></mat-divider>
+        <button mat-menu-item (click)="onCardDelete(card.id!)" class="danger-action">
+          <mat-icon>delete</mat-icon>
+          <span>Törlés</span>
+        </button>
+      </mat-menu>
+    </div>
+    
+    <!-- CDK Drag Preview -->
+    <div class="card-preview" *cdkDragPreview>
+      <div class="preview-content">
+        <mat-icon>style</mat-icon>
+        <span>{{ card.front }}</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="cards.length === 0">
+    <div class="empty-content">
+      <mat-icon class="empty-icon">style</mat-icon>
+      <h3>Nincsenek kártyák</h3>
+      <p>Adj hozzá kártyákat a kvízhez a kezdéshez!</p>
+    </div>
+  </div>
+</div>

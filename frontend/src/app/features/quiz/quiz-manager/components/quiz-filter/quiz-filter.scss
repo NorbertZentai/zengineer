@@ -1,0 +1,265 @@
+@use '../../../../../../scss/variables' as *;
+@use '../../../../../../scss/mixins' as *;
+
+.quiz-filter-container {
+  .main-filter-bar {
+    @include flex-between;
+    gap: $spacing-6;
+    margin-bottom: $spacing-6;
+    
+    @include mobile {
+      flex-direction: column;
+      gap: $spacing-4;
+    }
+    
+    .search-section {
+      flex: 1;
+      max-width: 400px;
+      
+      @include mobile {
+        max-width: 100%;
+        width: 100%;
+      }
+      
+      .search-field {
+        width: 100%;
+        
+        .mat-mdc-form-field-subscript-wrapper {
+          display: none;
+        }
+      }
+    }
+    
+    .quick-actions {
+      @include flex-center;
+      gap: $spacing-4;
+      
+      @include mobile {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+      }
+      
+      .view-toggle {
+        .mat-button-toggle {
+          border-radius: $radius-md;
+          
+          &.mat-button-toggle-checked {
+            background: $primary;
+            color: $white;
+
+            @include dark-theme {
+              background: $primary-light;
+              color: $dark-bg-primary;
+            }
+          }
+        }
+      }
+      
+      .sort-controls {
+        @include flex-center;
+        gap: $spacing-sm;
+        
+        .sort-field {
+          min-width: 140px;
+          
+          .mat-mdc-form-field-subscript-wrapper {
+            display: none;
+          }
+        }
+        
+        .sort-direction-btn {
+          transition: transform $transition-fast;
+          
+          &:hover {
+            transform: scale(1.1);
+          }
+        }
+      }
+      
+      .advanced-filter-btn {
+        @include button-base;
+        padding: $spacing-sm $spacing-md;
+        
+        &.active {
+          background: rgba($primary-color, 0.1);
+          color: $primary-color;
+        }
+        
+        .expand-icon {
+          transition: transform $transition-fast;
+        }
+        
+        &.active .expand-icon {
+          transform: rotate(180deg);
+        }
+      }
+      
+      .create-actions {
+        @include flex-center;
+        gap: $spacing-sm;
+        
+        @include mobile {
+          width: 100%;
+          justify-content: stretch;
+          
+          button {
+            flex: 1;
+          }
+        }
+        
+        .create-folder-btn {
+          @include button-secondary;
+          padding: $spacing-sm $spacing-md;
+        }
+        
+        .create-quiz-btn {
+          @include button-primary;
+          padding: $spacing-sm $spacing-md;
+        }
+        
+        .desktop-only {
+          @include mobile {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+  
+  .advanced-filters {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: $radius-lg;
+    padding: $spacing-lg;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: $shadow-md;
+    
+    @include slide-up;
+    
+    .active-filters {
+      margin-bottom: $spacing-lg;
+      
+      .filters-header {
+        @include flex-between;
+        margin-bottom: $spacing-md;
+        
+        .filters-label {
+          font-weight: 600;
+          color: $text-primary;
+        }
+        
+        .clear-filters-btn {
+          @include button-secondary;
+          padding: $spacing-xs $spacing-sm;
+          font-size: 0.875rem;
+        }
+      }
+      
+      .filter-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: $spacing-sm;
+        
+        mat-chip-set {
+          margin: 0;
+          
+          mat-chip {
+            background: rgba($primary-color, 0.1);
+            color: $primary-color;
+            border: 1px solid rgba($primary-color, 0.3);
+            
+            mat-icon[matChipAvatar] {
+              background: $primary-color;
+              color: white;
+            }
+            
+            mat-icon[matChipRemove] {
+              color: $primary-color;
+              transition: color $transition-fast;
+              
+              &:hover {
+                color: $error-color;
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    .filter-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: $spacing-lg;
+      
+      @include mobile {
+        grid-template-columns: 1fr;
+        gap: $spacing-md;
+      }
+      
+      .filter-group {
+        .filter-label {
+          @include flex-center;
+          gap: $spacing-sm;
+          font-weight: 500;
+          color: $text-primary;
+          margin-bottom: $spacing-sm;
+          
+          mat-icon {
+            font-size: 1.125rem;
+          }
+        }
+        
+        .filter-field {
+          width: 100%;
+          
+          .mat-mdc-form-field-subscript-wrapper {
+            display: none;
+          }
+        }
+        
+        .tag-selection {
+          mat-chip-set {
+            mat-chip {
+              margin: $spacing-xs;
+              transition: all $transition-fast;
+              cursor: pointer;
+              
+              &:hover {
+                transform: translateY(-2px);
+                box-shadow: $shadow-sm;
+              }
+              
+              &[selected] {
+                background: $primary-color;
+                color: white;
+              }
+              
+              &:not([selected]) {
+                background: rgba($text-secondary, 0.1);
+                color: $text-secondary;
+                
+                &:hover {
+                  background: rgba($primary-color, 0.1);
+                  color: $primary-color;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Animations
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

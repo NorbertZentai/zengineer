@@ -1,55 +1,34 @@
 <nav class="navbar">
-  <div class="navbar-left">
-    <!-- App icon (opcionális, de most eltávolítva) -->
-    <span class="navbar-title">Zengineer</span>
+  <a class="navbar-logo" href="/">Zengineer</a>
+  <div class="navbar-menu">
+    <a routerLink="/dashboard" routerLinkActive="active" href="/dashboard" role="link" tabindex="0">{{ 'NAV.DASHBOARD' | translate }}</a>
+    <a routerLink="/quiz-manager" routerLinkActive="active" href="/quiz-manager" role="link" tabindex="0">{{ 'NAV.QUIZ_MANAGER' | translate }}</a>
+    <a routerLink="/library" routerLinkActive="active" href="/library" role="link" tabindex="0">{{ 'NAV.LIBRARY' | translate }}</a>
+    <a routerLink="/analytics" routerLinkActive="active" href="/analytics" role="link" tabindex="0">{{ 'NAV.ANALYTICS' | translate }}</a>
   </div>
-  <div class="navbar-center">
-    <a routerLink="/dashboard" routerLinkActive="active">
-      <span>{{ 'NAV.DASHBOARD' | translate }}</span>
-    </a>
-    <a routerLink="/profile" routerLinkActive="active">
-      <span>{{ 'NAV.PROFILE' | translate }}</span>
-    </a>
-    <a routerLink="/about" routerLinkActive="active">
-      <span>{{ 'NAV.ABOUT' | translate }}</span>
-    </a>
-    <a routerLink="/contact" routerLinkActive="active">
-      <span>{{ 'NAV.CONTACT' | translate }}</span>
-    </a>
-    <a routerLink="/quiz-manager" routerLinkActive="active">
-      <span>{{ 'NAV.QUIZ_MANAGER' | translate }}</span>
-    </a>
-  </div>
-  <div class="navbar-right">
-    <!-- Show loading indicator while auth is initializing -->
-    <ng-container *ngIf="!authInitialized">
-      <div class="auth-loading">
-        <mat-icon>refresh</mat-icon>
-      </div>
-    </ng-container>
-    
-    <!-- Show auth buttons after initialization -->
-    <ng-container *ngIf="authInitialized">
-      <ng-container *ngIf="isLoggedIn(); else guestLinks">
-        <button class="icon-btn" (click)="logout()" [attr.aria-label]="'COMMON.LOGOUT' | translate">
-          <mat-icon>logout</mat-icon>
+  <div class="navbar-actions">
+    <!-- Language Selector -->
+
+    <div class="navbar-action navbar-lang" (click)="toggleLanguage()" tabindex="0" aria-label="Select language">
+      <span class="navbar-icon">🌐</span>
+      <div class="navbar-dropdown" *ngIf="showLanguageDropdown">
+        <button *ngFor="let lang of availableLanguages" (click)="$event.stopPropagation(); selectLanguage(lang)" [class.active]="currentLanguage === lang">
+          {{ lang | uppercase }}
         </button>
-      </ng-container>
-      <ng-template #guestLinks>
-        <a class="icon-btn" routerLink="/login" [attr.aria-label]="'COMMON.LOGIN' | translate">
-          <mat-icon>login</mat-icon>
-        </a>
-        <a class="icon-btn" routerLink="/register" [attr.aria-label]="'COMMON.REGISTER' | translate">
-          <mat-icon>person_add</mat-icon>
-        </a>
-      </ng-template>
-    </ng-container>
-    <select class="lang-switch" [value]="translate.currentLang" (change)="changeLang($event)">
-      <option value="hu">HU</option>
-      <option value="en">EN</option>
-    </select>
-    <button class="icon-btn" (click)="toggleTheme()" [attr.aria-label]="currentTheme === 'dark' ? 'Világos mód' : 'Sötét mód'">
-      <mat-icon>{{ currentTheme === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
+      </div>
+    </div>
+
+    <div class="navbar-action navbar-user" (click)="toggleUserDropdown()" tabindex="0" aria-label="Account">
+      <span class="navbar-icon">👤</span>
+      <div class="navbar-dropdown" *ngIf="showUserDropdown">
+        <button (click)="$event.stopPropagation(); logout()">{{ 'NAV.LOGOUT' | translate }}</button>
+      </div>
+    </div>
+
+    <!-- Theme Toggle -->
+    <button class="navbar-action navbar-theme" (click)="toggleTheme()" aria-label="Toggle theme">
+      <span *ngIf="isDarkMode(); else light">☀️</span>
+      <ng-template #light>🌙</ng-template>
     </button>
   </div>
 </nav>

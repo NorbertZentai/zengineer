@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { AuthService } from './core/services/auth.service';
+import { ThemeService } from './core/services/theme.service';
 import { Router } from '@angular/router';
 import { CommonModule  } from '@angular/common';
 import { NavbarComponent } from './shared/components/navbar/navbar';
@@ -19,8 +20,14 @@ export class App {
   protected title = 'zengineer';
   public translationsLoaded = false;
 
-  constructor(private translate: TranslateService, private auth: AuthService, private router: Router) {
+  constructor(
+    private translate: TranslateService, 
+    private auth: AuthService, 
+    private router: Router,
+    private themeService: ThemeService // Injektáljuk a ThemeService-t
+  ) {
     this.initializeTranslations();
+    // A ThemeService automatikusan inicializálódik az injektáláskor
   }
 
   async initializeTranslations() {

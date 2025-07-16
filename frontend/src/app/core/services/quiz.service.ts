@@ -3,19 +3,40 @@ import { Injectable, signal, computed } from '@angular/core';
 import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
 import { environment } from '../../../environments/environment';
 
+export interface Project {
+  id?: string;
+  name: string;
+  description?: string;
+  color: string;
+  visibility: 'private' | 'public';
+  tags: string[];
+  subject?: string;
+  difficulty_level?: number; // 1-5, opcionális
+  target_audience: string[];
+  language: string;
+  user_id?: string;
+  folders?: QuizFolder[];
+  quizzes?: Quiz[];
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface Quiz {
   id?: string;
   name: string;
   description?: string;
-  color?: string;
-  icon?: string;
+  color: string;
+  visibility: 'private' | 'public';
+  tags: string[];
+  subject?: string;
+  difficulty_level: number; // 1-5
+  estimated_time: number; // percben
+  study_modes: string[];
+  language: string;
+  project_id?: string;
   folder_id?: string;
   user_id?: string;
   cards?: QuizCard[];
-  tags?: string[];
-  created?: Date;
-  updated?: Date;
-  studySettings?: StudySettings;
   created_at?: string;
   updated_at?: string;
 }
@@ -23,10 +44,10 @@ export interface Quiz {
 export interface QuizCard {
   id?: string;
   quiz_id?: string;
-  question: string;
-  answer: string;
-  front: string; // kompatibilitás az UI-val
-  back: string; // kompatibilitás az UI-val
+  front: string; // elsődleges mező
+  back: string; // elsődleges mező
+  question?: string; // kompatibilitás az adatbázissal
+  answer?: string; // kompatibilitás az adatbázissal
   tags: string[]; // nem optional, alapértelmezett üres tömb
   difficulty: 'easy' | 'medium' | 'hard'; // nem optional, alapértelmezett medium
   reviewCount: number; // nem optional, alapértelmezett 0
@@ -40,13 +61,14 @@ export interface QuizCard {
 export interface QuizFolder {
   id?: string;
   name: string;
-  color?: string;
-  icon?: string;
-  parent_id?: string;
-  parentId?: string; // kompatibilitás
+  description?: string;
+  color: string;
+  visibility: 'private' | 'public';
+  tags: string[];
+  order_index: number;
+  project_id: string; // kötelező parent
   user_id?: string;
   quizzes?: Quiz[];
-  children?: QuizFolder[];
   created_at?: string;
   updated_at?: string;
 }
@@ -88,15 +110,18 @@ export class QuizService {
   
   // Reactive state
   user = signal<User | null>(null);
+  projects = signal<Project[]>([]);
   quizzes = signal<Quiz[]>([]);
   folders = signal<QuizFolder[]>([]);
   isLoading = signal(false);
   
   // Additional state for compatibility
+  private _currentProject = signal<Project | null>(null);
   private _currentFolder = signal<QuizFolder | null>(null);
   private _searchQuery = signal('');
   
   // Public readonly signals for compatibility
+  currentProject = this._currentProject.asReadonly();
   currentFolder = this._currentFolder.asReadonly();
   searchQuery = this._searchQuery.asReadonly();
   
@@ -159,6 +184,75 @@ export class QuizService {
     this.clearUserData();
   }
 
+  // 🎯 PROJECT METHODS
+  async loadProjects() {
+    this.isLoading.set(true);
+    try {
+      const { data, error } = await this.supabase
+        .from('projects')
+        .select('*')
+        .eq('user_id', this.user()?.id);
+
+      if (error) throw error;
+      this.projects.set(data || []);
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  async createProject(project: Omit<Project, 'id' | 'user_id' | 'created_at' | 'updated_at'>) {
+    const { data, error } = await this.supabase
+      .from('projects')
+      .insert({
+        name: project.name,
+        description: project.description,
+        color: project.color,
+        visibility: project.visibility,
+        tags: project.tags,
+        subject: project.subject,
+        difficulty_level: project.difficulty_level,
+        target_audience: project.target_audience,
+        language: project.language,
+        user_id: this.user()?.id
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    await this.loadProjects();
+    return data;
+  }
+
+  async updateProject(id: string, updates: Partial<Project>) {
+    const { data, error } = await this.supabase
+      .from('projects')
+      .update(updates)
+      .eq('id', id)
+      .eq('user_id', this.user()?.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    await this.loadProjects();
+    return data;
+  }
+
+  async deleteProject(id: string) {
+    const { error } = await this.supabase
+      .from('projects')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', this.user()?.id);
+
+    if (error) throw error;
+    await this.loadProjects();
+  }
+
+  selectProject(project: Project | null): void {
+    this._currentProject.set(project);
+    this._currentFolder.set(null); // Reset folder when changing project
+  }
+
   // 📚 QUIZ METHODS
   async loadQuizzes() {
     this.isLoading.set(true);
@@ -172,7 +266,30 @@ export class QuizService {
         .eq('user_id', this.user()?.id);
 
       if (error) throw error;
-      this.quizzes.set(data || []);
+      
+      // Transform data for UI compatibility
+      const numberToDifficultyMap: { [key: number]: 'easy' | 'medium' | 'hard' } = {
+        1: 'easy',
+        2: 'easy',
+        3: 'medium',
+        4: 'hard',
+        5: 'hard'
+      };
+
+      const transformedQuizzes = (data || []).map(quiz => ({
+        ...quiz,
+        cards: (quiz.quiz_cards || []).map((card: any) => ({
+          ...card,
+          front: card.question || card.front || '',
+          back: card.answer || card.back || '',
+          tags: card.tags || [],
+          difficulty: numberToDifficultyMap[card.difficulty] || 'medium',
+          reviewCount: card.reviewCount || 0,
+          successRate: card.successRate || 0
+        }))
+      }));
+      
+      this.quizzes.set(transformedQuizzes);
     } finally {
       this.isLoading.set(false);
     }
@@ -182,7 +299,18 @@ export class QuizService {
     const { data, error } = await this.supabase
       .from('quizzes')
       .insert({
-        ...quiz,
+        name: quiz.name,
+        description: quiz.description,
+        color: quiz.color,
+        visibility: quiz.visibility,
+        tags: quiz.tags,
+        subject: quiz.subject,
+        difficulty_level: quiz.difficulty_level,
+        estimated_time: quiz.estimated_time,
+        study_modes: quiz.study_modes,
+        language: quiz.language,
+        project_id: quiz.project_id,
+        folder_id: quiz.folder_id,
         user_id: this.user()?.id
       })
       .select()
@@ -220,6 +348,7 @@ export class QuizService {
 
   // 📁 FOLDER METHODS
   async loadFolders() {
+    console.log('Loading folders for user:', this.user()?.id);
     this.isLoading.set(true);
     try {
       const { data, error } = await this.supabase
@@ -227,7 +356,12 @@ export class QuizService {
         .select('*')
         .eq('user_id', this.user()?.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error loading folders:', error);
+        throw error;
+      }
+      
+      console.log('Loaded folders:', data);
       this.folders.set(data || []);
     } finally {
       this.isLoading.set(false);
@@ -235,17 +369,32 @@ export class QuizService {
   }
 
   async createFolder(folder: Omit<QuizFolder, 'id' | 'user_id' | 'created_at' | 'updated_at'>) {
+    console.log('Creating folder:', folder);
+    console.log('Current user:', this.user()?.id);
+    
     const { data, error } = await this.supabase
       .from('quiz_folders')
       .insert({
-        ...folder,
+        name: folder.name,
+        description: folder.description,
+        color: folder.color,
+        visibility: folder.visibility,
+        tags: folder.tags,
+        order_index: folder.order_index,
+        project_id: folder.project_id,
         user_id: this.user()?.id
       })
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error creating folder:', error);
+      throw error;
+    }
+    
+    console.log('Folder created successfully:', data);
     await this.loadFolders(); // Refresh list
+    console.log('Current folders after refresh:', this.folders());
     return data;
   }
 
@@ -319,14 +468,18 @@ export class QuizService {
   // 🧹 UTILITY METHODS
   private async loadUserData() {
     await Promise.all([
+      this.loadProjects(),
       this.loadQuizzes(),
       this.loadFolders()
     ]);
   }
 
   private clearUserData() {
+    this.projects.set([]);
     this.quizzes.set([]);
     this.folders.set([]);
+    this._currentProject.set(null);
+    this._currentFolder.set(null);
   }
 
   // 🔧 COMPATIBILITY METHODS for existing components
@@ -362,14 +515,19 @@ export class QuizService {
 
   // CARD MANAGEMENT
   async addCard(quizId: string, cardData: Partial<QuizCard>): Promise<QuizCard> {
+    // Difficulty string to number conversion
+    const difficultyMap: { [key: string]: number } = {
+      'easy': 1,
+      'medium': 3,
+      'hard': 5
+    };
+
     const cardToInsert = {
       quiz_id: quizId,
       question: cardData.front || cardData.question || '',
       answer: cardData.back || cardData.answer || '',
       tags: cardData.tags || [],
-      difficulty: cardData.difficulty || 'medium',
-      reviewCount: 0,
-      successRate: 0
+      difficulty: difficultyMap[cardData.difficulty || 'medium'] || 3
     };
 
     const { data, error } = await this.supabase
@@ -381,16 +539,34 @@ export class QuizService {
     if (error) throw error;
     
     // Transform data for UI compatibility
+    const numberToDifficultyMap: { [key: number]: 'easy' | 'medium' | 'hard' } = {
+      1: 'easy',
+      2: 'easy',
+      3: 'medium',
+      4: 'hard',
+      5: 'hard'
+    };
+
     return {
       ...data,
       front: data.question,
-      back: data.answer
+      back: data.answer,
+      difficulty: numberToDifficultyMap[data.difficulty] || 'medium',
+      reviewCount: 0,
+      successRate: 0
     };
   }
 
   async updateCard(quizId: string, cardId: string, updates: Partial<QuizCard>): Promise<QuizCard> {
     const updateData: any = {};
     
+    // Difficulty string to number conversion
+    const difficultyMap: { [key: string]: number } = {
+      'easy': 1,
+      'medium': 3,
+      'hard': 5
+    };
+
     if (updates.front || updates.question) {
       updateData.question = updates.front || updates.question;
     }
@@ -398,9 +574,7 @@ export class QuizService {
       updateData.answer = updates.back || updates.answer;
     }
     if (updates.tags !== undefined) updateData.tags = updates.tags;
-    if (updates.difficulty !== undefined) updateData.difficulty = updates.difficulty;
-    if (updates.reviewCount !== undefined) updateData.reviewCount = updates.reviewCount;
-    if (updates.successRate !== undefined) updateData.successRate = updates.successRate;
+    if (updates.difficulty !== undefined) updateData.difficulty = difficultyMap[updates.difficulty] || 3;
     if (updates.lastReviewed !== undefined) updateData.last_reviewed = updates.lastReviewed;
     if (updates.nextReview !== undefined) updateData.next_review = updates.nextReview;
 
@@ -413,10 +587,22 @@ export class QuizService {
 
     if (error) throw error;
     
+    // Transform data for UI compatibility
+    const numberToDifficultyMap: { [key: number]: 'easy' | 'medium' | 'hard' } = {
+      1: 'easy',
+      2: 'easy',
+      3: 'medium',
+      4: 'hard',
+      5: 'hard'
+    };
+
     return {
       ...data,
       front: data.question,
-      back: data.answer
+      back: data.answer,
+      difficulty: numberToDifficultyMap[data.difficulty] || 'medium',
+      reviewCount: updates.reviewCount ?? 0,
+      successRate: updates.successRate ?? 0
     };
   }
 

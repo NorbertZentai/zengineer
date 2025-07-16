@@ -1,0 +1,317 @@
+// =============================================================================
+// MIXINS AND UTILITY FUNCTIONS
+// =============================================================================
+
+@use 'variables' as *;
+
+// =============================================================================
+// RESPONSIVE BREAKPOINTS MIXINS
+// =============================================================================
+@mixin mobile {
+  @media (max-width: #{$breakpoint-sm - 1px}) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: #{$breakpoint-sm}) and (max-width: #{$breakpoint-lg - 1px}) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: #{$breakpoint-lg}) {
+    @content;
+  }
+}
+
+@mixin mobile-up {
+  @media (min-width: #{$breakpoint-xs}) {
+    @content;
+  }
+}
+
+@mixin tablet-up {
+  @media (min-width: #{$breakpoint-md}) {
+    @content;
+  }
+}
+
+@mixin desktop-up {
+  @media (min-width: #{$breakpoint-lg}) {
+    @content;
+  }
+}
+
+// =============================================================================
+// BUTTON MIXINS
+// =============================================================================
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-2;
+  padding: $spacing-3 $spacing-4;
+  border-radius: $button-border-radius;
+  font-weight: $button-font-weight;
+  font-size: $font-size-base;
+  line-height: 1;
+  text-decoration: none;
+  transition: all $button-transition;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  user-select: none;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}
+
+@mixin button-primary {
+  @include button-base;
+  background: $gradient-primary;
+  color: $white;
+  box-shadow: $shadow-primary;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: $shadow-lg;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+@mixin button-secondary {
+  @include button-base;
+  background: $white;
+  color: $gray-700;
+  border: 1px solid $gray-400;
+
+  &:hover {
+    background: $gray-50;
+    border-color: $primary;
+    color: $primary;
+  }
+}
+
+@mixin button-outline {
+  @include button-base;
+  background: transparent;
+  color: $primary;
+  border: 1px solid $primary;
+
+  &:hover {
+    background: $primary;
+    color: $white;
+  }
+}
+
+@mixin button-ghost {
+  @include button-base;
+  background: transparent;
+  color: $gray-600;
+
+  &:hover {
+    background: $gray-100;
+    color: $gray-800;
+  }
+}
+
+// =============================================================================
+// CARD MIXINS
+// =============================================================================
+@mixin card-base {
+  background: $card-bg;
+  border: 1px solid $card-border;
+  border-radius: $radius-xl;
+  box-shadow: $card-shadow;
+  transition: all $transition-base;
+}
+
+@mixin card-hover {
+  &:hover {
+    box-shadow: $card-hover-shadow;
+    transform: translateY(-2px);
+  }
+}
+
+@mixin card-interactive {
+  @include card-base;
+  @include card-hover;
+  cursor: pointer;
+}
+
+// =============================================================================
+// INPUT/FORM MIXINS
+// =============================================================================
+@mixin input-base {
+  width: 100%;
+  padding: $spacing-3 $spacing-4;
+  background: $input-bg;
+  border: 1px solid $input-border;
+  border-radius: $input-border-radius;
+  font-size: $input-font-size;
+  line-height: $line-height-normal;
+  color: $gray-800;
+  transition: all $transition-base;
+
+  &::placeholder {
+    color: $gray-500;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $input-border-focus;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// =============================================================================
+// FLEX UTILITIES
+// =============================================================================
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin flex-column-center {
+  @include flex-column;
+  align-items: center;
+  justify-content: center;
+}
+
+// =============================================================================
+// TEXT UTILITIES
+// =============================================================================
+@mixin text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin text-clamp($lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// =============================================================================
+// ANIMATIONS
+// =============================================================================
+@mixin fade-in($duration: $transition-base) {
+  opacity: 0;
+  animation: fade-in $duration ease-in-out forwards;
+}
+
+@keyframes fade-in {
+  to {
+    opacity: 1;
+  }
+}
+
+@mixin slide-up($duration: $transition-base, $distance: 20px) {
+  transform: translateY($distance);
+  opacity: 0;
+  animation: slide-up $duration ease-out forwards;
+}
+
+@keyframes slide-up {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+// =============================================================================
+// GLASSMORPHISM EFFECT
+// =============================================================================
+@mixin glassmorphism($opacity: 0.1, $blur: 20px) {
+  background: rgba(255, 255, 255, $opacity);
+  backdrop-filter: blur($blur);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+// =============================================================================
+// FOCUS VISIBLE (ACCESSIBILITY)
+// =============================================================================
+@mixin focus-visible {
+  &:focus-visible {
+    outline: 2px solid $primary;
+    outline-offset: 2px;
+  }
+}
+
+// =============================================================================
+// LOADING SPINNER
+// =============================================================================
+@mixin spinner($size: 40px, $color: $primary) {
+  width: $size;
+  height: $size;
+  border: 4px solid rgba($color, 0.2);
+  border-top: 4px solid $color;
+  border-radius: $radius-full;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// =============================================================================
+// GRID UTILITIES
+// =============================================================================
+@mixin grid-auto-fit($min-width: 250px, $gap: $spacing-6) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax($min-width, 1fr));
+  gap: $gap;
+}
+
+@mixin grid-auto-fill($min-width: 250px, $gap: $spacing-6) {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax($min-width, 1fr));
+  gap: $gap;
+}
+
+// =============================================================================
+// DARK THEME MIXINS
+// =============================================================================
+@mixin dark-theme {
+  [data-theme='dark'] & {
+    @content;
+  }
+}
+
+// =============================================================================
+// HOVER STATES (ONLY ON NON-TOUCH DEVICES)
+// =============================================================================
+@mixin hover {
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      @content;
+    }
+  }
+}

@@ -1,53 +1,67 @@
+@use '../../../../scss/variables' as *;
+@use '../../../../scss/mixins' as *;
+
 .study-mode-container {
-  display: flex;
-  flex-direction: column;
+  @include flex-column;
   height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: $gradient-primary;
+  color: $white;
   overflow: hidden;
+
+  @include dark-theme {
+    background: linear-gradient(135deg, #{$dark-bg-secondary} 0%, #{$dark-bg-tertiary} 100%);
+    color: $dark-text-primary;
+  }
 }
 
 // Header
 .study-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem 2rem;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  @include flex-between;
+  padding: $spacing-6 $spacing-8;
+  @include glassmorphism(0.1, 10px);
   
   .header-left {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+    @include flex-center;
+    gap: $spacing-4;
     
     .exit-btn {
-      color: white;
+      color: $white;
+
+      @include dark-theme {
+        color: $dark-text-primary;
+      }
       
       &:hover {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba($white, 0.1);
+
+        @include dark-theme {
+          background: rgba($dark-text-primary, 0.1);
+        }
       }
     }
     
     h2 {
       margin: 0;
-      font-size: 1.5rem;
-      font-weight: 600;
+      font-size: $font-size-2xl;
+      font-weight: $font-weight-semibold;
     }
   }
   
   .header-center {
     .mode-selector {
-      display: flex;
-      background: rgba(255, 255, 255, 0.1);
+      @include flex-center;
+      @include glassmorphism(0.1, 5px);
       border-radius: 25px;
       padding: 4px;
       
       button {
-        color: rgba(255, 255, 255, 0.8);
+        color: rgba($white, 0.8);
         border-radius: 20px;
-        padding: 0.5rem 1rem;
+        padding: $spacing-2 $spacing-4;
+
+        @include dark-theme {
+          color: rgba($dark-text-primary, 0.8);
+        }
         font-size: 0.9rem;
         transition: all 0.2s ease;
         

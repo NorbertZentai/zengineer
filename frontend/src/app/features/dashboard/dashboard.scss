@@ -1,3 +1,14 @@
-h1 {
-  color: #333;
+@use '../../../scss/variables' as *;
+@use '../../../scss/mixins' as *;
+
+.dashboard {
+  h1 {
+    color: $gray-800;
+    font-weight: $font-weight-bold;
+    margin-bottom: $spacing-6;
+
+    @include dark-theme {
+      color: $dark-text-primary;
+    }
+  }
 }

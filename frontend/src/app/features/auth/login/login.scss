@@ -1,43 +1,63 @@
+@use '../../../../scss/variables' as *;
+@use '../../../../scss/mixins' as *;
+
 .auth-card {
   max-width: 350px;
   margin: 48px auto;
-  padding: 2.2rem 2rem 1.5rem 2rem;
-  background: var(--navbar-bg);
-  border-radius: 14px;
-  box-shadow: 0 4px 24px 0 rgba(25, 118, 210, 0.10);
-  border: 1px solid var(--navbar-border);
-  color: var(--foreground);
-  font-family: var(--font-family);
-  display: flex;
-  flex-direction: column;
-  gap: 1.1rem;
+  padding: $spacing-8 $spacing-8 $spacing-6 $spacing-8;
+  @include card-base;
+  color: $gray-800;
+  font-family: $font-family-primary;
+  @include flex-column;
+  gap: $spacing-4;
+
+  @include dark-theme {
+    background: $dark-bg-card;
+    border-color: $dark-border-secondary;
+    color: $dark-text-primary;
+  }
 
   &__header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.2rem;
-    margin-bottom: 0.5rem;
+    @include flex-column-center;
+    gap: $spacing-1;
+    margin-bottom: $spacing-2;
+
     .auth-card__icon {
-      font-size: 2.2rem;
-      color: var(--primary);
-      margin-bottom: 0.2rem;
+      font-size: $font-size-3xl;
+      color: $primary;
+      margin-bottom: $spacing-1;
+      width: $font-size-3xl;
+      height: $font-size-3xl;
+      @include flex-center;
+
+      @include dark-theme {
+        color: $primary-light;
+      }
+
+      &.login-icon::before {
+        content: "🔑";
+        font-size: $font-size-3xl;
+      }
     }
+
     h2 {
-      font-size: 1.25rem;
-      font-weight: 700;
+      font-size: $font-size-xl;
+      font-weight: $font-weight-bold;
       margin: 0;
       letter-spacing: 0.01em;
+
+      @include dark-theme {
+        color: $dark-text-primary;
+      }
     }
   }
 
   form {
-    display: flex;
-    flex-direction: column;
-    gap: 0.7rem;
+    @include flex-column;
+    gap: $spacing-3;
+
     .form-group {
-      display: flex;
-      flex-direction: column;
+      @include flex-column;
       gap: 0.18rem;
       label {
         font-size: 0.97rem;
@@ -89,15 +109,22 @@
           display: flex;
           align-items: center;
           justify-content: center;
+          width: 32px;
+          height: 32px;
           
           &:hover {
             background: var(--navbar-border);
           }
           
-          mat-icon {
+          &::before {
+            content: "👁️";
             font-size: 20px;
             width: 20px;
             height: 20px;
+          }
+
+          &.password-visible::before {
+            content: "🙈";
           }
         }
       }
@@ -189,8 +216,10 @@
       justify-content: center;
       gap: 0.5rem;
       
-      .spinning {
+      .loading-spinner::before {
+        content: "⟳";
         animation: spin 1s linear infinite;
+        font-size: 1.2rem;
       }
     }
     
@@ -312,15 +341,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 32px;
+    height: 32px;
     
     &:hover {
       background: var(--navbar-border);
     }
     
-    mat-icon {
-      font-size: 20px;
-      width: 20px;
-      height: 20px;
+    &::before {
+      content: "✕";
+      font-size: 16px;
+      font-weight: bold;
     }
   }
 }
@@ -374,6 +405,14 @@
       font-size: 3rem;
       color: #4caf50;
       margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &::before {
+        content: "✅";
+        font-size: 3rem;
+      }
     }
     
     p {
@@ -436,8 +475,10 @@
         justify-content: center;
         gap: 0.5rem;
         
-        .spinning {
+        .loading-spinner::before {
+          content: "⟳";
           animation: spin 1s linear infinite;
+          font-size: 1.2rem;
         }
       }
     }
@@ -553,7 +594,7 @@ a:focus {
     transition-duration: 0.01ms !important;
   }
   
-  .spinning {
+  .loading-spinner::before {
     animation: none !important;
   }
 }

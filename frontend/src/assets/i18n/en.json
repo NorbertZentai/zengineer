@@ -19,8 +19,15 @@
   "NAV": {
     "DASHBOARD": "Dashboard",
     "QUIZ_MANAGER": "Quiz Manager",
-    "PROFILE": "Profile",
+    "LIBRARY": "Library",
+    "ANALYTICS": "Analytics",
     "ABOUT": "About",
+    "FEATURES": "Features",
+    "PROFILE": "Profile",
+    "SETTINGS": "Settings",
+    "LOGOUT": "Logout",
+    "LOGIN": "Login",
+    "REGISTER": "Register",
     "CONTACT": "Contact"
   },
   "LOGIN": {

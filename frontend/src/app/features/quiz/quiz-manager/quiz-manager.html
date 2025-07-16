@@ -1,150 +1,368 @@
-<div class="quiz-manager-container">
-  <!-- Header with search and controls -->
-  <header class="manager-header">
-    <div class="header-left">
-      <nav class="breadcrumb" *ngIf="breadcrumb().length > 0">
+<div class="quiz-manager">
+  <!-- Modern Header with Glass Effect -->
+  <header class="modern-header">
+    <div class="header-container">
+      <!-- Left Section: Navigation -->
+      <div class="nav-section">
+        <!-- Back Button -->
         <button 
-          mat-icon-button 
-          (click)="navigateToFolder(null)"
-          [matTooltip]="'QUIZ_MANAGER.HOME' | translate">
-          <mat-icon>home</mat-icon>
+          *ngIf="quizService.currentFolder() || quizService.currentProject()"
+          mat-button
+          class="nav-back-btn fab-style"
+          (click)="goBack()" 
+          matTooltip="Vissza">
+          <mat-icon>arrow_back</mat-icon>
         </button>
-        <ng-container *ngFor="let folder of breadcrumb(); let last = last">
-          <mat-icon class="breadcrumb-separator">chevron_right</mat-icon>
-          <button 
-            *ngIf="!last"
-            mat-button 
-            (click)="navigateToFolder(folder)"
-            class="breadcrumb-item">
-            {{ folder.name }}
-          </button>
-          <span *ngIf="last" class="breadcrumb-current">{{ folder.name }}</span>
-        </ng-container>
-      </nav>
-      <h1 class="page-title" *ngIf="breadcrumb().length === 0">
-        <mat-icon class="title-icon">quiz</mat-icon>
-        {{ 'QUIZ_MANAGER.PAGE_TITLE' | translate }}
-      </h1>
-    </div>
-    
-    <div class="header-right">
-      <!-- Search -->
-      <mat-form-field appearance="outline" class="search-field">
-        <mat-label>{{ 'QUIZ_MANAGER.SEARCH_PLACEHOLDER' | translate }}</mat-label>
-        <input 
-          matInput 
-          [value]="quizService.searchQuery()"
-          (input)="onSearch($any($event.target).value)"
-          [placeholder]="'QUIZ_MANAGER.SEARCH_BY' | translate">
-        <mat-icon matSuffix>search</mat-icon>
-      </mat-form-field>
-      
-      <!-- View mode controls -->
-      <div class="view-controls">
-        <button 
-          mat-icon-button 
-          [class.active]="viewMode() === 'grid'"
-          (click)="setViewMode('grid')"
-          [matTooltip]="'QUIZ_MANAGER.VIEW_GRID' | translate">
-          <mat-icon>grid_view</mat-icon>
-        </button>
-        <button 
-          mat-icon-button 
-          [class.active]="viewMode() === 'list'"
-          (click)="setViewMode('list')"
-          [matTooltip]="'QUIZ_MANAGER.VIEW_LIST' | translate">
-          <mat-icon>view_list</mat-icon>
-        </button>
+        
+        <!-- Breadcrumb with Modern Design -->
+        <nav class="modern-breadcrumb" *ngIf="breadcrumb().length > 0">
+          <div class="breadcrumb-container">
+            <button 
+              mat-icon-button 
+              (click)="navigateToFolder(null); quizService.selectProject(null)"
+              class="home-btn"
+              matTooltip="Kezdőlap">
+              <mat-icon>home</mat-icon>
+            </button>
+            
+            <div class="breadcrumb-path">
+              <ng-container *ngFor="let item of breadcrumb(); let last = last; let i = index">
+                <mat-icon class="path-separator" *ngIf="i > 0">chevron_right</mat-icon>
+                <div class="breadcrumb-item" [class.current]="last">
+                  <button 
+                    *ngIf="!last"
+                    mat-button 
+                    class="path-button"
+                    (click)="navigateToFolder('project_id' in item ? item : null)">
+                    <mat-icon class="item-icon">{{ 'project_id' in item ? 'folder' : 'work_outline' }}</mat-icon>
+                    <span class="item-text">{{ item.name }}</span>
+                  </button>
+                  <div *ngIf="last" class="current-item">
+                    <mat-icon class="current-icon">{{ 'project_id' in item ? 'folder' : 'work_outline' }}</mat-icon>
+                    <span class="current-text">{{ item.name }}</span>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </nav>
       </div>
       
-      <!-- Sort controls -->
-      <button 
-        mat-icon-button 
-        [matMenuTriggerFor]="sortMenu" 
-        [matTooltip]="'QUIZ_MANAGER.SORT' | translate">
-        <mat-icon>sort</mat-icon>
-      </button>
-      <mat-menu #sortMenu="matMenu">
-        <button mat-menu-item (click)="setSortBy('name')">
-          <mat-icon>{{ sortBy() === 'name' ? (sortAscending() ? 'keyboard_arrow_up' : 'keyboard_arrow_down') : 'sort_by_alpha' }}</mat-icon>
-          {{ 'QUIZ_MANAGER.SORT_BY_NAME' | translate }}
-        </button>
-        <button mat-menu-item (click)="setSortBy('created')">
-          <mat-icon>{{ sortBy() === 'created' ? (sortAscending() ? 'keyboard_arrow_up' : 'keyboard_arrow_down') : 'schedule' }}</mat-icon>
-          {{ 'QUIZ_MANAGER.SORT_BY_CREATED' | translate }}
-        </button>
-        <button mat-menu-item (click)="setSortBy('updated')">
-          <mat-icon>{{ sortBy() === 'updated' ? (sortAscending() ? 'keyboard_arrow_up' : 'keyboard_arrow_down') : 'update' }}</mat-icon>
-          {{ 'QUIZ_MANAGER.SORT_BY_UPDATED' | translate }}
-        </button>
-        <button mat-menu-item (click)="setSortBy('cards')">
-          <mat-icon>{{ sortBy() === 'cards' ? (sortAscending() ? 'keyboard_arrow_up' : 'keyboard_arrow_down') : 'style' }}</mat-icon>
-          {{ 'QUIZ_MANAGER.SORT_BY_CARDS' | translate }}
-        </button>
-      </mat-menu>
+      <!-- Center Section: Search -->
+      <div class="search-section">
+        <div class="search-container">
+          <mat-form-field appearance="outline" class="modern-search">
+            <mat-icon matPrefix class="search-icon">search</mat-icon>
+            <input 
+              matInput 
+              type="text"
+              placeholder="Keresés kvízek és mappák között..."
+              [value]="quizService.searchQuery()"
+              (input)="onSearch($any($event.target).value)">
+            <button 
+              *ngIf="quizService.searchQuery()" 
+              matSuffix 
+              mat-icon-button 
+              (click)="onSearch('')">
+              <mat-icon>clear</mat-icon>
+            </button>
+          </mat-form-field>
+        </div>
+      </div>
+      
+      <!-- Right Section: Actions -->
+      <div class="actions-section">
+        <!-- View Toggle -->
+        <div class="view-toggle">
+          <mat-button-toggle-group 
+            [value]="viewMode()" 
+            (change)="setViewMode($event.value)"
+            class="modern-toggle">
+            <mat-button-toggle value="grid" matTooltip="Rács nézet">
+              <mat-icon>grid_view</mat-icon>
+            </mat-button-toggle>
+            <mat-button-toggle value="list" matTooltip="Lista nézet">
+              <mat-icon>view_list</mat-icon>
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+        
+        <!-- Theme Toggle -->
+        <div class="theme-toggle">
+          <button 
+            mat-icon-button
+            class="theme-toggle-btn"
+            (click)="toggleTheme()"
+            [matTooltip]="isDarkTheme() ? 'Világos téma' : 'Sötét téma'">
+            <mat-icon>{{ isDarkTheme() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+          </button>
+        </div>
+      </div>
     </div>
   </header>
 
-  <!-- Statistics bar -->
-  <div class="stats-bar" *ngIf="folderStats() as stats">
-    <div class="stat-item">
-      <mat-icon>quiz</mat-icon>
-      <span>{{ stats.totalQuizzes }} {{ 'QUIZ_MANAGER.STATS.QUIZZES' | translate }}</span>
-    </div>
-    <div class="stat-item">
-      <mat-icon>style</mat-icon>
-      <span>{{ stats.totalCards }} {{ 'QUIZ_MANAGER.STATS.CARDS' | translate }}</span>
-    </div>
-    <div class="stat-item" *ngIf="stats.needsReview > 0">
-      <mat-icon>schedule</mat-icon>
-      <span>{{ stats.needsReview }} {{ 'QUIZ_MANAGER.STATS.NEEDS_REVIEW' | translate }}</span>
-    </div>
-  </div>
+  <!-- Modern Main Content -->
+  <main class="modern-content">
+    <!-- Smart Filter Bar -->
+    <section class="filter-bar" *ngIf="(displayedFolders().length > 0 || displayedQuizzes().length > 0) && !quizService.isLoading()">
+      <div class="filter-container">
+        <!-- Sort Controls -->
+        <div class="sort-section">
+          <span class="section-label">
+            <mat-icon>sort</mat-icon>
+            Rendezés:
+          </span>
+          <mat-chip-listbox class="sort-chips">
+            <mat-chip-option 
+              *ngFor="let sort of sortOptions"
+              [selected]="sortBy() === sort"
+              (selectionChange)="setSortBy(sort)"
+              [class.ascending]="sortBy() === sort && sortAscending()"
+              [class.descending]="sortBy() === sort && !sortAscending()">
+              {{ getSortLabel(sort) }}
+              <mat-icon *ngIf="sortBy() === sort" class="sort-arrow">
+                {{ sortAscending() ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}
+              </mat-icon>
+            </mat-chip-option>
+          </mat-chip-listbox>
+        </div>
+        
+        <!-- Tag Filter -->
+        <div class="filter-section" *ngIf="availableTags().length > 0">
+          <span class="section-label">
+            <mat-icon>local_offer</mat-icon>
+            Címkék:
+          </span>
+          <mat-chip-listbox class="filter-chips">
+            <mat-chip-option 
+              *ngFor="let tag of availableTags()"
+              [selected]="selectedTags().includes(tag)"
+              (selectionChange)="toggleTag(tag)">
+              {{ tag }}
+            </mat-chip-option>
+          </mat-chip-listbox>
+          <button 
+            *ngIf="selectedTags().length > 0"
+            mat-button 
+            color="warn"
+            (click)="clearTagFilter()"
+            class="clear-filter-btn">
+            <mat-icon>clear_all</mat-icon>
+            Törlés
+          </button>
+        </div>
+      </div>
+    </section>
 
-  <!-- Action buttons -->
-  <div class="action-bar">
-    <button 
-      mat-raised-button 
-      color="primary"
-      (click)="showCreateFolderDialog()"
-      class="create-btn">
-      <mat-icon>create_new_folder</mat-icon>
-      {{ 'QUIZ_MANAGER.ACTIONS.NEW_FOLDER' | translate }}
-    </button>
-    <button 
-      mat-raised-button 
-      color="accent"
-      (click)="showCreateQuizDialog()"
-      class="create-btn">
-      <mat-icon>add</mat-icon>
-      {{ 'QUIZ_MANAGER.ACTIONS.NEW_QUIZ' | translate }}
-    </button>
-  </div>
+    <!-- Modern Loading State -->
+    <div class="modern-loading" *ngIf="quizService.isLoading()">
+      <div class="loading-content">
+        <div class="loading-spinner">
+          <mat-progress-spinner diameter="60" mode="indeterminate"></mat-progress-spinner>
+        </div>
+        <h3 class="loading-title">Betöltés...</h3>
+        <p class="loading-subtitle">Kvízek és mappák betöltése folyamatban</p>
+      </div>
+    </div>
 
-  <!-- Content area -->
-  <main class="content-area" *ngIf="!quizService.isLoading()">
-    <!-- Quizzes display -->
-    <section class="quizzes-section">
-      <h2 class="section-title">
-        <mat-icon>quiz</mat-icon>
-        {{ 'QUIZ_MANAGER.STATS.QUIZZES' | translate | titlecase }}
-        <span class="count" *ngIf="displayedQuizzes().length > 0">({{ displayedQuizzes().length }})</span>
-      </h2>
+    <!-- Beautiful Empty State - No Project -->
+    <section class="hero-empty-state" *ngIf="!quizService.currentProject() && !quizService.isLoading()">
+      <div class="hero-content">
+        <div class="hero-visual">
+          <div class="floating-icons">
+            <mat-icon class="float-icon icon-1">psychology</mat-icon>
+            <mat-icon class="float-icon icon-2">folder</mat-icon>
+            <mat-icon class="float-icon icon-3">quiz</mat-icon>
+            <mat-icon class="float-icon icon-4">school</mat-icon>
+          </div>
+          <mat-icon class="hero-main-icon">work_outline</mat-icon>
+        </div>
+        <div class="hero-text">
+          <h1 class="hero-title">Kvíz Menedzser</h1>
+          <p class="hero-subtitle">Szervezd meg a tanulásod projektekbe és mappákba</p>
+          <p class="hero-description">
+            Készíts új projekteket, csoportosítsd a kvízeidet témák szerint és 
+            kövesed nyomon a tanulási előrehaladásodat.
+          </p>
+        </div>
+        <div class="hero-actions">
+          <button 
+            mat-button
+            class="hero-primary-btn fab-extended-style"
+            (click)="showCreateProjectDialog()">
+            <mat-icon>rocket_launch</mat-icon>
+            Első projekt létrehozása
+          </button>
+          <button 
+            mat-button
+            class="hero-quiz-btn fab-extended-style accent"
+            (click)="showCreateQuizDialog()">
+            <mat-icon>psychology</mat-icon>
+            vagy hozd létre az első kvízedet
+          </button>
+          <button 
+            mat-stroked-button 
+            class="hero-secondary-btn">
+            <mat-icon>help_outline</mat-icon>
+            Hogyan működik?
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modern Content Grid when project is selected -->
+    <div class="content-grid" *ngIf="quizService.currentProject() && !quizService.isLoading()">
       
-      <!-- Grid view -->
-      <div 
-        *ngIf="viewMode() === 'grid'" 
-        class="quizzes-grid">
-        <mat-card 
-          *ngFor="let quiz of displayedQuizzes(); trackBy: trackByQuizId"
-          class="quiz-card"
-          [style.border-left-color]="quiz.color">
+      <!-- Modern Folders Section -->
+      <section class="modern-section folders-section" *ngIf="displayedFolders().length > 0">
+        <div class="section-header">
+          <div class="section-title-group">
+            <mat-icon class="section-icon">folder</mat-icon>
+            <h2 class="section-title">Mappák</h2>
+            <span class="section-count">{{ displayedFolders().length }}</span>
+          </div>
+          <button 
+            mat-icon-button 
+            color="primary"
+            (click)="showCreateFolderDialog()"
+            matTooltip="Új mappa">
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
+        
+        <!-- Modern Grid Layout -->
+        <div class="modern-grid" *ngIf="viewMode() === 'grid'">
+          <div 
+            *ngFor="let folder of displayedFolders(); trackBy: trackByFolderId"
+            class="modern-card folder-card"
+            [style.--accent-color]="folder.color || '#2196f3'"
+            (click)="navigateToFolder(folder)">
+            
+            <div class="card-header">
+              <div class="card-icon">
+                <mat-icon>folder</mat-icon>
+              </div>
+              <button 
+                mat-icon-button 
+                [matMenuTriggerFor]="folderMenu"
+                class="card-menu"
+                (click)="$event.stopPropagation()">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+            </div>
+            
+            <div class="card-content">
+              <h3 class="card-title">{{ folder.name }}</h3>
+              <p class="card-description" *ngIf="folder.description">{{ folder.description }}</p>
+              
+              <div class="card-stats">
+                <div class="stat-item">
+                  <mat-icon>quiz</mat-icon>
+                  <span>{{ folder.quizzes?.length || 0 }} kvíz</span>
+                </div>
+                <div class="stat-item" *ngIf="folder.tags && folder.tags.length > 0">
+                  <mat-icon>local_offer</mat-icon>
+                  <span>{{ folder.tags.length }} címke</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card-footer">
+              <div class="card-tags" *ngIf="folder.tags && folder.tags.length > 0">
+                <mat-chip *ngFor="let tag of folder.tags.slice(0, 2)">{{ tag }}</mat-chip>
+                <span *ngIf="folder.tags.length > 2" class="more-tags">+{{ folder.tags.length - 2 }}</span>
+              </div>
+              <div class="card-date">
+                {{ folder.created_at | date:'MMM d' }}
+              </div>
+            </div>
+            
+            <!-- Menu -->
+            <mat-menu #folderMenu="matMenu">
+              <button mat-menu-item (click)="editFolder(folder)">
+                <mat-icon>edit</mat-icon>
+                <span>Szerkesztés</span>
+              </button>
+              <button mat-menu-item (click)="deleteFolder(folder)">
+                <mat-icon>delete</mat-icon>
+                <span>Törlés</span>
+              </button>
+            </mat-menu>
+          </div>
+        </div>
+        
+        <!-- List view for folders -->
+        <div class="folders-list" *ngIf="viewMode() === 'list'">
+          <mat-card 
+            *ngFor="let folder of displayedFolders(); trackBy: trackByFolderId"
+            class="folder-list-item"
+            [style.border-left-color]="folder.color || '#2196f3'"
+            (click)="navigateToFolder(folder)">
+          
+          <mat-card-content>
+            <div class="folder-info">
+              <div class="folder-header">
+                <mat-icon [style.color]="folder.color || '#2196f3'">
+                  folder
+                </mat-icon>
+                <h3>{{ folder.name }}</h3>
+              </div>
+              
+              <div class="folder-meta">
+                <div class="stat">
+                  <mat-icon>quiz</mat-icon>
+                  <span>{{ folder.quizzes?.length || 0 }}</span>
+                </div>
+                <div class="date">
+                  {{ folder.created_at | date:'short' }}
+                </div>
+              </div>
+            </div>
+            
+            <div class="folder-actions">
+              <button 
+                mat-icon-button 
+                [matMenuTriggerFor]="folderListMenu"
+                (click)="$event.stopPropagation()">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              
+              <mat-menu #folderListMenu="matMenu">
+                <button mat-menu-item (click)="editFolder(folder)">
+                  <mat-icon>edit</mat-icon>
+                  {{ 'QUIZ_MANAGER.EDIT' | translate }}
+                </button>
+                <button mat-menu-item (click)="deleteFolder(folder)">
+                  <mat-icon>delete</mat-icon>
+                  {{ 'QUIZ_MANAGER.DELETE' | translate }}
+                </button>
+              </mat-menu>
+            </div>
+          </mat-card-content>
+        </mat-card>
+        </div>
+      </section>
+
+      <!-- Quizzes Grid -->
+      <section class="quizzes-section" *ngIf="displayedQuizzes().length > 0">
+        <h3 class="section-title">
+          <mat-icon>quiz</mat-icon>
+          {{ 'QUIZ_MANAGER.QUIZZES' | translate }}
+        </h3>
+        
+        <div class="quizzes-grid" *ngIf="viewMode() === 'grid'">
+          <mat-card 
+            *ngFor="let quiz of displayedQuizzes(); trackBy: trackByQuizId"
+            class="quiz-card"
+            [style.border-left-color]="quiz.color"
+            (dragstart)="onDragStart($event, quiz)"
+            draggable="true">
           
           <mat-card-header>
             <mat-icon 
               [style.color]="quiz.color"
               mat-card-avatar>
-              {{ quiz.icon || 'quiz' }}
+              quiz
             </mat-icon>
             <mat-card-title>{{ quiz.name }}</mat-card-title>
             <mat-card-subtitle *ngIf="quiz.description">{{ quiz.description }}</mat-card-subtitle>
@@ -157,30 +375,22 @@
             </button>
             
             <mat-menu #quizMenu="matMenu">
-              <button mat-menu-item (click)="navigateToQuiz(quiz)">
-                <mat-icon>visibility</mat-icon>
-                {{ 'QUIZ_MANAGER.ACTIONS.OPEN' | translate }}
-              </button>
               <button mat-menu-item (click)="openCardEditor(quiz)">
                 <mat-icon>edit</mat-icon>
-                {{ 'QUIZ_MANAGER.ACTIONS.EDIT_CARDS' | translate }}
+                {{ 'QUIZ_MANAGER.EDIT_CARDS' | translate }}
               </button>
-              <button mat-menu-item (click)="startStudyMode(quiz)" [disabled]="(quiz.cards?.length ?? 0) === 0">
+              <button mat-menu-item (click)="startStudyMode(quiz)">
                 <mat-icon>school</mat-icon>
-                {{ 'QUIZ_MANAGER.ACTIONS.STUDY' | translate }}
+                {{ 'QUIZ_MANAGER.STUDY' | translate }}
               </button>
               <button mat-menu-item (click)="showQuizStats(quiz)">
                 <mat-icon>analytics</mat-icon>
-                {{ 'QUIZ_MANAGER.ACTIONS.STATISTICS' | translate }}
+                {{ 'QUIZ_MANAGER.STATISTICS' | translate }}
               </button>
               <mat-divider></mat-divider>
-              <button mat-menu-item (click)="exportQuiz(quiz)">
-                <mat-icon>download</mat-icon>
-                {{ 'QUIZ_MANAGER.ACTIONS.EXPORT' | translate }}
-              </button>
               <button mat-menu-item (click)="deleteQuiz(quiz)">
                 <mat-icon>delete</mat-icon>
-                {{ 'QUIZ_MANAGER.ACTIONS.DELETE' | translate }}
+                {{ 'QUIZ_MANAGER.DELETE' | translate }}
               </button>
             </mat-menu>
           </mat-card-header>
@@ -188,64 +398,69 @@
           <mat-card-content>
             <div class="quiz-stats">
               <div class="stat-row">
-                <span class="stat">
+                <div class="stat">
                   <mat-icon>style</mat-icon>
-                  {{ quiz.cards?.length ?? 0 }} {{ 'QUIZ_MANAGER.STATS.CARDS' | translate }}
-                </span>
-                <span class="stat" *ngIf="quizService.getCardsNeedingReview(quiz).length > 0">
-                  <mat-icon>schedule</mat-icon>
-                  {{ quizService.getCardsNeedingReview(quiz).length }} {{ 'QUIZ_MANAGER.STATS.NEEDS_REVIEW' | translate }}
-                </span>
+                  <span>{{ quiz.cards?.length || 0 }} {{ 'QUIZ_MANAGER.CARDS' | translate }}</span>
+                </div>
+                <div class="stat" *ngIf="getQuizTags(quiz).length > 0">
+                  <mat-icon>local_offer</mat-icon>
+                  <span>{{ getQuizTags(quiz).length }} {{ 'QUIZ_MANAGER.TAGS' | translate }}</span>
+                </div>
               </div>
-            </div>
-            
-            <div class="quiz-tags" *ngIf="(quiz.tags?.length ?? 0) > 0">
-              <mat-chip *ngFor="let tag of quiz.tags" class="tag-chip">{{ tag }}</mat-chip>
+              
+              <div class="quiz-tags" *ngIf="getQuizTags(quiz).length > 0">
+                <mat-chip-listbox>
+                  <mat-chip *ngFor="let tag of getQuizTags(quiz).slice(0, 3)">
+                    {{ tag }}
+                  </mat-chip>
+                  <mat-chip *ngIf="getQuizTags(quiz).length > 3">
+                    +{{ getQuizTags(quiz).length - 3 }}
+                  </mat-chip>
+                </mat-chip-listbox>
+              </div>
             </div>
           </mat-card-content>
           
           <mat-card-actions>
-            <button 
-              mat-button 
-              color="primary"
-              (click)="startStudyMode(quiz)"
-              [disabled]="(quiz.cards?.length ?? 0) === 0">
+            <button mat-button color="primary" (click)="startStudyMode(quiz)">
               <mat-icon>school</mat-icon>
-              {{ 'QUIZ_MANAGER.ACTIONS.STUDY' | translate }}
+              {{ 'QUIZ_MANAGER.STUDY' | translate }}
             </button>
-            <button 
-              mat-button 
-              (click)="openCardEditor(quiz)">
+            <button mat-button (click)="openCardEditor(quiz)">
               <mat-icon>edit</mat-icon>
-              {{ 'QUIZ_MANAGER.ACTIONS.EDIT' | translate }}
+              {{ 'QUIZ_MANAGER.EDIT' | translate }}
             </button>
           </mat-card-actions>
         </mat-card>
-      </div>
-      
-      <!-- Empty state -->
-      <div class="empty-state" *ngIf="displayedQuizzes().length === 0 && !quizService.searchQuery()">
-        <mat-icon class="empty-icon">quiz</mat-icon>
-        <h3>{{ 'QUIZ_MANAGER.EMPTY_STATE.NO_QUIZZES' | translate }}</h3>
-        <p>{{ 'QUIZ_MANAGER.EMPTY_STATE.NO_QUIZZES_DESC' | translate }}</p>
-        <button 
-          mat-raised-button 
-          color="primary"
-          (click)="showCreateQuizDialog()">
-          <mat-icon>add</mat-icon>
-          {{ 'QUIZ_MANAGER.EMPTY_STATE.CREATE_QUIZ' | translate }}
-        </button>
-      </div>
-      
-      <!-- No search results -->
-      <div class="empty-state" *ngIf="displayedQuizzes().length === 0 && quizService.searchQuery()">
-        <mat-icon class="empty-icon">search_off</mat-icon>
-        <h3>{{ 'QUIZ_MANAGER.EMPTY_STATE.NO_RESULTS' | translate }}</h3>
-        <p>{{ 'QUIZ_MANAGER.EMPTY_STATE.NO_RESULTS_DESC' | translate }}</p>
-      </div>
-    </section>
+        </div>
+      </section>
+
+      <!-- Empty state when no content -->
+      <section class="empty-state" *ngIf="displayedFolders().length === 0 && displayedQuizzes().length === 0 && !quizService.isLoading()">
+        <div class="empty-content">
+          <mat-icon class="empty-icon">inbox</mat-icon>
+          <h2>{{ 'QUIZ_MANAGER.NO_CONTENT' | translate }}</h2>
+          <p>{{ 'QUIZ_MANAGER.CREATE_FIRST_ITEM' | translate }}</p>
+          <div class="empty-actions">
+            <button 
+              mat-raised-button 
+              color="primary"
+              (click)="showCreateFolderDialog()">
+              <mat-icon>create_new_folder</mat-icon>
+              {{ 'QUIZ_MANAGER.CREATE_FOLDER' | translate }}
+            </button>
+            <button 
+              mat-raised-button 
+              color="accent"
+              (click)="showCreateQuizDialog()">
+              <mat-icon>add</mat-icon>
+              {{ 'QUIZ_MANAGER.CREATE_QUIZ' | translate }}
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
   </main>
-</div>
 
 <!-- Create Dialog -->
 <div class="create-dialog-overlay" *ngIf="showCreateDialog()" (click)="cancelCreate()">
@@ -261,26 +476,27 @@
     </div>
     
     <div class="dialog-content">
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>{{ 'QUIZ_MANAGER.CREATE_DIALOG.NAME' | translate }}</mat-label>
+      <div class="custom-form-field full-width">
+        <label class="field-label">{{ 'QUIZ_MANAGER.CREATE_DIALOG.NAME' | translate }}</label>
         <input 
-          matInput 
+          type="text"
+          class="custom-input"
           [ngModel]="createName()"
           (ngModelChange)="createName.set($event)"
           [placeholder]="'QUIZ_MANAGER.CREATE_DIALOG.NAME_PLACEHOLDER' | translate"
           (keydown.enter)="confirmCreate()">
-      </mat-form-field>
+      </div>
       
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>{{ 'QUIZ_MANAGER.CREATE_DIALOG.DESCRIPTION' | translate }}</mat-label>
+      <div class="custom-form-field full-width">
+        <label class="field-label">{{ 'QUIZ_MANAGER.CREATE_DIALOG.DESCRIPTION' | translate }}</label>
         <textarea 
-          matInput 
+          class="custom-textarea"
           [ngModel]="createDescription()"
           (ngModelChange)="createDescription.set($event)"
           rows="3"
           [placeholder]="'QUIZ_MANAGER.CREATE_DIALOG.DESCRIPTION_PLACEHOLDER' | translate">
         </textarea>
-      </mat-form-field>
+      </div>
       
       <div class="customization-section">
         <h4>{{ 'QUIZ_MANAGER.CREATE_DIALOG.CUSTOMIZATION' | translate }}</h4>
@@ -325,4 +541,5 @@
       </button>
     </div>
   </div>
+</div>
 </div>

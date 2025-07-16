@@ -1,0 +1,320 @@
+@use '../../../../../../scss/variables' as *;
+@use '../../../../../../scss/mixins' as *;
+
+.bulk-header {
+  background: rgba($white, 0.95);
+  backdrop-filter: blur(10px);
+  padding: $spacing-4 $spacing-6;
+  border-bottom: 1px solid rgba($black, 0.1);
+  border-radius: $radius-lg $radius-lg 0 0;
+
+  @include dark-theme {
+    background: rgba($dark-bg-card, 0.95);
+    border-bottom-color: rgba($white, 0.1);
+  }
+
+  .bulk-controls {
+    @include flex-center;
+    justify-content: flex-start;
+    gap: $spacing-4;
+
+    mat-checkbox {
+      font-weight: $font-weight-medium;
+      color: $gray-800;
+
+      @include dark-theme {
+        color: $dark-text-primary;
+      }
+    }
+  }
+}
+
+.cards-container {
+  max-height: 70vh;
+  overflow-y: auto;
+  
+  .card-item {
+    @include card-base;
+    margin-bottom: $spacing-4;
+    transition: all $transition-base;
+    position: relative;
+
+    @include dark-theme {
+      background: $dark-bg-card;
+      border-color: $dark-border-secondary;
+    }
+    
+    @include mobile {
+      margin-bottom: $spacing-3;
+    }
+    
+    &.selected {
+      border-left: 4px solid $primary;
+      background: rgba($primary, 0.05);
+
+      @include dark-theme {
+        border-left-color: $primary-light;
+        background: rgba($primary-light, 0.1);
+      }
+    }
+    
+    &:hover {
+      @include card-hover;
+    }
+    
+    .drag-handle {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 20px;
+      @include flex-center;
+      background: rgba($text-secondary, 0.1);
+      cursor: grab;
+      opacity: 0;
+      transition: opacity $transition-fast;
+      
+      &:active {
+        cursor: grabbing;
+      }
+      
+      mat-icon {
+        font-size: 16px;
+        color: $text-secondary;
+      }
+    }
+    
+    &:hover .drag-handle {
+      opacity: 1;
+    }
+    
+    .card-selection {
+      position: absolute;
+      left: 30px;
+      top: $spacing-md;
+      z-index: 10;
+    }
+    
+    .card-content {
+      padding: $spacing-lg;
+      margin-left: 20px;
+      cursor: pointer;
+      
+      @include mobile {
+        padding: $spacing-md;
+        margin-left: 10px;
+      }
+      
+      .card-sides {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: $spacing-lg;
+        align-items: flex-start;
+        margin-bottom: $spacing-md;
+        
+        @include mobile {
+          grid-template-columns: 1fr;
+          gap: $spacing-sm;
+        }
+        
+        .card-front,
+        .card-back {
+          .side-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: $text-secondary;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: $spacing-xs;
+            display: block;
+          }
+          
+          .side-content {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: $text-primary;
+            min-height: 40px;
+            padding: $spacing-sm;
+            background: $bg-secondary;
+            border-radius: $radius-sm;
+            border-left: 3px solid $primary-color;
+          }
+        }
+        
+        .card-divider {
+          @include flex-center;
+          
+          @include mobile {
+            display: none;
+          }
+          
+          mat-icon {
+            color: $text-secondary;
+            font-size: 20px;
+          }
+        }
+      }
+      
+      .card-metadata {
+        display: flex;
+        flex-wrap: wrap;
+        gap: $spacing-md;
+        align-items: center;
+        
+        @include mobile {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: $spacing-sm;
+        }
+        
+        .metadata-item {
+          &.difficulty {
+            @include flex-center;
+            gap: $spacing-xs;
+            font-size: 0.875rem;
+            font-weight: 500;
+            
+            mat-icon {
+              font-size: 16px;
+            }
+          }
+          
+          &.stats {
+            display: flex;
+            gap: $spacing-md;
+            
+            @include mobile {
+              gap: $spacing-sm;
+            }
+            
+            .stat-group {
+              @include flex-center;
+              gap: $spacing-xs;
+              font-size: 0.75rem;
+              color: $text-secondary;
+              
+              mat-icon {
+                font-size: 14px;
+              }
+            }
+          }
+          
+          &.tags {
+            flex: 1;
+            
+            mat-chip-set {
+              mat-chip {
+                background: rgba($primary-color, 0.1);
+                color: $primary-color;
+                font-size: 0.75rem;
+                height: 24px;
+                margin: 0 $spacing-xs $spacing-xs 0;
+                
+                &.more-tags {
+                  background: rgba($text-secondary, 0.1);
+                  color: $text-secondary;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    .card-actions {
+      position: absolute;
+      top: $spacing-md;
+      right: $spacing-md;
+      
+      .action-btn {
+        opacity: 0;
+        transition: opacity $transition-fast;
+        
+        @include mobile {
+          opacity: 1;
+        }
+      }
+    }
+    
+    &:hover .action-btn {
+      opacity: 1;
+    }
+    
+    .card-preview {
+      @include card-base;
+      padding: $spacing-md;
+      background: white;
+      box-shadow: $shadow-lg;
+      max-width: 200px;
+      
+      .preview-content {
+        @include flex-center;
+        gap: $spacing-sm;
+        font-size: 0.875rem;
+        font-weight: 500;
+        
+        mat-icon {
+          font-size: 16px;
+          color: $primary-color;
+        }
+      }
+    }
+  }
+  
+  .empty-state {
+    @include flex-center;
+    flex-direction: column;
+    padding: $spacing-2xl;
+    text-align: center;
+    color: $text-secondary;
+    
+    .empty-content {
+      max-width: 300px;
+      
+      .empty-icon {
+        font-size: 64px;
+        color: rgba($text-secondary, 0.5);
+        margin-bottom: $spacing-lg;
+      }
+      
+      h3 {
+        font-size: 1.25rem;
+        color: $text-primary;
+        margin-bottom: $spacing-sm;
+      }
+      
+      p {
+        font-size: 0.95rem;
+        line-height: 1.5;
+      }
+    }
+  }
+}
+
+// CDK Drag Drop styling
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: $radius-md;
+  box-shadow: $shadow-xl;
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.3;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drop-list-dragging .card-item:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+// Danger action styling
+.danger-action {
+  color: $error-color !important;
+  
+  mat-icon {
+    color: $error-color !important;
+  }
+}
