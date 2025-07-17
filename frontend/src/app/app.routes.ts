@@ -20,7 +20,7 @@ export const routes: Routes = [
   },
   {
     path: 'quiz-manager',
-    loadComponent: () => import('./features/quiz/quiz-manager/quiz-manager').then(m => m.QuizManager),
+    loadChildren: () => import('./features/quiz-manager/quiz-manager.module').then(m => m.QuizManagerModule),
     canActivate: [authGuard],
   },
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
