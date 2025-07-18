@@ -44,16 +44,39 @@ export interface Quiz {
 export interface QuizCard {
   id?: string;
   quiz_id?: string;
-  front: string; // elsődleges mező
-  back: string; // elsődleges mező
-  question?: string; // kompatibilitás az adatbázissal
-  answer?: string; // kompatibilitás az adatbázissal
-  tags: string[]; // nem optional, alapértelmezett üres tömb
-  difficulty: 'easy' | 'medium' | 'hard'; // nem optional, alapértelmezett medium
-  reviewCount: number; // nem optional, alapértelmezett 0
-  successRate: number; // nem optional, alapértelmezett 0
-  lastReviewed?: Date;
-  nextReview?: Date;
+  
+  // Kötelező mezők
+  question: string; // Kérdés vagy állítás
+  card_type: 'flashcard' | 'multiple_choice'; // Kártya típusa
+  
+  // Opcionális mezők
+  hint?: string; // Segítő tipp
+  
+  // Flashcard típushoz
+  answer?: string; // Egyszerű válasz flashcard esetén
+  
+  // Multiple choice típushoz
+  correct_answers?: string[]; // Helyes válaszok tömbje
+  incorrect_answers?: string[]; // Helytelen válaszok tömbje
+  
+  // Metadata
+  tags?: string[];
+  difficulty?: number; // 1-5
+  
+  // Tanulási algoritmus mezők
+  review_count?: number;
+  success_rate?: number; // 0-100 százalék
+  last_reviewed?: Date | string;
+  next_review?: Date | string;
+  
+  // UI állapot mezők
+  isFlipped?: boolean; // Flip animációhoz
+  
+  // Kompatibilitás régi mezőkkel
+  front?: string; // kompatibilitás
+  back?: string; // kompatibilitás
+  
+  // Timestamps
   created_at?: string;
   updated_at?: string;
 }
@@ -107,6 +130,7 @@ export interface StudyStats {
 })
 export class QuizService {
   private supabase: SupabaseClient;
+  private initPromise: Promise<void>;
   
   // Reactive state
   user = signal<User | null>(null);
@@ -143,6 +167,15 @@ export class QuizService {
       environment.supabaseKey
     );
 
+    // Initialize auth state
+    this.initPromise = this.initializeAuth();
+  }
+
+  private async initializeAuth() {
+    // Check for existing session on page load/refresh
+    const { data: { session } } = await this.supabase.auth.getSession();
+    this.user.set(session?.user ?? null);
+    
     // Listen to auth changes
     this.supabase.auth.onAuthStateChange((event, session) => {
       this.user.set(session?.user ?? null);
@@ -152,6 +185,11 @@ export class QuizService {
         this.clearUserData();
       }
     });
+  }
+
+  // Method to ensure initialization is complete
+  async waitForInit(): Promise<void> {
+    return this.initPromise;
   }
 
   // 🔐 AUTH METHODS
@@ -257,16 +295,24 @@ export class QuizService {
   async loadQuizzes() {
     this.isLoading.set(true);
     try {
+      // Várjuk meg az inicializációt
+      await this.waitForInit();
+      
+      const user = this.user();
+      if (!user || !user.id) {
+        throw new Error('Nincs bejelentkezett felhasználó. Jelentkezz be!');
+      }
+      
       const { data, error } = await this.supabase
         .from('quizzes')
         .select(`
           *,
           quiz_cards (*)
         `)
-        .eq('user_id', this.user()?.id);
+        .eq('user_id', user.id);
 
       if (error) throw error;
-      
+
       // Transform data for UI compatibility
       const numberToDifficultyMap: { [key: number]: 'easy' | 'medium' | 'hard' } = {
         1: 'easy',
@@ -288,31 +334,40 @@ export class QuizService {
           successRate: card.successRate || 0
         }))
       }));
-      
+
       this.quizzes.set(transformedQuizzes);
+    } catch (err) {
+      throw err;
     } finally {
       this.isLoading.set(false);
     }
   }
 
   async createQuiz(quiz: Omit<Quiz, 'id' | 'user_id' | 'created_at' | 'updated_at'>) {
+    // Csak az alapvető mezőket küldjük el, amelyek biztosan léteznek
+    const quizData: any = {
+      name: quiz.name,
+      description: quiz.description || null,
+      color: quiz.color || '#667eea',
+      // visibility: quiz.visibility || 'private', // Eltávolítva amíg az oszlop nem létezik
+      // tags: quiz.tags || [], // Eltávolítva amíg az oszlop nem létezik
+      user_id: this.user()?.id
+    };
+
+    // Csak akkor adjuk hozzá, ha meg van adva és létezik az oszlop
+    if (quiz.subject) {
+      quizData.subject = quiz.subject;
+    }
+    if (quiz.project_id) {
+      quizData.project_id = quiz.project_id;
+    }
+    if (quiz.folder_id) {
+      quizData.folder_id = quiz.folder_id;
+    }
+
     const { data, error } = await this.supabase
       .from('quizzes')
-      .insert({
-        name: quiz.name,
-        description: quiz.description,
-        color: quiz.color,
-        visibility: quiz.visibility,
-        tags: quiz.tags,
-        subject: quiz.subject,
-        difficulty_level: quiz.difficulty_level,
-        estimated_time: quiz.estimated_time,
-        study_modes: quiz.study_modes,
-        language: quiz.language,
-        project_id: quiz.project_id,
-        folder_id: quiz.folder_id,
-        user_id: this.user()?.id
-      })
+      .insert(quizData)
       .select()
       .single();
 
@@ -515,68 +570,107 @@ export class QuizService {
 
   // CARD MANAGEMENT
   async addCard(quizId: string, cardData: Partial<QuizCard>): Promise<QuizCard> {
-    // Difficulty string to number conversion
-    const difficultyMap: { [key: string]: number } = {
-      'easy': 1,
-      'medium': 3,
-      'hard': 5
+    try {
+      console.log('🔄 Adding card with legacy schema compatibility...');
+      
+      // Használjuk a RÉGI schema formátumot
+      const legacyCard = {
+        quiz_id: quizId,
+        question: cardData.question || '',
+        // A régi schemában csak 'answer' mező van, nem 'card_type'
+        answer: this.convertToLegacyAnswer(cardData),
+        difficulty: cardData.difficulty || 1,
+        tags: JSON.stringify(cardData.tags || [])
+      };
+
+      console.log('📤 Inserting legacy format:', legacyCard);
+
+      const { data, error } = await this.supabase
+        .from('quiz_cards')
+        .insert(legacyCard)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('❌ Database error:', error);
+        throw error;
+      }
+      
+      console.log('✅ Card inserted successfully:', data);
+      
+      // Konvertáljuk vissza az új formátumra a UI számára
+      return this.convertFromLegacy(data, cardData);
+      
+    } catch (err) {
+      console.error('❌ Error adding card:', err);
+      throw err;
+    }
+  }
+
+  private convertToLegacyAnswer(cardData: Partial<QuizCard>): string {
+    if (cardData.card_type === 'flashcard' || !cardData.card_type) {
+      // Flashcard: egyszerű válasz
+      return cardData.answer || '';
+    } else {
+      // Multiple choice: JSON formátumban tároljuk a válaszokat
+      const mcData = {
+        type: 'multiple_choice',
+        correct: cardData.correct_answers || [],
+        incorrect: cardData.incorrect_answers || [],
+        hint: cardData.hint
+      };
+      return JSON.stringify(mcData);
+    }
+  }
+
+  private convertFromLegacy(legacyData: any, originalCardData: Partial<QuizCard>): QuizCard {
+    let convertedCard: QuizCard = {
+      ...legacyData,
+      tags: legacyData.tags ? JSON.parse(legacyData.tags) : []
     };
 
-    const cardToInsert = {
-      quiz_id: quizId,
-      question: cardData.front || cardData.question || '',
-      answer: cardData.back || cardData.answer || '',
-      tags: cardData.tags || [],
-      difficulty: difficultyMap[cardData.difficulty || 'medium'] || 3
-    };
+    // Próbáljuk meg kitalálni, hogy ez multiple choice vagy flashcard
+    try {
+      const parsedAnswer = JSON.parse(legacyData.answer);
+      if (parsedAnswer.type === 'multiple_choice') {
+        // Ez egy multiple choice kártya volt
+        convertedCard.card_type = 'multiple_choice';
+        convertedCard.correct_answers = parsedAnswer.correct || [];
+        convertedCard.incorrect_answers = parsedAnswer.incorrect || [];
+        convertedCard.hint = parsedAnswer.hint;
+        convertedCard.answer = undefined;
+      } else {
+        throw new Error('Not MC format');
+      }
+    } catch {
+      // Ez egy egyszerű flashcard
+      convertedCard.card_type = 'flashcard';
+      convertedCard.answer = legacyData.answer;
+      convertedCard.correct_answers = [];
+      convertedCard.incorrect_answers = [];
+      if (originalCardData.hint) {
+        convertedCard.hint = originalCardData.hint;
+      }
+    }
 
-    const { data, error } = await this.supabase
-      .from('quiz_cards')
-      .insert(cardToInsert)
-      .select()
-      .single();
-
-    if (error) throw error;
-    
-    // Transform data for UI compatibility
-    const numberToDifficultyMap: { [key: number]: 'easy' | 'medium' | 'hard' } = {
-      1: 'easy',
-      2: 'easy',
-      3: 'medium',
-      4: 'hard',
-      5: 'hard'
-    };
-
-    return {
-      ...data,
-      front: data.question,
-      back: data.answer,
-      difficulty: numberToDifficultyMap[data.difficulty] || 'medium',
-      reviewCount: 0,
-      successRate: 0
-    };
+    return convertedCard;
   }
 
   async updateCard(quizId: string, cardId: string, updates: Partial<QuizCard>): Promise<QuizCard> {
     const updateData: any = {};
-    
-    // Difficulty string to number conversion
-    const difficultyMap: { [key: string]: number } = {
-      'easy': 1,
-      'medium': 3,
-      'hard': 5
-    };
 
-    if (updates.front || updates.question) {
-      updateData.question = updates.front || updates.question;
-    }
-    if (updates.back || updates.answer) {
-      updateData.answer = updates.back || updates.answer;
-    }
-    if (updates.tags !== undefined) updateData.tags = updates.tags;
-    if (updates.difficulty !== undefined) updateData.difficulty = difficultyMap[updates.difficulty] || 3;
-    if (updates.lastReviewed !== undefined) updateData.last_reviewed = updates.lastReviewed;
-    if (updates.nextReview !== undefined) updateData.next_review = updates.nextReview;
+    if (updates.question !== undefined) updateData.question = updates.question;
+    if (updates.answer !== undefined) updateData.answer = updates.answer;
+    if (updates.correct_answers !== undefined) updateData.correct_answers = JSON.stringify(updates.correct_answers);
+    if (updates.incorrect_answers !== undefined) updateData.incorrect_answers = JSON.stringify(updates.incorrect_answers);
+    if (updates.card_type !== undefined) updateData.card_type = updates.card_type;
+    if (updates.hint !== undefined) updateData.hint = updates.hint;
+    if (updates.tags !== undefined) updateData.tags = JSON.stringify(updates.tags);
+    if (updates.difficulty !== undefined) updateData.difficulty = updates.difficulty;
+    if (updates.review_count !== undefined) updateData.review_count = updates.review_count;
+    if (updates.success_rate !== undefined) updateData.success_rate = updates.success_rate;
+    if (updates.last_reviewed !== undefined) updateData.last_reviewed = updates.last_reviewed;
+    if (updates.next_review !== undefined) updateData.next_review = updates.next_review;
 
     const { data, error } = await this.supabase
       .from('quiz_cards')
@@ -587,26 +681,16 @@ export class QuizService {
 
     if (error) throw error;
     
-    // Transform data for UI compatibility
-    const numberToDifficultyMap: { [key: number]: 'easy' | 'medium' | 'hard' } = {
-      1: 'easy',
-      2: 'easy',
-      3: 'medium',
-      4: 'hard',
-      5: 'hard'
-    };
-
+    // Parse JSON fields back for UI
     return {
       ...data,
-      front: data.question,
-      back: data.answer,
-      difficulty: numberToDifficultyMap[data.difficulty] || 'medium',
-      reviewCount: updates.reviewCount ?? 0,
-      successRate: updates.successRate ?? 0
+      correct_answers: data.correct_answers ? JSON.parse(data.correct_answers) : [],
+      incorrect_answers: data.incorrect_answers ? JSON.parse(data.incorrect_answers) : [],
+      tags: data.tags ? JSON.parse(data.tags) : []
     };
   }
 
-  async deleteCard(quizId: string, cardId: string): Promise<void> {
+  async deleteCard(cardId: string): Promise<void> {
     const { error } = await this.supabase
       .from('quiz_cards')
       .delete()
@@ -644,7 +728,7 @@ export class QuizService {
   calculateNextReview(card: QuizCard, isCorrect: boolean): Date {
     const now = new Date();
     const days = isCorrect ? 
-      Math.min(30, Math.pow(2, (card.reviewCount || 0))) : 
+      Math.min(30, Math.pow(2, (card.review_count || 0))) : 
       1;
     
     return new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
@@ -652,12 +736,12 @@ export class QuizService {
 
   getStudyStats(quiz: Quiz): StudyStats {
     const cards = quiz.cards || [];
-    const totalReviews = cards.reduce((sum, card) => sum + (card.reviewCount || 0), 0);
+    const totalReviews = cards.reduce((sum, card) => sum + (card.review_count || 0), 0);
     const averageScore = cards.length > 0 ? 
-      cards.reduce((sum, card) => sum + (card.successRate || 0), 0) / cards.length : 0;
-    const masteredCards = cards.filter(card => (card.successRate || 0) >= 0.9).length;
+      cards.reduce((sum, card) => sum + (card.success_rate || 0), 0) / cards.length : 0;
+    const masteredCards = cards.filter(card => (card.success_rate || 0) >= 0.9).length;
     const needsReview = cards.filter(card => 
-      !card.nextReview || new Date(card.nextReview) <= new Date()
+      !card.next_review || new Date(card.next_review) <= new Date()
     ).length;
     
     return {
@@ -682,5 +766,67 @@ export class QuizService {
 
     if (error) throw error;
     return data;
+  }
+
+  // QUIZ DETAILS METHODS
+  async getQuizById(quizId: string): Promise<Quiz> {
+    const { data, error } = await this.supabase
+      .from('quizzes')
+      .select('*')
+      .eq('id', quizId)
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  async getQuizCards(quizId: string): Promise<QuizCard[]> {
+    const { data, error } = await this.supabase
+      .from('quiz_cards')
+      .select('*')
+      .eq('quiz_id', quizId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    
+    // Konvertáljuk a legacy formátumot új formátumra
+    return (data || []).map(card => this.convertFromLegacy(card, {}));
+  }
+
+  async createCard(cardData: {
+    quiz_id: string;
+    front: string;
+    back: string;
+    hint?: string;
+  }): Promise<QuizCard> {
+    // Csak az alapvető mezőket küldjük el, amelyek biztosan léteznek az adatbázisban
+    const cardPayload: any = {
+      quiz_id: cardData.quiz_id,
+      front: cardData.front,
+      back: cardData.back,
+      user_id: this.user()?.id
+    };
+
+    // Opcionális mezők hozzáadása, ha meg vannak adva
+    if (cardData.hint) {
+      cardPayload.hint = cardData.hint;
+    }
+
+    const { data, error } = await this.supabase
+      .from('quiz_cards')
+      .insert(cardPayload)
+      .select()
+      .single();
+
+    if (error) throw error;
+    
+    // A visszaadott adatot kiegészítjük a hiányzó mezőkkel
+    return {
+      ...data,
+      tags: data.tags || [],
+      difficulty: data.difficulty || 'medium',
+      reviewCount: data.reviewCount || 0,
+      successRate: data.successRate || 0
+    };
   }
 }

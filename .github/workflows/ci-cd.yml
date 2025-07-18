@@ -32,6 +32,8 @@ jobs:
         run: |
           echo "Installing frontend dependencies..."
           npm ci
+          # Install missing js-tokens dependency
+          npm install js-tokens
       
       - name: 🔧 TypeScript check
         run: |
@@ -41,7 +43,7 @@ jobs:
       - name: 🧪 Angular Tests
         run: |
           echo "Running Angular unit tests..."
-          npm run test:ci || echo "⚠️ Some tests failed"
+          npm run test:ci || echo "⚠️ Some tests failed - continuing with build"
         continue-on-error: true
       
       - name: 🏗️ Build Production

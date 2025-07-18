@@ -1,1 +1,123 @@
-<!-- Quiz editor UI -->
+<div class="quiz-editor-container">
+  <header class="quiz-editor-header">
+    <button class="back-btn" (click)="onCancel()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>{{ isNewQuiz ? 'Új kvíz létrehozása' : 'Kvíz szerkesztése' }}</h1>
+  </header>
+
+  <div class="quiz-editor-content" *ngIf="!isLoading">
+    <form class="quiz-form" (ngSubmit)="onSave()">
+      <!-- Alapinformációk -->
+      <div class="form-section">
+        <h2>Alapinformációk</h2>
+        
+        <div class="form-group">
+          <label for="name">Kvíz neve *</label>
+          <input 
+            id="name" 
+            type="text" 
+            [(ngModel)]="editingQuiz.name" 
+            name="name"
+            placeholder="Add meg a kvíz nevét"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Leírás</label>
+          <textarea 
+            id="description" 
+            [(ngModel)]="editingQuiz.description" 
+            name="description"
+            rows="3"
+            placeholder="Rövid leírás a kvízről"></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="difficulty">Nehézség (1-5)</label>
+            <input 
+              id="difficulty" 
+              type="range" 
+              min="1" 
+              max="5" 
+              [(ngModel)]="editingQuiz.difficulty_level" 
+              name="difficulty">
+            <span class="difficulty-label">{{ editingQuiz.difficulty_level }}</span>
+          </div>
+
+          <div class="form-group">
+            <label for="time">Becsült idő (perc)</label>
+            <input 
+              id="time" 
+              type="number" 
+              [(ngModel)]="editingQuiz.estimated_time" 
+              name="time"
+              min="1">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="visibility">Láthatóság</label>
+          <select id="visibility" [(ngModel)]="editingQuiz.visibility" name="visibility">
+            <option value="private">Privát</option>
+            <option value="public">Nyilvános</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Színválasztás -->
+      <div class="form-section">
+        <h2>Szín</h2>
+        <div class="color-picker">
+          <div 
+            *ngFor="let color of colorOptions" 
+            class="color-option"
+            [class.selected]="editingQuiz.color === color"
+            [style.background-color]="color"
+            (click)="editingQuiz.color = color">
+          </div>
+        </div>
+      </div>
+
+      <!-- Címkék -->
+      <div class="form-section">
+        <h2>Címkék</h2>
+        <div class="tags-input">
+          <div class="tags-list">
+            <span *ngFor="let tag of editingQuiz.tags" class="tag">
+              {{ tag }}
+              <button type="button" (click)="removeTag(tag)">
+                <mat-icon>close</mat-icon>
+              </button>
+            </span>
+          </div>
+          <input 
+            type="text" 
+            placeholder="Új címke hozzáadása (Enter)" 
+            (keydown)="addTag($event)">
+        </div>
+      </div>
+
+      <!-- Hiba üzenet -->
+      <div *ngIf="error" class="error-message">
+        {{ error }}
+      </div>
+
+      <!-- Műveletek -->
+      <div class="form-actions">
+        <button type="button" class="cancel-btn" (click)="onCancel()">
+          Mégse
+        </button>
+        <button type="submit" class="save-btn" [disabled]="isLoading">
+          {{ isNewQuiz ? 'Létrehozás' : 'Mentés' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-spinner">
+    <div class="spinner"></div>
+    <p>{{ isNewQuiz ? 'Kvíz létrehozása...' : 'Mentés...' }}</p>
+  </div>
+</div>

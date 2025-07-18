@@ -1,0 +1,42 @@
+<div class="quiz-manager-container">
+  <header class="quiz-manager-header">
+    <div class="header-left">
+      <mat-icon class="quiz-manager-icon">analytics</mat-icon>
+      <h1>Kvízkezelő</h1>
+    </div>
+    <div class="header-right" *ngIf="viewMode === 'list'">
+      <button class="create-quiz-btn" (click)="onCreateNew()">
+        <mat-icon>add</mat-icon>
+        Új kvíz
+      </button>
+    </div>
+  </header>
+  <div class="quiz-manager-content">
+    <!-- Navigáció/szűrő sáv (ha szükséges) -->
+    <ng-container *ngIf="viewMode === 'list'">
+      <app-quiz-list
+        (edit)="onEdit($event)"
+        (delete)="onDelete($event)"
+        (stats)="onStats($event)"
+        (preview)="onPreview($event)"
+        (createNew)="onCreateNew()">
+      </app-quiz-list>
+    </ng-container>
+    <ng-container *ngIf="viewMode === 'edit'">
+      <app-quiz-editor [quiz]="selectedQuiz" (back)="onBack()"></app-quiz-editor>
+    </ng-container>
+    <ng-container *ngIf="viewMode === 'stats'">
+      <app-quiz-stats [quiz]="selectedQuiz" (back)="onBack()"></app-quiz-stats>
+    </ng-container>
+    <ng-container *ngIf="viewMode === 'preview'">
+      <app-quiz-preview [quiz]="selectedQuiz" (back)="onBack()"></app-quiz-preview>
+    </ng-container>
+  </div>
+
+  <!-- Create Modal -->
+  <app-quiz-create-modal 
+    *ngIf="showCreateModal"
+    (close)="onModalClose()"
+    (created)="onQuizCreated($event)">
+  </app-quiz-create-modal>
+</div>

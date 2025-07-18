@@ -1,10 +1,14 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { QuizStatsComponent } from './quiz-stats/quiz-stats.component';
+import { QuizManagerComponent } from './quiz-manager.component';
 
 const routes: Routes = [
-  { path: '', component: QuizStatsComponent }
+  { path: '', component: QuizManagerComponent },
+  { 
+    path: ':id', 
+    loadComponent: () => import('./quiz-details/quiz-details.component').then(m => m.QuizDetailsComponent)
+  }
 ];
 
 @NgModule({

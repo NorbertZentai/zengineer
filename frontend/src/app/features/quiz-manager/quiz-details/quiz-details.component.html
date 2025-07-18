@@ -1,0 +1,286 @@
+<div class="quiz-details-container">
+  <!-- Header -->
+  <div class="quiz-header">
+    <button class="back-btn" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+      <span>Vissza a kvízekhez</span>
+    </button>
+    
+    <div class="quiz-info" *ngIf="quiz">
+      <div class="quiz-title-section">
+        <div class="quiz-color-indicator" [style.background-color]="quiz.color"></div>
+        <div class="quiz-content">
+          <div class="quiz-title-row">
+            <h1 class="quiz-title">{{ quiz.name }}</h1>
+            <div class="quiz-header-actions">
+              <button class="expand-btn" 
+                      (click)="toggleSettings()" 
+                      [class.expanded]="showSettings"
+                      title="Beállítások megjelenítése/elrejtése">
+                <mat-icon>expand_more</mat-icon>
+              </button>
+              <mat-icon class="visibility-icon" [title]="quiz.visibility === 'public' ? 'Nyilvános kvíz' : 'Privát kvíz'">
+                {{ quiz.visibility === 'public' ? 'lock_open' : 'lock' }}
+              </mat-icon>
+            </div>
+          </div>
+          <p class="quiz-description" *ngIf="quiz.description">{{ quiz.description }}</p>
+        </div>
+      </div>
+
+      <!-- Beállítások szekció - a quiz-info blokkon belül -->
+      <div class="settings-panel" *ngIf="showSettings" [@slideDown]>
+        <div class="settings-content">
+          <form class="settings-form" (ngSubmit)="saveSettings()">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="quizName">Kvíz neve</label>
+                <input type="text" id="quizName" [(ngModel)]="editForm.name" name="quizName" placeholder="Add meg a kvíz nevét" required>
+              </div>
+              <div class="form-group">
+                <label for="difficulty">Nehézségi szint</label>
+                <select id="difficulty" [(ngModel)]="editForm.difficulty_level" name="difficulty">
+                  <option value="1">🟢 Kezdő</option>
+                  <option value="2">🔵 Alapfok</option>
+                  <option value="3">🟡 Közepes</option>
+                  <option value="4">🟠 Haladó</option>
+                  <option value="5">🔴 Expert</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="form-group full-width">
+              <label for="quizDescription">Leírás</label>
+              <textarea id="quizDescription" [(ngModel)]="editForm.description" name="quizDescription" placeholder="Írd le mire vonatkozik ez a kvíz..."></textarea>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="visibility">Láthatóság</label>
+                <select id="visibility" [(ngModel)]="editForm.visibility" name="visibility">
+                  <option value="private">🔒 Privát</option>
+                  <option value="public">🌍 Nyilvános</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="language">Nyelv</label>
+                <select id="language" [(ngModel)]="editForm.language" name="language">
+                  <option value="hu">🇭🇺 Magyar</option>
+                  <option value="en">🇬🇧 English</option>
+                  <option value="de">🇩🇪 Deutsch</option>
+                  <option value="fr">🇫🇷 Français</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group color-selection">
+              <label>Téma szín</label>
+              <div class="color-palette">
+                <div class="color-option" 
+                     *ngFor="let color of colorPalette" 
+                     [style.background-color]="color.value"
+                     [class.selected]="editForm.color === color.value"
+                     (click)="selectColor(color.value)"
+                     [title]="color.name">
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-group full-width">
+              <label for="tags">Címkék (vesszővel elválasztva)</label>
+              <input type="text" id="tags" [(ngModel)]="tagsString" name="tags" placeholder="pl: matematika, algebra, egyenletek">
+            </div>
+            
+            <div class="form-actions">
+              <button type="button" class="btn btn-cancel" (click)="cancelEdit()">
+                <mat-icon>close</mat-icon>
+                <span>Mégse</span>
+              </button>
+              <button type="submit" class="btn btn-save" [disabled]="!editForm.name.trim()">
+                <mat-icon>save</mat-icon>
+                <span>Mentés</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Betöltés...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="error-container">
+    <mat-icon>error</mat-icon>
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- Quiz Stats -->
+  <div class="quiz-stats" *ngIf="quiz && !isLoading">
+    <div class="stat-item">
+      <mat-icon>quiz</mat-icon>
+      <span class="stat-number">{{ cards.length }}</span>
+      <span class="stat-label">kártya</span>
+    </div>
+    <div class="stat-item">
+      <mat-icon>schedule</mat-icon>
+      <span class="stat-label">Létrehozva: {{ formatDate(quiz.created_at!) }}</span>
+    </div>
+  </div>
+
+  <!-- Cards Section -->
+  <div class="cards-section" *ngIf="!isLoading">
+    <div class="section-header">
+      <h2>Kártyák ({{ cards.length }})</h2>
+    </div>
+
+    <!-- Quick Card Creator - Always visible at top -->
+    <div class="quick-card-creator">
+      <div class="creator-header">
+        <mat-icon>quiz</mat-icon>
+        <span>Új kártya hozzáadása</span>
+      </div>
+      
+      <!-- Main question input -->
+      <div class="question-input">
+        <input type="text" 
+               [(ngModel)]="newCard.question" 
+               placeholder="Kérdés vagy fogalom..."
+               class="main-input"
+               (keydown.enter)="focusFirstAnswer()">
+      </div>
+
+      <!-- Dynamic answers list -->
+      <div class="answers-container">
+        <div class="answer-row" *ngFor="let answer of newCard.answers; let i = index; let isLast = last; trackBy: trackByIndex">
+          <button type="button" 
+                  class="answer-type-btn" 
+                  [class.correct]="answer.isCorrect"
+                  [class.incorrect]="!answer.isCorrect"
+                  (click)="toggleAnswerType(i)"
+                  title="{{ answer.isCorrect ? 'Helyes válasz' : 'Rossz válasz' }}">
+            <mat-icon>{{ answer.isCorrect ? 'check' : 'close' }}</mat-icon>
+          </button>
+          <input type="text" 
+                 [(ngModel)]="answer.text" 
+                 placeholder="Válasz..."
+                 class="answer-input"
+                 (keydown.enter)="handleAnswerEnter(i, $event)">
+          <button type="button" 
+                  *ngIf="newCard.answers.length > 1"
+                  class="remove-answer-btn" 
+                  (click)="removeAnswer(i)"
+                  title="Válasz törlése">
+            <mat-icon>remove</mat-icon>
+          </button>
+          <button type="button" 
+                  *ngIf="isLast"
+                  class="add-answer-btn" 
+                  (click)="addNewAnswer()"
+                  title="Új válasz hozzáadása">
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Save button -->
+      <div class="creator-actions">
+        <button class="save-card-btn" 
+                (click)="saveQuickCard()" 
+                [disabled]="!isQuickCardValid()"
+                title="Kártya mentése">
+          <mat-icon>save</mat-icon>
+          <span>Mentés</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Cards Grid -->
+    <div class="cards-grid" *ngIf="cards.length > 0">
+      <div class="card-item" 
+           *ngFor="let card of cards; trackBy: trackByCardId" 
+           [class.flipped]="card.isFlipped"
+           (click)="flipCard(card)">
+        
+        <!-- Card Front -->
+        <div class="card-face card-front">
+          <!-- Card actions jobb felső sarok -->
+          <div class="card-actions" (click)="$event.stopPropagation()">
+            <button class="action-btn edit" (click)="editCard(card)" title="Szerkesztés">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button class="action-btn delete" (click)="deleteCard(card.id!)" title="Törlés">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+          
+          <div class="card-content">
+            <div class="card-question">
+              {{ card.question }}
+            </div>
+            <div class="card-flip-hint">
+              <mat-icon>touch_app</mat-icon>
+              <span>Kattints a válaszokért</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Back -->
+        <div class="card-face card-back">
+          <!-- Card actions jobb felső sarok -->
+          <div class="card-actions" (click)="$event.stopPropagation()">
+            <button class="action-btn edit" (click)="editCard(card)" title="Szerkesztés">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button class="action-btn delete" (click)="deleteCard(card.id!)" title="Törlés">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+          
+          <div class="card-content">
+            <div class="card-answers">
+              <!-- Single answer for flashcard -->
+              <div *ngIf="card.card_type === 'flashcard'" class="flashcard-answer">
+                {{ card.answer }}
+              </div>
+              
+              <!-- Multiple answers for multiple choice -->
+              <div *ngIf="card.card_type === 'multiple_choice'" class="multiple-choice-answers">
+                <div class="correct-answers" *ngIf="card.correct_answers && card.correct_answers.length > 0">
+                  <div class="answer-item correct" *ngFor="let answer of card.correct_answers">
+                    <mat-icon>check</mat-icon>
+                    <span>{{ answer }}</span>
+                  </div>
+                </div>
+                <div class="incorrect-answers" *ngIf="card.incorrect_answers && card.incorrect_answers.length > 0">
+                  <div class="answer-item incorrect" *ngFor="let answer of card.incorrect_answers">
+                    <mat-icon>close</mat-icon>
+                    <span>{{ answer }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card-hint" *ngIf="card.hint">
+              <mat-icon>lightbulb</mat-icon>
+              <span>{{ card.hint }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-cards" *ngIf="cards.length === 0 && !isLoading">
+      <div class="empty-illustration">
+        <mat-icon>quiz</mat-icon>
+      </div>
+      <h3>Még nincsenek kártyák</h3>
+      <p>Hozd létre az első kártyát a fenti űrlappal!</p>
+    </div>
+  </div>
+</div>
