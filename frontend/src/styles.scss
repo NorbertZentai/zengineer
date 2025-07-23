@@ -12,10 +12,13 @@
 /* Universal Theme System for Zengineer Quiz Manager */
 
 // =============================================================================
-// LIGHT THEME (Default)
+// LIGHT THEME (Alternative)
 // =============================================================================
-:root,
-:root[data-theme='light'] {
+:root[data-theme='light'],
+// =============================================================================
+// LIGHT THEME
+// =============================================================================
+body.light-theme {
   // Primary Brand Colors
   --primary: #{$primary};
   --primary-light: #{$primary-light};
@@ -30,31 +33,31 @@
   --accent-light: #{$accent-light};
   --accent-dark: #{$accent-dark};
   
-  // Background Colors
-  --bg-primary: #{$white};
-  --bg-secondary: #{$gray-50};
-  --bg-tertiary: #{$gray-100};
-  --bg-quaternary: #{$gray-200};
-  --bg-card: #{$white};
+  // Background Colors - Light theme
+  --bg-primary: #{$light-bg-primary};
+  --bg-secondary: #{$light-bg-secondary};
+  --bg-tertiary: #{$light-bg-tertiary};
+  --bg-quaternary: #{$light-bg-quaternary};
+  --bg-card: #{$light-bg-card};
   --bg-overlay: rgba(0, 0, 0, 0.5);
   --bg-gradient-primary: #{$gradient-background};
   --bg-gradient-card: #{$gradient-card};
   --bg-gradient-header: #{$gradient-header};
   
-  // Text Colors
-  --text-primary: #{$gray-800};
-  --text-secondary: #{$gray-700};
-  --text-muted: #{$gray-600};
-  --text-light: #{$gray-500};
-  --text-inverse: #{$white};
+  // Text Colors - Light theme
+  --text-primary: #{$light-text-primary};
+  --text-secondary: #{$light-text-secondary};
+  --text-muted: #{$light-text-tertiary};
+  --text-light: #{$light-text-muted};
+  --text-inverse: #{$light-text-inverse};
   --text-on-primary: #{$white};
   --text-on-secondary: #{$white};
   --text-accent: #{$primary};
   
-  // Border Colors
-  --border-primary: #{$gray-300};
-  --border-secondary: #{$gray-400};
-  --border-light: #{$gray-100};
+  // Border Colors - Light theme
+  --border-primary: #{$light-border-primary};
+  --border-secondary: #{$light-border-secondary};
+  --border-light: #{$light-border-light};
   --border-accent: var(--primary);
   --border-focus: var(--primary);
   
@@ -64,6 +67,14 @@
   --active-bg: rgba(102, 126, 234, 0.08);
   --focus-ring: rgba(102, 126, 234, 0.25);
   --selected-bg: #{$quiz-selected-bg};
+  
+  // Shadows - Light theme
+  --shadow-xs: #{$shadow-xs};
+  --shadow-sm: #{$shadow-sm};
+  --shadow-md: #{$shadow-md};
+  --shadow-lg: #{$shadow-lg};
+  --shadow-xl: #{$shadow-xl};
+  --shadow-2xl: #{$shadow-2xl};
   
   // Status Colors
   --success: #{$success};
@@ -78,55 +89,14 @@
   --info: #{$info};
   --info-light: #{$info-light};
   --info-dark: #{$info-dark};
-  
-  // Difficulty Colors
-  --difficulty-easy: #{$difficulty-easy};
-  --difficulty-easy-light: #{$difficulty-easy-light};
-  --difficulty-medium: #{$difficulty-medium};
-  --difficulty-medium-light: #{$difficulty-medium-light};
-  --difficulty-hard: #{$difficulty-hard};
-  --difficulty-hard-light: #{$difficulty-hard-light};
-  
-  // Shadows
-  --shadow-xs: #{$shadow-xs};
-  --shadow-sm: #{$shadow-sm};
-  --shadow-md: #{$shadow-md};
-  --shadow-lg: #{$shadow-lg};
-  --shadow-xl: #{$shadow-xl};
-  --shadow-primary: #{$shadow-primary};
-  --shadow-success: #{$shadow-success};
-  --shadow-warning: #{$shadow-warning};
-  --shadow-error: #{$shadow-error};
-  
-  // Component Specific
-  --navbar-bg: #{$navbar-bg};
-  --navbar-border: #{$navbar-border};
-  --card-bg: #{$card-bg};
-  --input-bg: #{$input-bg};
-  --input-border: #{$input-border};
-  --button-primary-bg: var(--primary-gradient);
-  --button-secondary-bg: var(--bg-quaternary);
-  
-  // Quiz Specific
-  --quiz-card-bg: #{$quiz-card-bg};
-  --quiz-card-border: #{$quiz-card-border};
-  --quiz-card-hover: #{$quiz-card-hover-bg};
-  --quiz-selected-bg: #{$quiz-selected-bg};
-  --quiz-selected-border: var(--border-accent);
-  
-  // 📁 Folder Specific
-  --folder-card-bg: #{$folder-card-bg};
-  --folder-card-border: rgba(102, 126, 234, 0.15);
-  --folder-card-hover: linear-gradient(135deg, #f8f9ff 0%, #f0f7ff 100%);
-  --folder-icon: #{$folder-icon-color};
-  --folder-accent: #{$folder-accent};
-  --folder-accent-light: #64b5f6;
 }
 
 // =============================================================================
-// DARK THEME
+// DARK THEME (Default)
 // =============================================================================
-:root[data-theme='dark'] {
+:root,
+:root[data-theme='dark'],
+body.dark-theme {
   // Primary Brand Colors (adjusted for dark)
   --primary: #{$primary-light};
   --primary-light: #b8c7f6;
@@ -141,42 +111,51 @@
   --accent-light: #81c784;
   --accent-dark: #{$accent};
   
-  // Background Colors
+  // Background Colors - Modern dark theme
   --bg-primary: #{$dark-bg-primary};
   --bg-secondary: #{$dark-bg-secondary};
   --bg-tertiary: #{$dark-bg-tertiary};
-  --bg-quaternary: #383838;
+  --bg-quaternary: #{$dark-bg-quaternary};
   --bg-card: #{$dark-bg-card};
-  --bg-overlay: rgba(0, 0, 0, 0.7);
+  --bg-elevated: #{$dark-bg-elevated};
+  --bg-overlay: rgba(0, 0, 0, 0.8);
   --bg-gradient-primary: linear-gradient(135deg, #{$dark-bg-secondary} 0%, #{$dark-bg-tertiary} 100%);
-  --bg-gradient-card: linear-gradient(135deg, #{$dark-bg-card} 0%, #2a2a3a 100%);
+  --bg-gradient-card: linear-gradient(135deg, #{$dark-bg-card} 0%, #{$dark-bg-elevated} 100%);
   --bg-gradient-header: linear-gradient(135deg, #{$primary-light} 0%, #{$secondary-light} 100%);
   
-  // Text Colors
+  // Text Colors - High contrast for dark theme
   --text-primary: #{$dark-text-primary};
   --text-secondary: #{$dark-text-secondary};
-  --text-muted: #{$dark-text-muted};
-  --text-light: #777777;
-  --text-inverse: #{$dark-bg-primary};
-  --text-on-primary: #{$dark-bg-primary};
-  --text-on-secondary: #{$dark-bg-primary};
+  --text-muted: #{$dark-text-tertiary};
+  --text-light: #{$dark-text-muted};
+  --text-inverse: #{$dark-text-inverse};
+  --text-on-primary: #{$dark-text-inverse};
+  --text-on-secondary: #{$dark-text-inverse};
   --text-accent: #{$primary-light};
   
-  // Border Colors
+  // Border Colors - Subtle but visible
   --border-primary: #{$dark-border-primary};
   --border-secondary: #{$dark-border-secondary};
-  --border-light: #353535;
+  --border-light: #{$dark-border-light};
   --border-accent: var(--primary);
   --border-focus: var(--primary);
   
-  // Interactive States
+  // Interactive States - Enhanced for dark theme
   --hover-bg: rgba(143, 167, 243, 0.08);
   --hover-border: rgba(143, 167, 243, 0.4);
   --active-bg: rgba(143, 167, 243, 0.12);
-  --focus-ring: rgba(143, 167, 243, 0.3);
-  --selected-bg: linear-gradient(135deg, #2a2a3a 0%, #353545 100%);
+  --focus-ring: rgba(143, 167, 243, 0.4);
+  --selected-bg: linear-gradient(135deg, #{$dark-bg-tertiary} 0%, #{$dark-bg-quaternary} 100%);
   
-  // Status Colors (adjusted for dark)
+  // Shadows - More pronounced for dark theme
+  --shadow-xs: #{$shadow-dark-xs};
+  --shadow-sm: #{$shadow-dark-sm};
+  --shadow-md: #{$shadow-dark-md};
+  --shadow-lg: #{$shadow-dark-lg};
+  --shadow-xl: #{$shadow-dark-xl};
+  --shadow-2xl: #{$shadow-dark-2xl};
+  
+  // Status Colors
   --success: #4caf50;
   --success-light: #2d5016;
   --success-dark: #66bb6a;
@@ -189,49 +168,6 @@
   --info: #29b6f6;
   --info-light: #014c5e;
   --info-dark: #4fc3f7;
-  
-  // Difficulty Colors (adjusted)
-  --difficulty-easy: #66bb6a;
-  --difficulty-easy-light: #2d5016;
-  --difficulty-medium: #ffb74d;
-  --difficulty-medium-light: #5d4e00;
-  --difficulty-hard: #ef5350;
-  --difficulty-hard-light: #5d1a1d;
-  
-  // Shadows (enhanced for dark)
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
-  --shadow-xl: 0 12px 40px rgba(0, 0, 0, 0.6);
-  --shadow-primary: 0 4px 12px rgba(143, 167, 243, 0.4);
-  --shadow-success: 0 4px 12px rgba(76, 175, 80, 0.4);
-  --shadow-warning: 0 4px 12px rgba(255, 183, 77, 0.4);
-  --shadow-error: 0 4px 12px rgba(244, 67, 54, 0.4);
-  
-  // Component Specific
-  --navbar-bg: var(--bg-secondary);
-  --navbar-border: var(--border-primary);
-  --card-bg: var(--bg-card);
-  --input-bg: var(--bg-tertiary);
-  --input-border: var(--border-primary);
-  --button-primary-bg: var(--primary-gradient);
-  --button-secondary-bg: var(--bg-quaternary);
-  
-  // Quiz Specific
-  --quiz-card-bg: var(--bg-card);
-  --quiz-card-border: var(--border-primary);
-  --quiz-card-hover: rgba(143, 167, 243, 0.02);
-  --quiz-selected-bg: var(--selected-bg);
-  --quiz-selected-border: var(--border-accent);
-  
-  // 📁 Folder Specific
-  --folder-card-bg: linear-gradient(135deg, #121212 0%, #1e1e1e 100%);
-  --folder-card-border: rgba(143, 167, 243, 0.15);
-  --folder-card-hover: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
-  --folder-icon: #90caf9;
-  --folder-accent: #90caf9;
-  --folder-accent-light: #bbdefb;
 }
 
 // =============================================================================

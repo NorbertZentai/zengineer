@@ -2,6 +2,7 @@ import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslateModule } from '@ngx-translate/core';
 import { QuizService, Quiz } from '../../../core/services/quiz.service';
 
 @Component({
@@ -9,7 +10,7 @@ import { QuizService, Quiz } from '../../../core/services/quiz.service';
   templateUrl: './quiz-create-modal.component.html',
   styleUrls: ['./quiz-create-modal.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule]
+  imports: [CommonModule, FormsModule, MatIconModule, TranslateModule]
 })
 export class QuizCreateModalComponent implements OnInit {
   @Output() close = new EventEmitter<void>();

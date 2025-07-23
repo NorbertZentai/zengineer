@@ -2,12 +2,12 @@
   <header class="quiz-manager-header">
     <div class="header-left">
       <mat-icon class="quiz-manager-icon">analytics</mat-icon>
-      <h1>Kvízkezelő</h1>
+      <h1>{{ 'QUIZ_MANAGER.TITLE' | translate }}</h1>
     </div>
     <div class="header-right" *ngIf="viewMode === 'list'">
       <button class="create-quiz-btn" (click)="onCreateNew()">
         <mat-icon>add</mat-icon>
-        Új kvíz
+        {{ 'QUIZ_MANAGER.NEW_QUIZ' | translate }}
       </button>
     </div>
   </header>

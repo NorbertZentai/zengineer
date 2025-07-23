@@ -32,8 +32,11 @@
   },
   "LOGIN": {
     "TITLE": "Login",
+    "SUBTITLE": "Enter your credentials to continue",
     "EMAIL": "Email",
+    "EMAIL_PLACEHOLDER": "Enter your email address",
     "PASSWORD": "Password",
+    "PASSWORD_PLACEHOLDER": "Enter your password",
     "LOGIN": "Login",
     "LOGGING_IN": "Logging in...",
     "NO_ACCOUNT": "No account yet?",
@@ -41,6 +44,9 @@
     "TOGGLE_PASSWORD": "Toggle password visibility",
     "REMEMBER_ME": "Remember me",
     "FORGOT_PASSWORD": "Forgot password?",
+    "OR": "or",
+    "GOOGLE": "Continue with Google",
+    "GITHUB": "Continue with GitHub",
     "VALIDATION": {
       "EMAIL_REQUIRED": "Email is required",
       "EMAIL_INVALID": "Please enter a valid email address",
@@ -66,10 +72,15 @@
   },
   "REGISTER": {
     "TITLE": "Register",
+    "SUBTITLE": "Create your account to get started",
     "NAME": "Name",
+    "NAME_PLACEHOLDER": "Enter your full name",
     "EMAIL": "Email",
+    "EMAIL_PLACEHOLDER": "Enter your email address",
     "PASSWORD": "Password",
+    "PASSWORD_PLACEHOLDER": "Create a secure password",
     "CONFIRM_PASSWORD": "Confirm Password",
+    "CONFIRM_PASSWORD_PLACEHOLDER": "Confirm your password",
     "REGISTER": "Register",
     "REGISTERING": "Registering...",
     "ALREADY_ACCOUNT": "Already have an account?",
@@ -83,9 +94,10 @@
     "REQ_NUMBER": "Number",
     "STRENGTH": {
       "WEAK": "Weak",
-      "MEDIUM": "Medium", 
+      "FAIR": "Fair",
       "GOOD": "Good",
-      "STRONG": "Strong"
+      "STRONG": "Strong",
+      "VERY_STRONG": "Very Strong"
     },
     "VALIDATION": {
       "NAME_REQUIRED": "Name is required",
@@ -117,9 +129,9 @@
     "ADD_FOLDER": "Add folder",
     "NEW_QUIZFOLDER": "New quiz-folder name",
     "ADD_QUIZFOLDER": "Add quiz-folder",
-    "NEW_QUIZ": "New quiz name",
+    "NEW_QUIZ": "New quiz",
     "ADD_QUIZ": "Add quiz",
-    "CARDS": "Cards",
+    "CARDS": "cards",
     "SEARCH_PLACEHOLDER": "Search in quizzes...",
     "SEARCH_BY": "By name or tag",
     "VIEW_GRID": "Grid view",
@@ -130,6 +142,8 @@
     "SORT_BY_UPDATED": "By modification date",
     "SORT_BY_CARDS": "By number of cards",
     "HOME": "Home",
+    "PUBLIC_QUIZ": "Public quiz",
+    "PRIVATE_QUIZ": "Private quiz",
     "STATS": {
       "QUIZZES": "quizzes",
       "CARDS": "cards",

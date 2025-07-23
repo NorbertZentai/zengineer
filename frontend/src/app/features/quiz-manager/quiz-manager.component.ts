@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslateModule } from '@ngx-translate/core';
 import { QuizEditorComponent } from './quiz-editor/quiz-editor.component';
 import { QuizStatsComponent } from './quiz-stats/quiz-stats.component';
 import { QuizPreviewComponent } from './quiz-preview/quiz-preview.component';
@@ -18,6 +19,7 @@ import { Quiz } from '../../core/services/quiz.service';
     CommonModule,
     FormsModule,
     MatIconModule,
+    TranslateModule,
     QuizEditorComponent,
     QuizStatsComponent,
     QuizPreviewComponent,

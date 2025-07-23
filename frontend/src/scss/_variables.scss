@@ -1,5 +1,51 @@
+// ==========================================================================// =============================================================================
+// COLORS - MODERN DARK THEME PALETTE
+// ========// =============================================================================
+// SHADOWS - MODERN ELEVATION SYSTEM
 // =============================================================================
-// ZENGINEER GLOBAL SCSS VARIABLES
+// Light theme shadows
+$shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+$shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+// Dark theme shadows (more pronounced)
+$shadow-dark-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+$shadow-dark-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.4);
+$shadow-dark-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+$shadow-dark-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+$shadow-dark-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+$shadow-dark-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+
+// Colored shadows for interactive elements
+$shadow-primary: 0 4px 12px rgba(102, 126, 234, 0.3);
+$shadow-success: 0 4px 12px rgba(40, 167, 69, 0.3);
+$shadow-warning: 0 4px 12px rgba(255, 193, 7, 0.3);
+$shadow-error: 0 4px 12px rgba(220, 53, 69, 0.3);
+
+// =============================================================================
+// COLORS - MODERN DARK THEME PALETTE
+// =============================================================================
+$dark-bg-primary: #0d1117;      // Very dark blue-gray (main background)
+$dark-bg-secondary: #161b22;    // Slightly lighter (cards, sections)
+$dark-bg-tertiary: #21262d;     // Medium dark (raised elements)
+$dark-bg-quaternary: #30363d;   // Lighter (hover states)
+$dark-bg-card: #1c2128;         // Card backgrounds with subtle warmth
+$dark-bg-elevated: #2d333b;     // Modal, popover backgrounds
+
+// Dark theme text colors with high contrast
+$dark-text-primary: #f0f6fc;    // Pure white-blue for primary text
+$dark-text-secondary: #e6edf3;  // Slightly softer for secondary text
+$dark-text-tertiary: #7d8590;   // Muted gray for less important text
+$dark-text-muted: #656d76;      // Very muted for placeholders
+$dark-text-inverse: #0d1117;    // Dark text on light backgrounds
+
+// Dark theme borders with subtle contrast
+$dark-border-primary: #30363d;   // Main borders
+$dark-border-secondary: #21262d; // Subtle borders
+$dark-border-light: #373e47;     // Lighter borders for focus statesR GLOBAL SCSS VARIABLES
 // =============================================================================
 // Ez a fájl tartalmazza a projekt összes globális változóját.
 // Mindegyik színt, méret, árnyék és egyéb dizájn tokent itt definiálunk.
@@ -21,22 +67,40 @@ $accent-light: #66bb6a;
 $accent-dark: #2e7d32;
 
 // =============================================================================
-// COLORS - NEUTRAL PALETTE
+// COLORS - NEUTRAL PALETTE (UPDATED FOR MODERN LIGHT THEME)
 // =============================================================================
 $white: #ffffff;
 $black: #000000;
 
-// Grays (Light to Dark)
-$gray-50: #fafafa;
-$gray-100: #f5f7fa;
-$gray-200: #f8f9fa;
-$gray-300: #e9ecef;
-$gray-400: #dee2e6;
-$gray-500: #adb5bd;
-$gray-600: #6c757d;
-$gray-700: #495057;
-$gray-800: #2c3e50;
-$gray-900: #212529;
+// Modern light grays with better contrast
+$gray-50: #f9fafb;     // Very light background
+$gray-100: #f3f4f6;    // Light backgrounds, subtle sections
+$gray-200: #e5e7eb;    // Borders, dividers
+$gray-300: #d1d5db;    // Disabled states, subtle borders
+$gray-400: #9ca3af;    // Placeholder text
+$gray-500: #6b7280;    // Secondary text
+$gray-600: #4b5563;    // Primary text (medium)
+$gray-700: #374151;    // Primary text (darker)
+$gray-800: #1f2937;    // Headings, high emphasis text
+$gray-900: #111827;    // Maximum contrast text
+
+// Light theme specific colors
+$light-bg-primary: #ffffff;
+$light-bg-secondary: #f9fafb;
+$light-bg-tertiary: #f3f4f6;
+$light-bg-quaternary: #e5e7eb;
+$light-bg-card: #ffffff;
+$light-bg-elevated: #ffffff;
+
+$light-text-primary: #111827;
+$light-text-secondary: #374151;
+$light-text-tertiary: #6b7280;
+$light-text-muted: #9ca3af;
+$light-text-inverse: #ffffff;
+
+$light-border-primary: #e5e7eb;
+$light-border-secondary: #d1d5db;
+$light-border-light: #f3f4f6;
 
 // =============================================================================
 // COLORS - STATUS COLORS
@@ -168,15 +232,29 @@ $radius-3xl: 1.5rem;    // 24px
 $radius-full: 9999px;
 
 // =============================================================================
-// SHADOWS
+// SHADOWS - MODERN ELEVATION SYSTEM
 // =============================================================================
-$shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
-$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
-$shadow-md: 0 4px 20px rgba(0, 0, 0, 0.08);
-$shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
-$shadow-xl: 0 12px 40px rgba(0, 0, 0, 0.15);
+// Light theme shadows
+$shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+$shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 
-// Colored shadows
+// Dark theme shadows (more pronounced)
+$shadow-dark-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+$shadow-dark-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.4);
+$shadow-dark-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+$shadow-dark-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+$shadow-dark-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+$shadow-dark-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+
+// Colored shadows for interactive elements
+$shadow-primary: 0 4px 12px rgba(102, 126, 234, 0.3);
+$shadow-success: 0 4px 12px rgba(40, 167, 69, 0.3);
+$shadow-warning: 0 4px 12px rgba(255, 193, 7, 0.3);
+$shadow-error: 0 4px 12px rgba(220, 53, 69, 0.3);
 $shadow-primary: 0 4px 12px rgba(102, 126, 234, 0.3);
 $shadow-success: 0 4px 12px rgba(40, 167, 69, 0.3);
 $shadow-warning: 0 4px 12px rgba(255, 193, 7, 0.3);
@@ -250,3 +328,34 @@ $quiz-selected-border: $primary;
 $folder-icon-color: #2196f3;
 $folder-accent: #2196f3;
 $folder-card-bg: linear-gradient(135deg, #{$white} 0%, #{$gray-50} 100%);
+
+// =============================================================================
+// AUTH SPECIFIC COLORS
+// =============================================================================
+// Light theme auth colors
+$auth-bg: $white;
+$auth-card-bg: $white;
+$auth-text-primary: $gray-800;
+$auth-text-secondary: $gray-600;
+$auth-text-muted: $gray-500;
+$auth-border: $gray-300;
+$auth-border-focus: $primary;
+$auth-input-bg: $white;
+$auth-button-bg: $primary;
+$auth-button-hover: $primary-hover;
+$auth-link: $primary;
+$auth-link-hover: $primary-dark;
+
+// Dark theme auth colors
+$auth-dark-bg: $dark-bg-primary;
+$auth-dark-card-bg: $dark-bg-card;
+$auth-dark-text-primary: $dark-text-primary;
+$auth-dark-text-secondary: $dark-text-secondary;
+$auth-dark-text-muted: $dark-text-tertiary;
+$auth-dark-border: $dark-border-primary;
+$auth-dark-border-focus: $primary-light;
+$auth-dark-input-bg: $dark-bg-tertiary;
+$auth-dark-button-bg: $primary;
+$auth-dark-button-hover: $primary-light;
+$auth-dark-link: $primary-light;
+$auth-dark-link-hover: $primary;

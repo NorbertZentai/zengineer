@@ -191,6 +191,11 @@
   justify-content: space-between;
 }
 
+@mixin flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
 @mixin flex-column {
   display: flex;
   flex-direction: column;
@@ -297,10 +302,19 @@
 }
 
 // =============================================================================
+// =============================================================================
 // DARK THEME MIXINS
 // =============================================================================
 @mixin dark-theme {
+  @media (prefers-color-scheme: dark) {
+    @content;
+  }
+  
   [data-theme='dark'] & {
+    @content;
+  }
+  
+  .dark-theme & {
     @content;
   }
 }

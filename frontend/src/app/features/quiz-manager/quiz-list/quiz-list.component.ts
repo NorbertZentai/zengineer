@@ -6,13 +6,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-quiz-list',
   templateUrl: './quiz-list.component.html',
   styleUrls: ['./quiz-list.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, RouterModule]
+  imports: [CommonModule, FormsModule, MatIconModule, RouterModule, TranslateModule]
 })
 export class QuizListComponent implements OnInit {
   quizzes: Quiz[] = [];

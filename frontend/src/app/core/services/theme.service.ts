@@ -60,27 +60,27 @@ export class ThemeService {
       return storedTheme;
     }
     
-    // Fall back to system preference
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return 'dark';
+    // Fall back to system preference, but default to dark
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+      return 'light';
     }
     
-    return 'light';
+    return 'dark'; // Default to dark theme
   }
   
   /**
    * Apply theme to the DOM
    */
   private applyTheme(theme: Theme): void {
-    const html = document.documentElement;
+    const body = document.body;
     
-    // Remove any existing theme attributes
-    html.removeAttribute('data-theme');
+    // Remove existing theme classes
+    body.classList.remove('light-theme', 'dark-theme');
     
-    // Set the new theme
-    if (theme === 'dark') {
-      html.setAttribute('data-theme', 'dark');
-    }
-    // For light theme, we don't need to set attribute as it's the default
+    // Add the new theme class
+    body.classList.add(theme === 'dark' ? 'dark-theme' : 'light-theme');
+    
+    // Also set data-theme attribute for compatibility
+    document.documentElement.setAttribute('data-theme', theme);
   }
 }

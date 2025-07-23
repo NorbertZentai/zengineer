@@ -1,10 +1,10 @@
 <!-- Quiz list UI -->
 <div class="quiz-list-header">
-  <input type="text" [(ngModel)]="searchTerm" placeholder="Keresés..." class="quiz-search" />
+  <input type="text" [(ngModel)]="searchTerm" [placeholder]="'QUIZ_MANAGER.SEARCH_PLACEHOLDER' | translate" class="quiz-search" />
   <!-- Szűrő/rendező gombok -->
-  <button class="quiz-sort" (click)="sortBy = 'name'">Név</button>
-  <button class="quiz-sort" (click)="sortBy = 'date'">Dátum</button>
-  <button class="quiz-sort" (click)="sortBy = 'status'">Státusz</button>
+  <button class="quiz-sort" (click)="sortBy = 'name'">{{ 'QUIZ_MANAGER.SORT_BY_NAME' | translate }}</button>
+  <button class="quiz-sort" (click)="sortBy = 'date'">{{ 'QUIZ_MANAGER.SORT_BY_CREATED' | translate }}</button>
+  <button class="quiz-sort" (click)="sortBy = 'status'">{{ 'QUIZ_MANAGER.SORT_BY_CARDS' | translate }}</button>
 </div>
 
 <div *ngIf="isLoading" class="quiz-list-loading">
@@ -18,10 +18,10 @@
 
 <div *ngIf="!isLoading && !error && filteredQuizzes.length === 0" class="quiz-list-empty">
   <div class="empty-illustration"></div>
-  <p>Nincs elérhető kvíz.</p>
+  <p>{{ 'QUIZ_MANAGER.EMPTY_STATE.NO_QUIZZES_DESC' | translate }}</p>
   <button class="create-first-quiz-btn" (click)="onCreateNew()">
     <mat-icon>add_circle</mat-icon>
-    Hozz létre az első kvízedet!
+    {{ 'QUIZ_MANAGER.EMPTY_STATE.CREATE_QUIZ' | translate }}
   </button>
 </div>
 
@@ -37,7 +37,7 @@
         <div class="quiz-title-row">
           <h3 class="quiz-title">{{ quiz.name }}</h3>
           <div class="quiz-actions-menu" [class.menu-open]="activeMenuId === quiz.id">
-            <mat-icon class="visibility-icon" [title]="quiz.visibility === 'public' ? 'Nyilvános kvíz' : 'Privát kvíz'">
+            <mat-icon class="visibility-icon" [title]="quiz.visibility === 'public' ? ('QUIZ_MANAGER.PUBLIC_QUIZ' | translate) : ('QUIZ_MANAGER.PRIVATE_QUIZ' | translate)">
               {{ quiz.visibility === 'public' ? 'lock_open' : 'lock' }}
             </mat-icon>
             <button class="menu-trigger" (click)="toggleMenu(quiz.id, $event); $event.stopPropagation()" [class.active]="activeMenuId === quiz.id">
@@ -48,20 +48,20 @@
                  (click)="closeMenu(); $event.stopPropagation()">
               <button class="menu-item" (click)="onEdit(quiz); $event.stopPropagation()">
                 <mat-icon>edit</mat-icon>
-                <span>Szerkesztés</span>
+                <span>{{ 'QUIZ_MANAGER.ACTIONS.EDIT' | translate }}</span>
               </button>
               <button class="menu-item" (click)="onPreview(quiz); $event.stopPropagation()">
                 <mat-icon>visibility</mat-icon>
-                <span>Előnézet</span>
+                <span>{{ 'QUIZ_MANAGER.ACTIONS.OPEN' | translate }}</span>
               </button>
               <button class="menu-item" (click)="onStats(quiz); $event.stopPropagation()">
                 <mat-icon>bar_chart</mat-icon>
-                <span>Statisztikák</span>
+                <span>{{ 'QUIZ_MANAGER.ACTIONS.STATISTICS' | translate }}</span>
               </button>
               <div class="menu-divider"></div>
               <button class="menu-item danger" (click)="onDelete(quiz); $event.stopPropagation()">
                 <mat-icon>delete</mat-icon>
-                <span>Törlés</span>
+                <span>{{ 'QUIZ_MANAGER.ACTIONS.DELETE' | translate }}</span>
               </button>
             </div>
           </div>
@@ -76,7 +76,7 @@
     <div class="quiz-meta">
       <div class="quiz-meta-item">
         <mat-icon>quiz</mat-icon>
-        <span>{{ quiz.cards?.length || 0 }} kártya</span>
+        <span>{{ quiz.cards?.length || 0 }} {{ 'QUIZ_MANAGER.CARDS' | translate }}</span>
       </div>
       <div class="quiz-meta-item" *ngIf="quiz.created_at">
         <mat-icon>schedule</mat-icon>

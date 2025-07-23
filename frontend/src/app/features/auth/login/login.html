@@ -1,106 +1,124 @@
-<div class="auth-card">
-  <div class="auth-card__header">
-    <div class="auth-card__icon login-icon"></div>
-    <h2>{{ 'LOGIN.TITLE' | translate }}</h2>
-  </div>
-  <form (ngSubmit)="onSubmit()" #loginForm="ngForm" autocomplete="on" role="form" [attr.aria-label]="'LOGIN.TITLE' | translate">
-    <div class="form-group">
-      <label for="email">{{ 'LOGIN.EMAIL' | translate }}</label>
-      <input 
-        id="email" 
-        name="email" 
-        [(ngModel)]="email" 
-        required 
-        type="email" 
-        autocomplete="email"
-        (blur)="onEmailBlur()"
-        [class.invalid]="validationErrors.email"
-        [attr.aria-describedby]="validationErrors.email ? 'email-error' : null"
-        [attr.aria-invalid]="validationErrors.email ? 'true' : 'false'"
-      />
-      <div class="error" *ngIf="validationErrors.email" id="email-error" role="alert">
-        {{ validationErrors.email | translate }}
-      </div>
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-card__header">
+      <div class="auth-card__icon login-icon"></div>
+      <h2>{{ 'LOGIN.TITLE' | translate }}</h2>
+      <p>{{ 'LOGIN.SUBTITLE' | translate }}</p>
     </div>
     
-    <div class="form-group">
-      <label for="password">{{ 'LOGIN.PASSWORD' | translate }}</label>
-      <div class="password-input-container">
-        <input 
-          id="password" 
-          name="password" 
-          [(ngModel)]="password" 
-          required 
-          [type]="showPassword ? 'text' : 'password'" 
-          autocomplete="current-password"
-          (blur)="onPasswordBlur()"
-          [class.invalid]="validationErrors.password"
-          [attr.aria-describedby]="validationErrors.password ? 'password-error' : null"
-          [attr.aria-invalid]="validationErrors.password ? 'true' : 'false'"
-        />
-        <button 
-          type="button" 
-          class="password-toggle" 
-          [class.password-visible]="showPassword"
-          (click)="togglePasswordVisibility()"
-          [attr.aria-label]="'LOGIN.TOGGLE_PASSWORD' | translate"
-          [attr.aria-pressed]="showPassword"
-        >
+    <form class="auth-form" (ngSubmit)="onSubmit()" #loginForm="ngForm" autocomplete="on" role="form" [attr.aria-label]="'LOGIN.TITLE' | translate">
+      <div class="form-group">
+        <label for="email">{{ 'LOGIN.EMAIL' | translate }}</label>
+        <div class="input-container">
+          <input 
+            id="email" 
+            name="email" 
+            [(ngModel)]="email" 
+            required 
+            type="email" 
+            autocomplete="email"
+            placeholder="{{ 'LOGIN.EMAIL_PLACEHOLDER' | translate }}"
+            (blur)="onEmailBlur()"
+            [class.invalid]="validationErrors.email"
+            [attr.aria-describedby]="validationErrors.email ? 'email-error' : null"
+            [attr.aria-invalid]="validationErrors.email ? 'true' : 'false'"
+          />
+        </div>
+        <div class="error-message" *ngIf="validationErrors.email" id="email-error" role="alert">
+          {{ validationErrors.email | translate }}
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="password">{{ 'LOGIN.PASSWORD' | translate }}</label>
+        <div class="input-container password-input">
+          <input 
+            id="password" 
+            name="password" 
+            [(ngModel)]="password" 
+            required 
+            [type]="showPassword ? 'text' : 'password'" 
+            autocomplete="current-password"
+            placeholder="{{ 'LOGIN.PASSWORD_PLACEHOLDER' | translate }}"
+            (blur)="onPasswordBlur()"
+            [class.invalid]="validationErrors.password"
+            [attr.aria-describedby]="validationErrors.password ? 'password-error' : null"
+            [attr.aria-invalid]="validationErrors.password ? 'true' : 'false'"
+          />
+          <button 
+            type="button" 
+            class="password-toggle" 
+            [class.password-visible]="showPassword"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="'LOGIN.TOGGLE_PASSWORD' | translate"
+            [attr.aria-pressed]="showPassword"
+          >
+          </button>
+        </div>
+        <div class="error-message" *ngIf="validationErrors.password" id="password-error" role="alert">
+          {{ validationErrors.password | translate }}
+        </div>
+      </div>
+      
+      <div class="remember-me">
+        <label class="checkbox-container">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="rememberMe" 
+            name="rememberMe"
+            id="rememberMe"
+          />
+          <span class="checkmark"></span>
+          {{ 'LOGIN.REMEMBER_ME' | translate }}
+        </label>
+      </div>
+      
+      <div class="forgot-password">
+        <a href="#" (click)="onForgotPassword($event)">{{ 'LOGIN.FORGOT_PASSWORD' | translate }}</a>
+      </div>
+      
+      <button 
+        type="submit" 
+        class="auth-button" 
+        [disabled]="isLoading || !isFormValid()"
+        [class.loading]="isLoading"
+      >
+        <span *ngIf="!isLoading">{{ 'LOGIN.LOGIN' | translate }}</span>
+        <span *ngIf="isLoading" class="loading-content">
+          <span class="loading-spinner"></span>
+          {{ 'LOGIN.LOGGING_IN' | translate }}
+        </span>
+      </button>
+      
+      <!-- Auth Divider -->
+      <div class="auth-divider" style="display: none;">
+        <span>{{ 'LOGIN.OR' | translate }}</span>
+      </div>
+      
+      <!-- Social Login Buttons -->
+      <div class="social-buttons" style="display: none;">
+        <button type="button" class="social-button google-login">
+          <span class="social-icon">🔍</span>
+          {{ 'LOGIN.GOOGLE' | translate }}
+        </button>
+        <button type="button" class="social-button github-login">
+          <span class="social-icon">⚫</span>
+          {{ 'LOGIN.GITHUB' | translate }}
         </button>
       </div>
-      <div class="error" *ngIf="validationErrors.password" id="password-error" role="alert">
-        {{ validationErrors.password | translate }}
-      </div>
-    </div>
+    </form>
     
-    <div class="form-group remember-me">
-      <label class="checkbox-container">
-        <input 
-          type="checkbox" 
-          [(ngModel)]="rememberMe" 
-          name="rememberMe"
-          id="rememberMe"
-        />
-        <span class="checkmark"></span>
-        {{ 'LOGIN.REMEMBER_ME' | translate }}
-      </label>
-    </div>
-    
-    <button 
-      type="submit" 
-      class="auth-btn" 
-      [disabled]="isLoading || !isFormValid()"
-      [class.loading]="isLoading"
-    >
-      <span *ngIf="!isLoading">{{ 'LOGIN.LOGIN' | translate }}</span>
-      <span *ngIf="isLoading" class="loading-content">
-        <span class="loading-spinner"></span>
-        {{ 'LOGIN.LOGGING_IN' | translate }}
-      </span>
-    </button>
-    
-    <div class="forgot-password">
-      <a href="#" (click)="onForgotPassword($event)">{{ 'LOGIN.FORGOT_PASSWORD' | translate }}</a>
-    </div>
-    
-    <!-- Test Connection Button -->
-    <button 
-      type="button" 
-      class="test-connection-btn" 
-      (click)="testConnection()"
-      [disabled]="isTestingConnection"
-    >
-      <span *ngIf="!isTestingConnection">🔧 Test BE/FE Connection</span>
-      <span *ngIf="isTestingConnection">Testing...</span>
-    </button>
-    
-    <div class="error general-error" *ngIf="errorMessage">
+    <!-- Success/Error Messages -->
+    <div class="auth-message error" *ngIf="errorMessage" role="alert">
       {{ errorMessage | translate }}
     </div>
-  </form>
-  <div class="auth-card__footer">
-    <span>{{ 'LOGIN.NO_ACCOUNT' | translate }}</span>
-    <a routerLink="/register">{{ 'LOGIN.REGISTER_LINK' | translate }}</a>
+    
+    <div class="auth-footer">
+      <p>
+        {{ 'LOGIN.NO_ACCOUNT' | translate }}
+        <a routerLink="/register">{{ 'LOGIN.REGISTER_LINK' | translate }}</a>
+      </p>
+    </div>
   </div>
 </div>
 

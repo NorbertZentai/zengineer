@@ -32,8 +32,11 @@
   },
   "LOGIN": {
     "TITLE": "Bejelentkezés",
+    "SUBTITLE": "Add meg az adataidat a folytatáshoz",
     "EMAIL": "Email",
+    "EMAIL_PLACEHOLDER": "Add meg az email címed",
     "PASSWORD": "Jelszó",
+    "PASSWORD_PLACEHOLDER": "Add meg a jelszavad",
     "LOGIN": "Belépés",
     "LOGGING_IN": "Bejelentkezés...",
     "NO_ACCOUNT": "Még nincs fiókod?",
@@ -41,6 +44,9 @@
     "TOGGLE_PASSWORD": "Jelszó láthatóságának váltása",
     "REMEMBER_ME": "Emlékezz rám",
     "FORGOT_PASSWORD": "Elfelejtetted a jelszót?",
+    "OR": "vagy",
+    "GOOGLE": "Folytatás Google-lel",
+    "GITHUB": "Folytatás GitHub-bal",
     "VALIDATION": {
       "EMAIL_REQUIRED": "Az email cím megadása kötelező",
       "EMAIL_INVALID": "Kérlek adj meg egy érvényes email címet",
@@ -66,10 +72,15 @@
   },
   "REGISTER": {
     "TITLE": "Regisztráció",
+    "SUBTITLE": "Hozd létre a fiókodat az induláshoz",
     "NAME": "Név",
+    "NAME_PLACEHOLDER": "Add meg a teljes neved",
     "EMAIL": "Email",
+    "EMAIL_PLACEHOLDER": "Add meg az email címed",
     "PASSWORD": "Jelszó",
+    "PASSWORD_PLACEHOLDER": "Hozz létre egy biztonságos jelszót",
     "CONFIRM_PASSWORD": "Jelszó megerősítése",
+    "CONFIRM_PASSWORD_PLACEHOLDER": "Erősítsd meg a jelszavad",
     "REGISTER": "Regisztrálok",
     "REGISTERING": "Regisztráció...",
     "ALREADY_ACCOUNT": "Van már fiókod?",
@@ -83,9 +94,10 @@
     "REQ_NUMBER": "Szám",
     "STRENGTH": {
       "WEAK": "Gyenge",
-      "MEDIUM": "Közepes",
+      "FAIR": "Elfogadható",
       "GOOD": "Jó", 
-      "STRONG": "Erős"
+      "STRONG": "Erős",
+      "VERY_STRONG": "Nagyon Erős"
     },
     "VALIDATION": {
       "NAME_REQUIRED": "A név megadása kötelező",
@@ -117,9 +129,9 @@
     "ADD_FOLDER": "Mappa hozzáadása",
     "NEW_QUIZFOLDER": "Új kvíz-mappa neve",
     "ADD_QUIZFOLDER": "Kvíz-mappa hozzáadása",
-    "NEW_QUIZ": "Új kvíz neve",
+    "NEW_QUIZ": "Új kvíz",
     "ADD_QUIZ": "Kvíz hozzáadása",
-    "CARDS": "Kártyák",
+    "CARDS": "kártya",
     "SEARCH_PLACEHOLDER": "Keresés kvízekben...",
     "SEARCH_BY": "Név vagy címke alapján",
     "VIEW_GRID": "Rács nézet",
@@ -130,6 +142,8 @@
     "SORT_BY_UPDATED": "Módosítás ideje",
     "SORT_BY_CARDS": "Kártyák száma",
     "HOME": "Kezdőlap",
+    "PUBLIC_QUIZ": "Nyilvános kvíz",
+    "PRIVATE_QUIZ": "Privát kvíz",
     "STATS": {
       "QUIZZES": "kvíz",
       "CARDS": "kártya",

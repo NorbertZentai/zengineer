@@ -175,6 +175,17 @@ export class Register {
     return isNameValid && isEmailValid && isPasswordValid && isConfirmPasswordValid;
   }
 
+  isFormValid(): boolean {
+    return this.name.trim() !== '' && 
+           this.email.trim() !== '' && 
+           this.password !== '' && 
+           this.confirmPassword !== '' &&
+           this.validationErrors.name === '' &&
+           this.validationErrors.email === '' &&
+           this.validationErrors.password === '' &&
+           this.validationErrors.confirmPassword === '';
+  }
+
   async onSubmit() {
     if (this.isLoading) return;
     
@@ -216,15 +227,17 @@ export class Register {
   
   getStrengthClass(): string {
     if (this.passwordStrength < 30) return 'weak';
-    if (this.passwordStrength < 60) return 'medium';
-    if (this.passwordStrength < 80) return 'good';
-    return 'strong';
+    if (this.passwordStrength < 50) return 'fair';
+    if (this.passwordStrength < 70) return 'good';
+    if (this.passwordStrength < 85) return 'strong';
+    return 'very-strong';
   }
-  
+
   getStrengthText(): string {
     if (this.passwordStrength < 30) return 'REGISTER.STRENGTH.WEAK';
-    if (this.passwordStrength < 60) return 'REGISTER.STRENGTH.MEDIUM';
-    if (this.passwordStrength < 80) return 'REGISTER.STRENGTH.GOOD';
-    return 'REGISTER.STRENGTH.STRONG';
+    if (this.passwordStrength < 50) return 'REGISTER.STRENGTH.FAIR';
+    if (this.passwordStrength < 70) return 'REGISTER.STRENGTH.GOOD';
+    if (this.passwordStrength < 85) return 'REGISTER.STRENGTH.STRONG';
+    return 'REGISTER.STRENGTH.VERY_STRONG';
   }
 }

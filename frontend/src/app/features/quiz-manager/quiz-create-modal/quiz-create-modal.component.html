@@ -1,7 +1,7 @@
 <div class="modal-backdrop" (click)="onBackdropClick($event)" (keydown)="onKeyPress($event)">
   <div class="modal-container">
     <div class="modal-header">
-      <h2>Új kvíz létrehozása</h2>
+      <h2>{{ 'QUIZ_MANAGER.CREATE_DIALOG.NEW_QUIZ' | translate }}</h2>
       <button class="close-btn" (click)="onClose()">
         <mat-icon>close</mat-icon>
       </button>
@@ -11,25 +11,25 @@
       <form class="quiz-form" (ngSubmit)="onSave()">
         <!-- Kvíz neve -->
         <div class="form-group">
-          <label for="quiz-name">Kvíz neve *</label>
+          <label for="quiz-name">{{ 'QUIZ_MANAGER.CREATE_DIALOG.NAME' | translate }} *</label>
           <input 
             id="quiz-name" 
             type="text" 
             [(ngModel)]="newQuiz.name" 
             name="name"
-            placeholder="Add meg a kvíz nevét"
+            [placeholder]="'QUIZ_MANAGER.CREATE_DIALOG.NAME_PLACEHOLDER' | translate"
             required>
         </div>
 
         <!-- Leírás -->
         <div class="form-group">
-          <label for="description">Leírás</label>
+          <label for="description">{{ 'QUIZ_MANAGER.CREATE_DIALOG.DESCRIPTION' | translate }}</label>
           <textarea 
             id="description" 
             [(ngModel)]="newQuiz.description" 
             name="description"
             rows="2"
-            placeholder="Rövid leírás a kvízről"></textarea>
+            [placeholder]="'QUIZ_MANAGER.CREATE_DIALOG.DESCRIPTION_PLACEHOLDER' | translate"></textarea>
         </div>
 
         <!-- Nehézségi szint és Láthatóság -->
@@ -90,10 +90,10 @@
         <!-- Műveletek -->
         <div class="modal-actions">
           <button type="button" class="cancel-btn" (click)="onClose()">
-            Mégse
+            {{ 'QUIZ_MANAGER.CREATE_DIALOG.CANCEL' | translate }}
           </button>
           <button type="submit" class="create-btn" [disabled]="isLoading || !newQuiz.name?.trim()">
-            Létrehozás
+            {{ 'QUIZ_MANAGER.CREATE_DIALOG.CREATE' | translate }}
           </button>
         </div>
       </form>
