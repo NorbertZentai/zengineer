@@ -85,7 +85,12 @@ jobs:
       - name: 📂 Checkout code
         uses: actions/checkout@v4
       
-      - name: 🔧 Environment Check
+      - name: �️ Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl
+      
+      - name: �🔧 Environment Check
         run: |
           echo "Checking Supabase environment configuration..."
           echo "SUPABASE_URL: ${SUPABASE_URL:-'Not set'}"
@@ -101,11 +106,11 @@ jobs:
         run: |
           echo "Starting full application stack..."
           cd infrastructure
-          docker-compose up -d --build
+          docker compose up -d --build
           sleep 60
           echo "Checking service status:"
-          docker-compose ps
-          docker-compose logs frontend
+          docker compose ps
+          docker compose logs frontend
 
       - name: 🩺 Health checks
         run: |
@@ -207,7 +212,7 @@ jobs:
         run: |
           echo "Stopping services..."
           cd infrastructure
-          docker-compose down -v || echo "Failed to stop services"
+          docker compose down -v || echo "Failed to stop services"
         if: always()
 
   smoke-tests:
