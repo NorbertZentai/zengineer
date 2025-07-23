@@ -19,7 +19,7 @@ export class NavbarComponent implements OnInit {
   unreadNotifications = 0;
   currentLanguage = 'hu';
   availableLanguages = ['hu', 'en'];
-  mobileMenuOpen = false;
+  isMobileMenuOpen = false;
   
   private themeService = inject(ThemeService);
   private ngZone = inject(NgZone);
@@ -126,14 +126,14 @@ export class NavbarComponent implements OnInit {
   }
 
   toggleMobileMenu() {
-    this.mobileMenuOpen = !this.mobileMenuOpen;
-    if (!this.mobileMenuOpen) {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+    if (!this.isMobileMenuOpen) {
       this.closeDropdowns();
     }
   }
 
   closeMobileMenu() {
-    this.mobileMenuOpen = false;
+    this.isMobileMenuOpen = false;
     this.closeDropdowns();
   }
 }

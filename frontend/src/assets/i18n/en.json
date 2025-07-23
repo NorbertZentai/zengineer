@@ -28,7 +28,9 @@
     "LOGOUT": "Logout",
     "LOGIN": "Login",
     "REGISTER": "Register",
-    "CONTACT": "Contact"
+    "CONTACT": "Contact",
+    "LANGUAGE": "Language",
+    "THEME": "Theme"
   },
   "LOGIN": {
     "TITLE": "Login",

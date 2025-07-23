@@ -28,7 +28,9 @@
     "LOGOUT": "Kijelentkezés",
     "LOGIN": "Bejelentkezés",
     "REGISTER": "Regisztráció",
-    "CONTACT": "Kapcsolat"
+    "CONTACT": "Kapcsolat",
+    "LANGUAGE": "Nyelv",
+    "THEME": "Téma"
   },
   "LOGIN": {
     "TITLE": "Bejelentkezés",
