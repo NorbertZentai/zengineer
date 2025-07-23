@@ -245,7 +245,7 @@ export class Login {
         });
         healthStatus = healthResponse.status;
         console.log('Health check status:', healthResponse.status);
-        console.log('Health check headers:', Object.fromEntries(healthResponse.headers.entries()));
+        // console.log('Health check headers:', Array.from(healthResponse.headers));
         
         if (healthResponse.ok) {
           const healthData = await healthResponse.text();
@@ -272,7 +272,7 @@ export class Login {
         });
         collectionsStatus = collectionsResponse.status;
         console.log('Collections status:', collectionsResponse.status);
-        console.log('Collections headers:', Object.fromEntries(collectionsResponse.headers.entries()));
+        // console.log('Collections headers:', Array.from(collectionsResponse.headers));
         
         if (collectionsResponse.ok) {
           const collectionsData = await collectionsResponse.json();
@@ -301,7 +301,7 @@ export class Login {
         });
         usersStatus = usersResponse.status;
         console.log('Users collection status:', usersResponse.status);
-        console.log('Users collection headers:', Object.fromEntries(usersResponse.headers.entries()));
+        // console.log('Users collection headers:', Array.from(usersResponse.headers));
         
         if (usersResponse.ok) {
           const usersData = await usersResponse.json();
@@ -337,7 +337,7 @@ export class Login {
         });
         registrationStatus = testRegisterResponse.status;
         console.log('Test registration status:', testRegisterResponse.status);
-        console.log('Test registration headers:', Object.fromEntries(testRegisterResponse.headers.entries()));
+        // console.log('Test registration headers:', Array.from(testRegisterResponse.headers));
         
         const registerResponseText = await testRegisterResponse.text();
         console.log('Test registration response:', registerResponseText);

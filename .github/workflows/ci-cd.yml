@@ -31,9 +31,8 @@ jobs:
       - name: 📦 Install dependencies
         run: |
           echo "Installing frontend dependencies..."
-          npm ci
-          # Install missing js-tokens dependency
-          npm install js-tokens
+          npm ci --legacy-peer-deps
+          echo "✅ Dependencies installed successfully"
       
       - name: 🔧 TypeScript check
         run: |
@@ -69,7 +68,7 @@ jobs:
         run: |
           echo "Building frontend Docker image with lenient configuration..."
           cd frontend
-          docker build -f Dockerfile.lenient -t zengineer-frontend:latest .
+          docker build -f Dockerfile.lenient -t zengineer-frontend:latest . --build-arg BUILDKIT_INLINE_CACHE=1
           echo "✅ Frontend Docker image built successfully"
       
       - name: 🔍 Verify Docker image
@@ -98,15 +97,15 @@ jobs:
           fi
           echo "✅ Environment variables are set"
       
-      
-      - name: � Start application with Docker Compose
+      - name: 🚀 Start application with Docker Compose
         run: |
           echo "Starting full application stack..."
           cd infrastructure
           docker-compose up -d --build
-          sleep 45
+          sleep 60
           echo "Checking service status:"
           docker-compose ps
+          docker-compose logs frontend
 
       - name: 🩺 Health checks
         run: |
@@ -137,9 +136,6 @@ jobs:
       - name: 🔐 Supabase Connection Test
         run: |
           echo "Testing Supabase connectivity..."
-          
-          # Install curl for API testing
-          curl --version || apt-get update && apt-get install -y curl
           
           # Test Supabase API endpoint
           response=$(curl -s -w "%{http_code}" \

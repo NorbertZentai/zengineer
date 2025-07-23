@@ -27,4 +27,4 @@ backend/pb_data/*.db-wal
 # Logs
 *.log
 
-.fake
+.fake.github/workflows/ci-cd-backup.yml
