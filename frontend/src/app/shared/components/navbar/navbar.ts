@@ -16,6 +16,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   authInitialized = false;
   showUserDropdown = false;
   showLanguageDropdown = false;
+  showCreateDropdown = false;
   unreadNotifications = 0;
   currentLanguage = 'hu';
   availableLanguages = ['hu', 'en'];
@@ -61,11 +62,13 @@ export class NavbarComponent implements OnInit, OnDestroy {
     const target = event.target as HTMLElement;
     const langAction = document.querySelector('.navbar-lang');
     const userAction = document.querySelector('.navbar-user');
+    const createAction = document.querySelector('.navbar-create');
     const dropdowns = document.querySelectorAll('.navbar-dropdown');
     // If click is outside any dropdown or action, close all
     if (
       (!langAction || !langAction.contains(target)) &&
       (!userAction || !userAction.contains(target)) &&
+      (!createAction || !createAction.contains(target)) &&
       !Array.from(dropdowns).some(dropdown => dropdown.contains(target))
     ) {
       this.ngZone.run(() => this.closeDropdowns());
@@ -73,7 +76,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   isLoggedIn(): boolean {
-    return this.authInitialized && this.auth.isAuthenticated();
+    return this.authInitialized && this.auth.getAuthenticationStatus();
+  }
+
+  // Tesztelési célú bejelentkezés
+  mockLogin() {
+    this.auth.mockLogin();
   }
 
   async logout() {
@@ -96,6 +104,15 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.showUserDropdown = !this.showUserDropdown;
     if (this.showUserDropdown) {
       this.showLanguageDropdown = false;
+      this.showCreateDropdown = false;
+    }
+  }
+
+  toggleCreateDropdown() {
+    this.showCreateDropdown = !this.showCreateDropdown;
+    if (this.showCreateDropdown) {
+      this.showUserDropdown = false;
+      this.showLanguageDropdown = false;
     }
   }
 
@@ -104,6 +121,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.showLanguageDropdown = !this.showLanguageDropdown;
     if (this.showLanguageDropdown) {
       this.showUserDropdown = false;
+      this.showCreateDropdown = false;
     }
     console.log('new state:', this.showLanguageDropdown);
   }
@@ -118,6 +136,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   closeDropdowns() {
     this.showUserDropdown = false;
     this.showLanguageDropdown = false;
+    this.showCreateDropdown = false;
   }
 
   changeLang(event: Event) {

@@ -90,9 +90,19 @@ export class AuthService {
     return this.initPromise;
   }
 
+  // Mock login for testing - sets user as authenticated
+  mockLogin() {
+    this.user.set({ id: 'mock-user', email: 'test@example.com' } as any);
+    this.isAuthenticated.set(true);
+  }
+
   // Kompatibilitási metódusok a régi API-val
   get currentUser() {
     return this.user();
+  }
+
+  getAuthenticationStatus() {
+    return this.isAuthenticated();
   }
 
   async login(email: string, password: string) {

@@ -60,6 +60,7 @@ body.light-theme {
   --primary-light: #{$primary-light};
   --primary-dark: #{$primary-dark};
   --primary-gradient: #{$gradient-primary};
+  --primary-rgb: 102, 126, 234; // RGB értékek a primary színhez
   
   --secondary: #{$secondary};
   --secondary-light: #{$secondary-light};
@@ -156,9 +157,10 @@ body.light-theme {
 body.dark-theme {
   // Primary Brand Colors (adjusted for dark)
   --primary: #{$primary-light};
-  --primary-light: #b8c7f6;
+  --primary-light: #f7c52d;
   --primary-dark: #{$primary};
   --primary-gradient: linear-gradient(135deg, #{$primary-light} 0%, #{$secondary-light} 100%);
+  --primary-rgb: 143, 167, 243; // RGB értékek a primary-light színhez dark theme-ben
   
   --secondary: #{$secondary-light};
   --secondary-light: #b896d1;

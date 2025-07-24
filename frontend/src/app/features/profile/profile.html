@@ -1,0 +1,124 @@
+<div class="profile-container">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>{{ 'PROFILE.LOADING' | translate }}</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <div class="error-icon">⚠️</div>
+    <p>{{ error }}</p>
+    <button (click)="loadUserStats()" class="retry-btn">
+      {{ 'PROFILE.RETRY' | translate }}
+    </button>
+  </div>
+
+  <!-- Profile Content -->
+  <div *ngIf="!loading && !error" class="profile-content">
+    <!-- Header -->
+    <div class="profile-header">
+      <div class="user-info">
+        <div class="avatar">
+          {{ user?.email?.charAt(0).toUpperCase() }}
+        </div>
+        <div class="user-details">
+          <h1>{{ 'PROFILE.TITLE' | translate }}</h1>
+          <p class="email">{{ user?.email }}</p>
+          <p class="member-since">
+            {{ 'PROFILE.MEMBER_SINCE' | translate }}: 
+            {{ user?.created_at | date:'MMM d, y' }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistics Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">📚</div>
+        <div class="stat-content">
+          <h3>{{ userStats.totalTests }}</h3>
+          <p>{{ 'PROFILE.TOTAL_TESTS' | translate }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">❓</div>
+        <div class="stat-content">
+          <h3>{{ userStats.totalQuestions }}</h3>
+          <p>{{ 'PROFILE.TOTAL_QUESTIONS' | translate }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div class="stat-content">
+          <h3>{{ userStats.averageScore | number:'1.1-1' }}%</h3>
+          <p>{{ 'PROFILE.AVERAGE_SCORE' | translate }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-content">
+          <h3 [class]="getScoreColor(userStats.bestScore)">{{ userStats.bestScore }}%</h3>
+          <p>{{ 'PROFILE.BEST_SCORE' | translate }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">⏱️</div>
+        <div class="stat-content">
+          <h3>{{ formatDuration(userStats.totalTimeSpent) }}</h3>
+          <p>{{ 'PROFILE.TIME_SPENT' | translate }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Test Types Distribution -->
+    <div *ngIf="userStats.testsByType && Object.keys(userStats.testsByType).length > 0" class="test-types-section">
+      <h2>{{ 'PROFILE.TEST_TYPES_DISTRIBUTION' | translate }}</h2>
+      <div class="test-types-grid">
+        <div *ngFor="let type of Object.keys(userStats.testsByType)" class="test-type-card">
+          <div class="test-type-name">{{ 'TEST_TYPES.' + type.toUpperCase() | translate }}</div>
+          <div class="test-type-count">{{ userStats.testsByType[type] }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Tests -->
+    <div *ngIf="userStats.recentTests && userStats.recentTests.length > 0" class="recent-tests-section">
+      <h2>{{ 'PROFILE.RECENT_TESTS' | translate }}</h2>
+      <div class="recent-tests-list">
+        <div *ngFor="let test of userStats.recentTests" class="recent-test-item">
+          <div class="test-info">
+            <h4>{{ test.quiz_name }}</h4>
+            <p class="test-meta">
+              {{ 'PROFILE.COMPLETED_ON' | translate }}: {{ test.completed_at | date:'short' }}
+            </p>
+          </div>
+          <div class="test-results">
+            <div class="score" [class]="getScoreColor(test.percentage)">
+              {{ test.percentage }}%
+            </div>
+            <div class="details">
+              <span>{{ test.correct_answers }}/{{ test.total_questions }}</span>
+              <span>{{ formatDuration(test.time_spent) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="userStats.totalTests === 0" class="empty-state">
+      <div class="empty-icon">📖</div>
+      <h3>{{ 'PROFILE.NO_TESTS_YET' | translate }}</h3>
+      <p>{{ 'PROFILE.START_TESTING_MESSAGE' | translate }}</p>
+      <button routerLink="/quiz-manager" class="start-testing-btn">
+        {{ 'PROFILE.START_TESTING' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

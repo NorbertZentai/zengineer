@@ -1,0 +1,145 @@
+<div class="library-container">
+  <!-- Header -->
+  <div class="library-header">
+    <h1>{{ 'LIBRARY.TITLE' | translate }}</h1>
+    <p>{{ 'LIBRARY.SUBTITLE' | translate }}</p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>{{ 'LIBRARY.LOADING' | translate }}</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <div class="error-icon">⚠️</div>
+    <p>{{ error }}</p>
+    <button (click)="loadPublicQuizzes()" class="retry-btn">
+      {{ 'LIBRARY.RETRY' | translate }}
+    </button>
+  </div>
+
+  <!-- Library Content -->
+  <div *ngIf="!loading && !error" class="library-content">
+    <!-- Filters -->
+    <div class="filters-section">
+      <div class="search-bar">
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          (input)="onSearchChange()"
+          [placeholder]="'LIBRARY.SEARCH_PLACEHOLDER' | translate"
+          class="search-input">
+        <div class="search-icon">🔍</div>
+      </div>
+
+      <div class="filter-controls">
+        <select 
+          [(ngModel)]="selectedCategory" 
+          (change)="onCategoryChange()"
+          class="filter-select">
+          <option value="">{{ 'LIBRARY.ALL_SUBJECTS' | translate }}</option>
+          <option *ngFor="let category of categories" [value]="category">
+            {{ category }}
+          </option>
+        </select>
+
+        <select 
+          [(ngModel)]="selectedLanguage" 
+          (change)="onLanguageChange()"
+          class="filter-select">
+          <option value="">{{ 'LIBRARY.ALL_LANGUAGES' | translate }}</option>
+          <option *ngFor="let language of languages" [value]="language">
+            {{ language }}
+          </option>
+        </select>
+
+        <button 
+          *ngIf="searchTerm || selectedCategory || selectedLanguage"
+          (click)="clearFilters()" 
+          class="clear-filters-btn">
+          {{ 'LIBRARY.CLEAR_FILTERS' | translate }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Results Info -->
+    <div class="results-info">
+      <p>
+        {{ 'LIBRARY.SHOWING_RESULTS' | translate: {count: filteredQuizzes.length, total: publicQuizzes.length} }}
+      </p>
+    </div>
+
+    <!-- Quiz Grid -->
+    <div *ngIf="filteredQuizzes.length > 0" class="quiz-grid">
+      <div *ngFor="let quiz of filteredQuizzes" class="quiz-card">
+        <div class="quiz-card-header">
+          <div class="quiz-color" [style.background-color]="quiz.color"></div>
+          <div class="quiz-info">
+            <h3>{{ quiz.name }}</h3>
+            <p class="quiz-description">{{ quiz.description }}</p>
+          </div>
+          <div class="quiz-actions">
+            <button 
+              (click)="copyQuizToMyLibrary(quiz)" 
+              class="copy-btn"
+              [title]="'LIBRARY.COPY_TO_MY_LIBRARY' | translate">
+              📋
+            </button>
+          </div>
+        </div>
+
+        <div class="quiz-details">
+          <div class="quiz-meta">
+            <span class="meta-item">
+              <span class="meta-icon">📚</span>
+              {{ quiz.cards?.length || 0 }} {{ 'LIBRARY.CARDS' | translate }}
+            </span>
+            <span class="meta-item" *ngIf="quiz.subject">
+              <span class="meta-icon">🏷️</span>
+              {{ quiz.subject }}
+            </span>
+            <span class="meta-item" *ngIf="quiz.language">
+              <span class="meta-icon">🌐</span>
+              {{ quiz.language }}
+            </span>
+            <span class="meta-item" *ngIf="quiz.difficulty_level">
+              <span class="meta-icon">⭐</span>
+              {{ 'LIBRARY.DIFFICULTY' | translate }}: {{ quiz.difficulty_level }}/5
+            </span>
+          </div>
+
+          <div class="quiz-tags" *ngIf="quiz.tags && quiz.tags.length > 0">
+            <span *ngFor="let tag of quiz.tags" class="tag">{{ tag }}</span>
+          </div>
+
+          <div class="quiz-footer">
+            <div class="quiz-author">
+              {{ 'LIBRARY.BY' | translate }}: {{ quiz.profiles?.username || quiz.profiles?.email }}
+            </div>
+            <div class="quiz-date">
+              {{ quiz.created_at | date:'MMM d, y' }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="filteredQuizzes.length === 0 && publicQuizzes.length > 0" class="empty-filtered-state">
+      <div class="empty-icon">🔍</div>
+      <h3>{{ 'LIBRARY.NO_RESULTS' | translate }}</h3>
+      <p>{{ 'LIBRARY.TRY_DIFFERENT_FILTERS' | translate }}</p>
+      <button (click)="clearFilters()" class="clear-filters-btn">
+        {{ 'LIBRARY.CLEAR_FILTERS' | translate }}
+      </button>
+    </div>
+
+    <div *ngIf="publicQuizzes.length === 0" class="empty-state">
+      <div class="empty-icon">📚</div>
+      <h3>{{ 'LIBRARY.NO_PUBLIC_QUIZZES' | translate }}</h3>
+      <p>{{ 'LIBRARY.NO_PUBLIC_QUIZZES_MESSAGE' | translate }}</p>
+    </div>
+  </div>
+</div>

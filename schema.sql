@@ -3,6 +3,42 @@
 -- Enable RLS (Row Level Security)
 ALTER DATABASE postgres SET "app.jwt_secret" TO 'your-jwt-secret';
 
+-- Profiles table to store additional user information
+CREATE TABLE profiles (
+  id uuid REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
+  username text UNIQUE,
+  email text,
+  created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- RLS policies for profiles
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view all profiles" ON profiles
+  FOR SELECT USING (true);
+
+CREATE POLICY "Users can update own profile" ON profiles
+  FOR UPDATE USING (auth.uid() = id);
+
+CREATE POLICY "Users can insert own profile" ON profiles
+  FOR INSERT WITH CHECK (auth.uid() = id);
+
+-- Function to automatically create profile when user signs up
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger AS $$
+BEGIN
+  INSERT INTO public.profiles (id, username, email)
+  VALUES (new.id, new.raw_user_meta_data->>'username', new.email);
+  RETURN new;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Trigger to automatically create profile
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+
 -- Users table (Supabase auth.users táblára hivatkozunk)
 -- Nincs külön users tábla, Supabase auth kezeli
 

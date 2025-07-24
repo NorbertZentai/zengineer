@@ -95,7 +95,7 @@
       }
 
       &.needs-improvement {
-        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        background: linear-gradient(135deg, #374151, #1f2937);
         color: white;
       }
 
@@ -271,7 +271,7 @@
     }
 
     &.needs-improvement::before {
-      background: linear-gradient(90deg, #3b82f6, #2563eb);
+      background: linear-gradient(90deg, #374151, #1f2937);
     }
 
     &:hover {
@@ -449,7 +449,7 @@
       }
 
       &.needs-improvement::before {
-        background: linear-gradient(180deg, #3b82f6, #2563eb);
+        background: linear-gradient(180deg, #374151, #1f2937);
       }
 
       .col-quiz {

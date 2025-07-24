@@ -46,6 +46,13 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   position: relative;
+  
+  // Fallback ha a gradient nem működik
+  @supports not (background-clip: text) {
+    color: var(--primary);
+    background: none;
+    -webkit-text-fill-color: unset;
+  }
 
   &::after {
     content: '';
@@ -170,7 +177,7 @@
 
   &:hover {
     color: var(--text-primary);
-    transform: scale(1.15);
+    transform: scale(1.25);
   }
 
   &:focus-visible {
@@ -180,7 +187,25 @@
 
   &:active {
     color: var(--primary);
-    transform: scale(1.05);
+    transform: scale(1.15);
+  }
+
+  // Create button special styling
+  &.navbar-create {
+    background: transparent;
+    color: var(--primary);
+    font-size: 1.1rem;
+    font-weight: bold;
+
+    &:hover {
+      color: var(--primary-dark);
+      transform: scale(1.25);
+    }
+
+    &:active {
+      color: var(--primary-dark);
+      transform: scale(1.15);
+    }
   }
 
   // Theme toggle special styling
@@ -229,6 +254,15 @@
     transition: all 0.2s ease;
     border-radius: 0;
     text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
 
     &:hover {
       background: var(--hover-bg);
@@ -589,6 +623,33 @@
         box-shadow: var(--shadow-md);
       }
     }
+
+    &--profile {
+      color: var(--text-secondary);
+      background: var(--bg-tertiary);
+      border-color: var(--border-primary);
+      gap: 8px;
+
+      &:hover {
+        color: var(--text-primary);
+        background: var(--hover-bg);
+        border-color: var(--border-secondary);
+        transform: translateY(-1px);
+      }
+    }
+
+    &--settings {
+      color: var(--text-muted);
+      background: var(--bg-tertiary);
+      border-color: var(--border-primary);
+      gap: 8px;
+
+      &:hover {
+        color: var(--text-secondary);
+        background: var(--bg-tertiary);
+        transform: none;
+      }
+    }
   }
 
   &__action-group {
@@ -710,6 +771,13 @@
   &__user-email {
     font-size: 0.85rem;
     color: var(--text-muted);
+  }
+
+  &__user-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
   }
 
   &__language-options {

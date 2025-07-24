@@ -1,10 +1,32 @@
 {
   "COMMON": {
-    "TITLE": "Üdv a Zengineer-ben!",
+    "TITLE": "Üdvözlünk a Zengineer-ben!",
     "LOGIN": "Bejelentkezés",
     "REGISTER": "Regisztráció",
     "LOGOUT": "Kijelentkezés",
     "CLOSE": "Bezárás"
+  },
+  "NAV": {
+    "DASHBOARD": "Irányítópult",
+    "QUIZ_MANAGER": "Kvíz kezelő",
+    "LIBRARY": "Könyvtár",
+    "ANALYTICS": "Analitika",
+    "ABOUT": "Rólunk",
+    "FEATURES": "Funkciók",
+    "PROFILE": "Profil",
+    "SETTINGS": "Beállítások",
+    "LOGOUT": "Kijelentkezés",
+    "LOGIN": "Bejelentkezés",
+    "REGISTER": "Regisztráció",
+    "CONTACT": "Kapcsolat",
+    "LANGUAGE": "Nyelv",
+    "THEME": "Téma",
+    "CREATE": {
+      "TITLE": "Létrehozás",
+      "NEW_QUIZ": "Új kvíz",
+      "NEW_PROJECT": "Új projekt",
+      "NEW_FOLDER": "Új mappa"
+    }
   },
   "ERRORS": {
     "REGISTRATION_FAILED": "A regisztráció sikertelen. Kérjük, próbálja újra.",
@@ -15,22 +37,6 @@
     "SERVER_ERROR": "Szerverhiba. Kérjük, próbálja később.",
     "LOGIN_FAILED": "A bejelentkezés sikertelen. Ellenőrizze az adatokat és próbálja újra.",
     "NETWORK_ERROR": "Hálózati hiba. Ellenőrizze a kapcsolatot és próbálja újra."
-  },
-  "NAV": {
-    "DASHBOARD": "Kezdőlap",
-    "QUIZ_MANAGER": "Kvízkezelő",
-    "LIBRARY": "Könyvtár",
-    "ANALYTICS": "Analitika",
-    "ABOUT": "Névjegy",
-    "FEATURES": "Funkciók",
-    "PROFILE": "Profil",
-    "SETTINGS": "Beállítások",
-    "LOGOUT": "Kijelentkezés",
-    "LOGIN": "Bejelentkezés",
-    "REGISTER": "Regisztráció",
-    "CONTACT": "Kapcsolat",
-    "LANGUAGE": "Nyelv",
-    "THEME": "Téma"
   },
   "LOGIN": {
     "TITLE": "Bejelentkezés",
@@ -355,6 +361,68 @@
     "LOGGED_IN_USER": "Bejelentkezett felhasználó",
     "RECENT_ACTIVITY": "Legutóbbi tevékenység",
     "STATISTICS": "Statisztikák",
-    "QUICK_ACTIONS": "Gyors műveletek"
+    "QUICK_ACTIONS": "Gyors műveletek",
+    "GOOD_MORNING": "Jó reggelt!",
+    "GOOD_AFTERNOON": "Jó délutánt!",
+    "GOOD_EVENING": "Jó estét!",
+    "LOADING": "Irányítópult betöltése...",
+    "MANAGE_QUIZZES": "Kvízek kezelése",
+    "BROWSE_LIBRARY": "Könyvtár böngészése",
+    "MY_QUIZZES": "Kvízeim",
+    "TESTS_THIS_WEEK": "Tesztek ezen a héten",
+    "AVERAGE_SCORE": "Átlagos eredmény",
+    "STUDY_STREAK": "Tanulási sorozat (napok)",
+    "RECENT_QUIZZES": "Legutóbbi kvízek",
+    "RECENT_TESTS": "Legutóbbi teszt eredmények",
+    "VIEW_ALL": "Összes megtekintése",
+    "CARDS": "kártya",
+    "NO_QUIZZES_YET": "Még nincsenek kvízek",
+    "CREATE_FIRST_QUIZ": "Hozd létre az első kvízedet",
+    "NO_TESTS_YET": "Még nem írtál tesztet",
+    "START_TESTING": "Kezdj tesztelni"
+  },
+  "PROFILE": {
+    "TITLE": "Profilom",
+    "LOADING": "Profil betöltése...",
+    "LOAD_ERROR": "Nem sikerült betölteni a profil adatokat",
+    "RETRY": "Újra",
+    "MEMBER_SINCE": "Tag",
+    "TOTAL_TESTS": "Összes teszt",
+    "TOTAL_QUESTIONS": "Összes kérdés",
+    "AVERAGE_SCORE": "Átlagos eredmény",
+    "BEST_SCORE": "Legjobb eredmény",
+    "TIME_SPENT": "Eltöltött idő",
+    "TEST_TYPES_DISTRIBUTION": "Teszt típusok megoszlása",
+    "RECENT_TESTS": "Legutóbbi tesztek",
+    "COMPLETED_ON": "Teljesítve",
+    "NO_TESTS_YET": "Még nincsenek teljesített tesztek",
+    "START_TESTING_MESSAGE": "Kezdj tesztelni, hogy itt lásd a statisztikáidat",
+    "START_TESTING": "Kezdj tesztelni"
+  },
+  "LIBRARY": {
+    "TITLE": "Nyilvános könyvtár",
+    "SUBTITLE": "Fedezd fel és másold a közösség által megosztott kvízeket",
+    "LOADING": "Nyilvános kvízek betöltése...",
+    "LOAD_ERROR": "Nem sikerült betölteni a nyilvános kvízeket",
+    "RETRY": "Újra",
+    "SEARCH_PLACEHOLDER": "Kvízek keresése...",
+    "ALL_SUBJECTS": "Minden témakör",
+    "ALL_LANGUAGES": "Minden nyelv",
+    "CLEAR_FILTERS": "Szűrők törlése",
+    "SHOWING_RESULTS": "{{count}} kvíz megjelenítése a(z) {{total}}-ból/ből",
+    "COPY_TO_MY_LIBRARY": "Másolás a könyvtáramba",
+    "CARDS": "kártya",
+    "DIFFICULTY": "Nehézség",
+    "BY": "Készítette",
+    "NO_RESULTS": "Nem találhatók kvízek",
+    "TRY_DIFFERENT_FILTERS": "Próbálj más keresési szűrőket",
+    "NO_PUBLIC_QUIZZES": "Nincsenek elérhető nyilvános kvízek",
+    "NO_PUBLIC_QUIZZES_MESSAGE": "Légy az első, aki megoszt egy kvízt a közösséggel!"
+  },
+  "TEST_TYPES": {
+    "FLASHCARD": "Kártya teszt",
+    "MULTIPLE_CHOICE": "Feleletválasztós",
+    "WRITTEN": "Írásbeli",
+    "MIXED": "Vegyes"
   }
 }

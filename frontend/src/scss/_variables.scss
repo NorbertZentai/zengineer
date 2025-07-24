@@ -1,6 +1,10 @@
-// ==========================================================================// =============================================================================
-// COLORS - MODERN DARK THEME PALETTE
-// ========// =============================================================================
+// =============================================================================
+// ZENGINEER GLOBAL SCSS VARIABLES
+// =============================================================================
+// Ez a fájl tartalmazza a projekt összes globális változóját.
+// Mindegyik színt, méret, árnyék és egyéb dizájn tokent itt definiálunk.
+
+// =============================================================================
 // SHADOWS - MODERN ELEVATION SYSTEM
 // =============================================================================
 // Light theme shadows
@@ -51,14 +55,14 @@ $dark-border-light: #373e47;     // Lighter borders for focus statesR GLOBAL SCS
 // Mindegyik színt, méret, árnyék és egyéb dizájn tokent itt definiálunk.
 
 // =============================================================================
-// COLORS - PRIMARY PALETTE
+// COLORS - PRIMARY PALETTE (ORIGINAL BLUE)
 // =============================================================================
-$primary: #667eea;
-$primary-light: #8fa7f3;
-$primary-dark: #5a6fd8;
-$primary-hover: #7a8eec;
+$primary: #667eea;        // Eredeti kék - visszaállítva
+$primary-light: #8fa7f3;  // Világos kék
+$primary-dark: #5a6fd8;   // Sötét kék
+$primary-hover: #7a8eec;  // Hover állapot
 
-$secondary: #764ba2;
+$secondary: #764ba2;      // Eredeti lila
 $secondary-light: #9d72c4;
 $secondary-dark: #5a3679;
 
@@ -93,9 +97,9 @@ $light-bg-card: #ffffff;
 $light-bg-elevated: #ffffff;
 
 $light-text-primary: #111827;
-$light-text-secondary: #374151;
-$light-text-tertiary: #6b7280;
-$light-text-muted: #9ca3af;
+$light-text-secondary: #6b7280;
+$light-text-tertiary: #9ca3af;
+$light-text-muted: #d1d5db;
 $light-text-inverse: #ffffff;
 
 $light-border-primary: #e5e7eb;

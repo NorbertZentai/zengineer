@@ -19,6 +19,16 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'profile',
+    loadComponent: () => import('./features/profile/profile').then(m => m.ProfilePage),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'library',
+    loadComponent: () => import('./features/library/library').then(m => m.LibraryPage),
+    canActivate: [authGuard],
+  },
+  {
     path: 'quiz-manager',
     loadChildren: () => import('./features/quiz-manager/quiz-manager.module').then(m => m.QuizManagerModule),
     canActivate: [authGuard],

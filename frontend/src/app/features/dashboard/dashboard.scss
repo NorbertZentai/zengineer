@@ -5,15 +5,15 @@
   min-height: 100vh;
   background: var(--bg-primary);
   background-image: 
-    radial-gradient(circle at 20% 20%, rgba(102, 126, 234, 0.05) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.05) 0%, transparent 50%);
+    radial-gradient(circle at 20% 20%, rgba(102, 126, 234, 0.02) 0%, transparent 60%),
+    radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.02) 0%, transparent 60%);
 }
 
 .dashboard-header {
   background: var(--bg-card);
   border-bottom: 1px solid var(--border-primary);
   padding: $spacing-6 $spacing-8;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 
   .header-content {
     max-width: 1200px;
@@ -31,7 +31,7 @@
         color: var(--text-primary);
         font-size: $font-size-3xl;
         font-weight: $font-weight-bold;
-        background: linear-gradient(135deg, var(--text-primary), var(--primary));
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
         background-clip: text;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
@@ -41,6 +41,7 @@
         margin: 0;
         color: var(--text-secondary);
         font-size: $font-size-base;
+        opacity: 0.8;
       }
     }
 
@@ -55,23 +56,46 @@
         text-decoration: none;
         border-radius: $radius-lg;
         padding: $spacing-3 $spacing-5;
-        font-weight: $font-weight-semibold;
-        transition: all 0.2s ease;
+        font-weight: $font-weight-medium;
+        transition: all 0.3s ease;
+        border: 1px solid transparent;
 
         &.primary {
-          background: linear-gradient(135deg, var(--primary), var(--secondary));
+          background: linear-gradient(135deg, #374151, #1f2937);
           color: white;
+          box-shadow: 0 2px 8px rgba(55, 65, 81, 0.25);
 
           &:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(55, 65, 81, 0.35);
           }
         }
 
-        mat-icon {
-          font-size: 1.25rem;
+        &.secondary {
+          background: rgba(var(--primary-rgb), 0.03);
+          color: var(--primary-600);
+          border-color: rgba(var(--primary-rgb), 0.15);
+
+          &:hover {
+            background: rgba(var(--primary-rgb), 0.08);
+            border-color: rgba(var(--primary-rgb), 0.25);
+            color: var(--primary-700);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(var(--primary-rgb), 0.12);
+          }
+
+          &:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(var(--primary-rgb), 0.08);
+          }
+        }        mat-icon {
+          font-size: 1.2rem;
           width: auto;
           height: auto;
+        }
+        &:focus-visible {
+          outline: 2px solid var(--primary-400);
+          outline-offset: 2px;
         }
       }
     }
@@ -79,7 +103,134 @@
 }
 
 .dashboard-content {
-  padding: 0; // Test history component will handle its own styling
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: $spacing-6 $spacing-8;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-8;
+
+  @media (max-width: 768px) {
+    padding: $spacing-4;
+    gap: $spacing-6;
+  }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  gap: $spacing-4;
+
+  .spinner {
+    width: 2rem;
+    height: 2rem;
+    border: 3px solid rgba(55, 65, 81, 0.1);
+    border-top: 3px solid #374151;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  p {
+    color: var(--text-secondary);
+    font-size: $font-size-base;
+    opacity: 0.8;
+  }
+}
+
+.test-history-section {
+  background: var(--bg-card);
+  border-radius: $radius-lg;
+  padding: $spacing-6;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-primary);
+
+  .section-header {
+    margin-bottom: $spacing-4;
+
+    h2 {
+      margin: 0;
+      font-size: $font-size-xl;
+      font-weight: $font-weight-semibold;
+      color: var(--text-primary);
+    }
+  }
+
+  // Finomabb stílusok a teszt előzményekhez
+  .test-history-item {
+    background: rgba(var(--primary-rgb), 0.01);
+    border-radius: $radius-md;
+    padding: $spacing-4;
+    margin-bottom: $spacing-3;
+    border: 1px solid rgba(var(--primary-rgb), 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(0);
+
+    &:hover {
+      background: rgba(var(--primary-rgb), 0.03);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.08);
+      border-color: rgba(var(--primary-rgb), 0.15);
+    }
+
+    &:active {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 6px rgba(var(--primary-rgb), 0.06);
+    }
+
+    .test-name {
+      font-weight: $font-weight-medium;
+      color: var(--text-primary);
+      margin-bottom: $spacing-1;
+    }
+
+    .test-meta {
+      font-size: $font-size-sm;
+      color: var(--text-secondary);
+      opacity: 0.8;
+    }
+
+    .test-score {
+      font-weight: $font-weight-semibold;
+      font-size: $font-size-lg;
+
+      &.excellent { color: #10b981; }
+      &.good { color: #374151; }
+      &.average { color: #f59e0b; }
+      &.poor { color: #ef4444; }
+    }
+  }
+}
+
+@keyframes spin {
+  0% { 
+    transform: rotate(0deg); 
+  }
+  100% { 
+    transform: rotate(360deg); 
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Fade-in animáció a dashboard elemekhez
+.dashboard-header {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.dashboard-content {
+  animation: fadeInUp 0.6s ease-out 0.1s both;
 }
 
 // Legacy dashboard styles for backward compatibility
@@ -111,12 +262,27 @@
 
       .quick-actions {
         width: 100%;
+        flex-direction: column;
 
         .action-btn {
-          flex: 1;
           justify-content: center;
+          padding: $spacing-4 $spacing-6;
+          
+          &:not(:last-child) {
+            margin-bottom: $spacing-2;
+          }
         }
       }
     }
+  }
+
+  .dashboard-content {
+    padding: $spacing-3;
+    gap: $spacing-4;
+  }
+
+  .test-history-section {
+    padding: $spacing-4;
+    margin: 0 $spacing-2;
   }
 }

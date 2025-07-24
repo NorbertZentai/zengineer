@@ -30,7 +30,13 @@
     "REGISTER": "Register",
     "CONTACT": "Contact",
     "LANGUAGE": "Language",
-    "THEME": "Theme"
+    "THEME": "Theme",
+    "CREATE": {
+      "TITLE": "Create",
+      "NEW_QUIZ": "New Quiz",
+      "NEW_PROJECT": "New Project",
+      "NEW_FOLDER": "New Folder"
+    }
   },
   "LOGIN": {
     "TITLE": "Login",
@@ -355,6 +361,68 @@
     "LOGGED_IN_USER": "Logged in user",
     "RECENT_ACTIVITY": "Recent activity",
     "STATISTICS": "Statistics",
-    "QUICK_ACTIONS": "Quick actions"
+    "QUICK_ACTIONS": "Quick actions",
+    "GOOD_MORNING": "Good morning!",
+    "GOOD_AFTERNOON": "Good afternoon!",
+    "GOOD_EVENING": "Good evening!",
+    "LOADING": "Loading dashboard...",
+    "MANAGE_QUIZZES": "Manage Quizzes",
+    "BROWSE_LIBRARY": "Browse Library",
+    "MY_QUIZZES": "My Quizzes",
+    "TESTS_THIS_WEEK": "Tests This Week",
+    "AVERAGE_SCORE": "Average Score",
+    "STUDY_STREAK": "Study Streak Days",
+    "RECENT_QUIZZES": "Recent Quizzes",
+    "RECENT_TESTS": "Recent Test Results",
+    "VIEW_ALL": "View All",
+    "CARDS": "cards",
+    "NO_QUIZZES_YET": "No quizzes yet",
+    "CREATE_FIRST_QUIZ": "Create your first quiz",
+    "NO_TESTS_YET": "No tests taken yet",
+    "START_TESTING": "Start testing"
+  },
+  "PROFILE": {
+    "TITLE": "My Profile",
+    "LOADING": "Loading profile...",
+    "LOAD_ERROR": "Failed to load profile data",
+    "RETRY": "Retry",
+    "MEMBER_SINCE": "Member since",
+    "TOTAL_TESTS": "Total Tests",
+    "TOTAL_QUESTIONS": "Total Questions",
+    "AVERAGE_SCORE": "Average Score",
+    "BEST_SCORE": "Best Score",
+    "TIME_SPENT": "Time Spent",
+    "TEST_TYPES_DISTRIBUTION": "Test Types Distribution",
+    "RECENT_TESTS": "Recent Tests",
+    "COMPLETED_ON": "Completed on",
+    "NO_TESTS_YET": "No tests completed yet",
+    "START_TESTING_MESSAGE": "Start taking tests to see your statistics here",
+    "START_TESTING": "Start Testing"
+  },
+  "LIBRARY": {
+    "TITLE": "Public Library",
+    "SUBTITLE": "Discover and copy quizzes shared by the community",
+    "LOADING": "Loading public quizzes...",
+    "LOAD_ERROR": "Failed to load public quizzes",
+    "RETRY": "Retry",
+    "SEARCH_PLACEHOLDER": "Search quizzes...",
+    "ALL_SUBJECTS": "All Subjects",
+    "ALL_LANGUAGES": "All Languages",
+    "CLEAR_FILTERS": "Clear Filters",
+    "SHOWING_RESULTS": "Showing {{count}} of {{total}} quizzes",
+    "COPY_TO_MY_LIBRARY": "Copy to My Library",
+    "CARDS": "cards",
+    "DIFFICULTY": "Difficulty",
+    "BY": "By",
+    "NO_RESULTS": "No quizzes found",
+    "TRY_DIFFERENT_FILTERS": "Try adjusting your search filters",
+    "NO_PUBLIC_QUIZZES": "No public quizzes available",
+    "NO_PUBLIC_QUIZZES_MESSAGE": "Be the first to share a quiz with the community!"
+  },
+  "TEST_TYPES": {
+    "FLASHCARD": "Flashcard",
+    "MULTIPLE_CHOICE": "Multiple Choice", 
+    "WRITTEN": "Written",
+    "MIXED": "Mixed"
   }
 }
