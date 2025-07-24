@@ -1,13 +1,49 @@
-// === QUIZ FILTER MODERN DIZÁJN (FORCED OVERRIDE) ===
-// A filter SCSS-t közvetlenül ide másolom, nem @import-tal, hogy ne ütközzön az @use szabályokkal.
 // =============================================================================
 // ZENGINEER QUIZ MANAGER - MAIN STYLES
 // =============================================================================
 
-// Import all our SCSS modules using modern @use syntax
+// Import all our SCSS modules using modern @use syntax (MUST BE FIRST!)
 @use 'scss/variables' as *;
 @use 'scss/mixins' as *;
 @use 'scss/utilities' as *;
+
+// === GLOBAL MOBILE ANTI-SCROLL SETTINGS ===
+// Disable horizontal scrolling and ensure responsive behavior across all pages
+html, body {
+  overflow-x: hidden; // Prevent horizontal scrolling completely
+  max-width: 100vw; // Ensure content never exceeds viewport width
+  position: relative; // Establish containing block
+}
+
+// Prevent touch-based horizontal scrolling on mobile devices
+@media (max-width: 767px) {
+  html, body {
+    touch-action: pan-y pinch-zoom; // Allow only vertical panning and pinch zoom
+    overscroll-behavior-x: none; // Prevent horizontal overscroll bouncing
+  }
+  
+  // Ensure all containers respect viewport boundaries
+  *, *::before, *::after {
+    max-width: 100vw;
+    box-sizing: border-box;
+  }
+  
+  // Prevent wide elements from causing horizontal overflow
+  img, video, iframe, canvas, svg {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+  
+  // Ensure text doesn't break out of containers
+  p, div, span, h1, h2, h3, h4, h5, h6 {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+}
+
+// === QUIZ FILTER MODERN DIZÁJN (FORCED OVERRIDE) ===
+// A filter SCSS-t közvetlenül ide másolom, nem @import-tal, hogy ne ütközzön az @use szabályokkal.
 
 /* Universal Theme System for Zengineer Quiz Manager */
 

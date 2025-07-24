@@ -1,0 +1,137 @@
+<!-- Desktop Navbar (768px+) -->
+<div class="navbar-desktop">
+  <nav class="navbar">
+    <a class="navbar-logo" routerLink="/">Zengineer</a>
+    <div class="navbar-menu">
+      <a routerLink="/dashboard" routerLinkActive="active">{{ 'NAV.DASHBOARD' | translate }}</a>
+      <a routerLink="/quiz-manager" routerLinkActive="active">{{ 'NAV.QUIZ_MANAGER' | translate }}</a>
+      <a routerLink="/library" routerLinkActive="active">{{ 'NAV.LIBRARY' | translate }}</a>
+      <a routerLink="/analytics" routerLinkActive="active">{{ 'NAV.ANALYTICS' | translate }}</a>
+    </div>
+    <div class="navbar-actions">
+      <!-- Theme Toggle -->
+      <button class="navbar-action navbar-theme" (click)="toggleTheme()" aria-label="Toggle theme">
+        <span *ngIf="isDarkMode(); else light">☀️</span>
+        <ng-template #light>🌙</ng-template>
+      </button>
+
+      <!-- Language Selector -->
+      <div class="navbar-action navbar-lang" (click)="toggleLanguage()" aria-label="Select language">
+        🌐
+        <div class="navbar-dropdown" *ngIf="showLanguageDropdown">
+          <button *ngFor="let lang of availableLanguages" (click)="$event.stopPropagation(); selectLanguage(lang)" [class.active]="currentLanguage === lang">
+            {{ lang | uppercase }}
+          </button>
+        </div>
+      </div>
+
+      <!-- User Account / Auth -->
+      <div class="navbar-action navbar-user" (click)="toggleUserDropdown()" aria-label="Account">
+        👤
+        <div class="navbar-dropdown" *ngIf="showUserDropdown">
+          <a *ngIf="!isLoggedIn()" routerLink="/login" (click)="closeDropdowns()">{{ 'NAV.LOGIN' | translate }}</a>
+          <a *ngIf="!isLoggedIn()" routerLink="/register" (click)="closeDropdowns()">{{ 'NAV.REGISTER' | translate }}</a>
+          <button *ngIf="isLoggedIn()" (click)="logout()">{{ 'NAV.LOGOUT' | translate }}</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+</div>
+
+<!-- Mobile Navbar (<768px) -->
+<div class="navbar-mobile">
+  <nav class="mobile-navbar" [class.mobile-navbar--open]="isMobileMenuOpen">
+    <div class="mobile-navbar__header">
+      <a routerLink="/" class="mobile-navbar__logo" (click)="closeMobileMenu()">Zengineer</a>
+
+      <button class="mobile-navbar__toggle" (click)="toggleMobileMenu()" aria-label="Toggle mobile menu">
+        <div class="mobile-navbar__hamburger">
+          <span class="mobile-navbar__hamburger-line"></span>
+          <span class="mobile-navbar__hamburger-line"></span>
+          <span class="mobile-navbar__hamburger-line"></span>
+        </div>
+      </button>
+    </div>
+
+    <!-- Mobile Slide-out Menu -->
+    <div class="mobile-navbar__menu" [class.mobile-navbar__menu--open]="isMobileMenuOpen">
+      <div class="mobile-navbar__overlay" (click)="closeMobileMenu()"></div>
+      <div class="mobile-navbar__content">
+        <!-- Mobile Header -->
+        <div class="mobile-navbar__menu-header">
+          <span>Zengineer</span>
+          <button class="mobile-navbar__close" (click)="closeMobileMenu()" aria-label="Close menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Mobile Navigation Links -->
+        <div class="mobile-navbar__links">
+          <a routerLink="/dashboard" routerLinkActive="mobile-navbar__link--active" class="mobile-navbar__link" (click)="closeMobileMenu()">
+            {{ 'NAV.DASHBOARD' | translate }}
+          </a>
+          <a routerLink="/quiz-manager" routerLinkActive="mobile-navbar__link--active" class="mobile-navbar__link" (click)="closeMobileMenu()">
+            {{ 'NAV.QUIZ_MANAGER' | translate }}
+          </a>
+          <a routerLink="/library" routerLinkActive="mobile-navbar__link--active" class="mobile-navbar__link" (click)="closeMobileMenu()">
+            {{ 'NAV.LIBRARY' | translate }}
+          </a>
+          <a routerLink="/analytics" routerLinkActive="mobile-navbar__link--active" class="mobile-navbar__link" (click)="closeMobileMenu()">
+            {{ 'NAV.ANALYTICS' | translate }}
+          </a>
+        </div>
+
+        <!-- Mobile Auth Section -->
+        <div class="mobile-navbar__actions">
+          <div *ngIf="!isLoggedIn(); else mobileLoggedIn" class="mobile-navbar__auth-actions">
+            <a routerLink="/login" class="mobile-navbar__auth-btn mobile-navbar__auth-btn--login" (click)="closeMobileMenu()">
+              {{ 'NAV.LOGIN' | translate }}
+            </a>
+            <a routerLink="/register" class="mobile-navbar__auth-btn mobile-navbar__auth-btn--register" (click)="closeMobileMenu()">
+              {{ 'NAV.REGISTER' | translate }}
+            </a>
+          </div>
+          
+          <ng-template #mobileLoggedIn>
+            <div class="mobile-navbar__user-info">
+              <div class="mobile-navbar__user-details">
+                <span class="mobile-navbar__user-name">Felhasználó</span>
+                <span class="mobile-navbar__user-email">user@example.com</span>
+              </div>
+              <button class="mobile-navbar__auth-btn mobile-navbar__auth-btn--logout" (click)="logout()">
+                {{ 'NAV.LOGOUT' | translate }}
+              </button>
+            </div>
+          </ng-template>
+        </div>
+
+        <!-- Mobile Settings -->
+        <div class="mobile-navbar__action-group">
+          <span class="mobile-navbar__action-label">Beállítások</span>
+          
+          <button class="mobile-navbar__action-btn" [class.mobile-navbar__action-btn--active]="isDarkMode()" (click)="toggleTheme()">
+            <span class="emoji" *ngIf="isDarkMode(); else lightIcon">☀️</span>
+            <ng-template #lightIcon><span class="emoji">🌙</span></ng-template>
+            <span>{{ isDarkMode() ? 'Light Mode' : 'Dark Mode' }}</span>
+          </button>
+          
+          <button class="mobile-navbar__action-btn" [class.mobile-navbar__action-btn--active]="showLanguageDropdown" (click)="toggleLanguage()">
+            <span class="emoji">🌐</span>
+            <span>{{ currentLanguage | uppercase }}</span>
+            <div class="mobile-navbar__language-options" *ngIf="showLanguageDropdown">
+              <button *ngFor="let lang of availableLanguages" 
+                      (click)="$event.stopPropagation(); selectLanguage(lang)" 
+                      [class.active]="currentLanguage === lang"
+                      class="mobile-navbar__language-option">
+                {{ lang | uppercase }}
+              </button>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+</div>

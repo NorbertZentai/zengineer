@@ -1,5 +1,6 @@
+<app-navbar />
+
 <div *ngIf="translationsLoaded; else loadingTemplate">
-  <app-navbar />
   <router-outlet />
   <app-toast-notification />
 </div>

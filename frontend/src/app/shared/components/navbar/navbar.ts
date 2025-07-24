@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, computed, NgZone } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, computed, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -12,7 +12,7 @@ import { ThemeService } from '../../../core/services/theme.service';
   templateUrl: './navbar.html',
   styleUrls: ['./navbar.scss']
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent implements OnInit, OnDestroy {
   authInitialized = false;
   showUserDropdown = false;
   showLanguageDropdown = false;
@@ -27,7 +27,6 @@ export class NavbarComponent implements OnInit {
   // Computed properties for theme
   public currentTheme = computed(() => this.themeService.getCurrentTheme());
   public isDarkTheme = computed(() => this.themeService.isDarkTheme());
-  public isDarkMode = computed(() => this.themeService.isDarkTheme());
 
   private documentClickHandler: any;
 
@@ -53,6 +52,9 @@ export class NavbarComponent implements OnInit {
 
   ngOnDestroy(): void {
     document.removeEventListener('click', this.documentClickHandler);
+    
+    // Restore body scroll when component is destroyed
+    document.body.style.overflow = '';
   }
 
   handleDocumentClick(event: MouseEvent) {
@@ -98,10 +100,12 @@ export class NavbarComponent implements OnInit {
   }
 
   toggleLanguage() {
+    console.log('toggleLanguage called, current state:', this.showLanguageDropdown);
     this.showLanguageDropdown = !this.showLanguageDropdown;
     if (this.showLanguageDropdown) {
       this.showUserDropdown = false;
     }
+    console.log('new state:', this.showLanguageDropdown);
   }
 
   selectLanguage(lang: string) {
@@ -129,11 +133,24 @@ export class NavbarComponent implements OnInit {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
     if (!this.isMobileMenuOpen) {
       this.closeDropdowns();
+      // Restore body scroll
+      document.body.style.overflow = '';
+    } else {
+      // Prevent body scroll when menu is open
+      document.body.style.overflow = 'hidden';
     }
   }
 
   closeMobileMenu() {
     this.isMobileMenuOpen = false;
     this.closeDropdowns();
+    
+    // Ensure body scroll is restored when menu closes
+    document.body.style.overflow = '';
+  }
+
+  // Mobile theme check method for template
+  isDarkMode() {
+    return this.themeService.isDarkTheme();
   }
 }

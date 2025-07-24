@@ -1,6 +1,22 @@
 @use '../scss/variables' as *;
 @use '../scss/mixins' as *;
 
+// Prevent horizontal scroll at app level
+:host {
+  display: block;
+  overflow-x: hidden;
+  max-width: 100vw;
+  position: relative;
+}
+
+// Mobile anti-scroll enforcement
+@media (max-width: 767px) {
+  :host {
+    touch-action: pan-y pinch-zoom;
+    overscroll-behavior-x: none;
+  }
+}
+
 .loading-container {
   @include flex-column-center;
   height: 100vh;
