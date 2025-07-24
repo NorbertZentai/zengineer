@@ -281,6 +281,17 @@
         
         <!-- Card Front -->
         <div class="card-face card-front">
+          <!-- Card performance indicator -->
+          <div class="card-performance" *ngIf="getCardPerformance(card.id!)">
+            <div class="performance-badge" [class]="getCardPerformanceClass(card.id!)">
+              <mat-icon>{{ getCardPerformanceIcon(card.id!) }}</mat-icon>
+              <span>{{ getCardSuccessRate(card.id!) }}%</span>
+            </div>
+            <div class="performance-stats">
+              <span class="attempts">{{ getCardPerformance(card.id!)?.total_attempts || 0 }} {{ 'TEST.PERFORMANCE.ATTEMPTS' | translate }}</span>
+            </div>
+          </div>
+          
           <!-- Card actions jobb felső sarok -->
           <div class="card-actions" (click)="$event.stopPropagation()">
             <button class="action-btn edit" (click)="editCard(card)" title="Szerkesztés">

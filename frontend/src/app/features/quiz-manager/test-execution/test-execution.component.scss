@@ -322,7 +322,14 @@
     }
   }
 
-  .hint-btn {
+  .question-buttons {
+    display: flex;
+    align-items: center;
+    gap: $spacing-3;
+  }
+
+  .hint-btn,
+  .solution-btn {
     display: flex;
     align-items: center;
     gap: $spacing-2;
@@ -336,9 +343,20 @@
 
     &:hover,
     &.active {
-      background: #fef3c7;
       border-color: #f59e0b;
       color: #d97706;
+    }
+
+    &.hint-btn:hover,
+    &.hint-btn.active {
+      background: #fef3c7;
+    }
+
+    &.solution-btn:hover,
+    &.solution-btn.active {
+      background: #dcfce7;
+      border-color: #16a34a;
+      color: #15803d;
     }
 
     mat-icon {
@@ -385,6 +403,59 @@
       margin: 0;
       color: #92400e;
       line-height: 1.5;
+    }
+  }
+}
+
+.solution-container {
+  margin-bottom: $spacing-6;
+
+  .solution-content {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-3;
+    background: #dcfce7;
+    border: 1px solid #16a34a;
+    border-radius: $radius-lg;
+    padding: $spacing-4;
+
+    mat-icon {
+      color: #15803d;
+      font-size: 1.25rem;
+      width: auto;
+      height: auto;
+      margin-top: 2px;
+    }
+
+    .solution-text {
+      flex: 1;
+
+      h4 {
+        margin: 0 0 $spacing-2 0;
+        color: #15803d;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+      }
+
+      .solution-answer {
+        margin: 0 0 $spacing-2 0;
+        color: #14532d;
+        font-weight: 600;
+        font-size: 1.1rem;
+        line-height: 1.4;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        max-width: 100%;
+      }
+
+      .solution-warning {
+        margin: 0;
+        color: #16a34a;
+        font-size: 0.75rem;
+        font-style: italic;
+      }
     }
   }
 }
@@ -462,6 +533,9 @@
           font-size: $font-size-xl;
           font-weight: $font-weight-medium;
           line-height: 1.4;
+          white-space: pre-wrap;
+          word-wrap: break-word;
+          max-width: 100%;
         }
       }
     }
@@ -608,6 +682,9 @@
       color: var(--text-primary);
       font-size: $font-size-base;
       line-height: 1.5;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      text-align: left;
     }
   }
 }

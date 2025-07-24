@@ -8,7 +8,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { QuizService, Quiz, QuizCard } from '../../../core/services/quiz.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { TestService, TestConfiguration } from '../../../core/services/test.service';
+import { TestService, TestConfiguration, CardPerformance } from '../../../core/services/test.service';
 import { TestConfigModalComponent } from '../test-config-modal/test-config-modal.component';
 import { environment } from '../../../../environments/environment';
 
@@ -64,6 +64,7 @@ export class QuizDetailsComponent implements OnInit {
   
   // Test-related properties
   showTestConfig = false;
+  cardPerformance: CardPerformance[] = [];
   
   // Színpaletta
   colorPalette = [
@@ -115,6 +116,9 @@ export class QuizDetailsComponent implements OnInit {
       // Betöltjük a kvízt és a kártyákat
       this.quiz = await this.quizService.getQuizById(quizId);
       this.cards = await this.quizService.getQuizCards(quizId);
+      
+      // Kártyák teljesítményének betöltése
+      this.cardPerformance = await this.testService.getCardPerformance(quizId);
       
       // Inicializáljuk az edit form-ot a kvíz adataival
       if (this.quiz) {
@@ -501,5 +505,32 @@ export class QuizDetailsComponent implements OnInit {
       this.isLoading = false;
       this.showTestConfig = false;
     }
+  }
+
+  // Card performance methods
+  getCardPerformance(cardId: string): CardPerformance | null {
+    return this.cardPerformance.find(p => p.card_id === cardId) || null;
+  }
+
+  getCardSuccessRate(cardId: string): number {
+    const performance = this.getCardPerformance(cardId);
+    if (!performance || performance.total_attempts === 0) return 0;
+    return Math.round((performance.correct_count / performance.total_attempts) * 100);
+  }
+
+  getCardPerformanceClass(cardId: string): string {
+    const successRate = this.getCardSuccessRate(cardId);
+    if (successRate >= 80) return 'excellent';
+    if (successRate >= 60) return 'good';
+    if (successRate > 0) return 'needs-improvement';
+    return 'untested';
+  }
+
+  getCardPerformanceIcon(cardId: string): string {
+    const successRate = this.getCardSuccessRate(cardId);
+    if (successRate >= 80) return 'emoji_events';
+    if (successRate >= 60) return 'thumb_up';
+    if (successRate > 0) return 'trending_up';
+    return 'help_outline';
   }
 }

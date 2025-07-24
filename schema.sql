@@ -119,6 +119,25 @@ CREATE TABLE test_results (
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+-- Card performance table for tracking individual card results
+CREATE TABLE card_performance (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  quiz_id uuid REFERENCES quizzes(id) ON DELETE CASCADE NOT NULL,
+  card_id uuid REFERENCES quiz_cards(id) ON DELETE CASCADE NOT NULL,
+  correct_count integer NOT NULL DEFAULT 0,
+  incorrect_count integer NOT NULL DEFAULT 0,
+  total_attempts integer NOT NULL DEFAULT 0,
+  average_response_time real NOT NULL DEFAULT 0, -- in seconds
+  hints_used_count integer NOT NULL DEFAULT 0,
+  last_answered_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
+  created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
+  
+  -- Ensure one record per user-card combination
+  UNIQUE(user_id, card_id)
+);
+
 -- Enable Row Level Security
 ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE quiz_folders ENABLE ROW LEVEL SECURITY;
@@ -127,6 +146,7 @@ ALTER TABLE quiz_cards ENABLE ROW LEVEL SECURITY;
 ALTER TABLE quiz_sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE test_sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE test_results ENABLE ROW LEVEL SECURITY;
+ALTER TABLE card_performance ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
 -- Users can only see their own data
@@ -218,6 +238,19 @@ CREATE POLICY "Users can view own test results" ON test_results
 CREATE POLICY "Users can insert own test results" ON test_results
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 
+-- Card performance policies
+CREATE POLICY "Users can view own card performance" ON card_performance
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own card performance" ON card_performance
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own card performance" ON card_performance
+  FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own card performance" ON card_performance
+  FOR DELETE USING (auth.uid() = user_id);
+
 -- Indexes for performance
 CREATE INDEX idx_projects_user_id ON projects(user_id);
 CREATE INDEX idx_quiz_folders_project_id ON quiz_folders(project_id);
@@ -233,6 +266,10 @@ CREATE INDEX idx_test_sessions_quiz_id ON test_sessions(quiz_id);
 CREATE INDEX idx_test_results_user_id ON test_results(user_id);
 CREATE INDEX idx_test_results_quiz_id ON test_results(quiz_id);
 CREATE INDEX idx_test_results_session_id ON test_results(session_id);
+CREATE INDEX idx_card_performance_user_id ON card_performance(user_id);
+CREATE INDEX idx_card_performance_quiz_id ON card_performance(quiz_id);
+CREATE INDEX idx_card_performance_card_id ON card_performance(card_id);
+CREATE INDEX idx_card_performance_user_card ON card_performance(user_id, card_id);
 
 -- Updated_at trigger function
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -257,4 +294,7 @@ CREATE TRIGGER update_quiz_cards_updated_at BEFORE UPDATE ON quiz_cards
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_test_sessions_updated_at BEFORE UPDATE ON test_sessions
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_card_performance_updated_at BEFORE UPDATE ON card_performance
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

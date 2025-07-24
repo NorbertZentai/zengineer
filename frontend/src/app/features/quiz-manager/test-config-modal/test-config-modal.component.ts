@@ -22,6 +22,7 @@ export class TestConfigModalComponent {
   configuration: TestConfiguration = {
     testTypes: [],
     timeLimit: undefined,
+    questionCount: undefined,
     shuffleQuestions: true,
     showHints: true,
     immediateResultsForMC: false,
@@ -32,9 +33,26 @@ export class TestConfigModalComponent {
   availableTestTypes: TestType[] = [];
   showAdvancedSettings = false;
 
+  // Time limit options for dropdown
+  timeLimitOptions = [
+    { value: null, label: 'Nincs időkorlát' },
+    { value: 5, label: '5 perc' },
+    { value: 10, label: '10 perc' },
+    { value: 15, label: '15 perc' },
+    { value: 20, label: '20 perc' },
+    { value: 30, label: '30 perc' },
+    { value: 45, label: '45 perc' },
+    { value: 60, label: '1 óra' },
+    { value: 90, label: '1,5 óra' },
+    { value: 120, label: '2 óra' }
+  ];
+
   constructor(private testService: TestService) {
     this.availableTestTypes = [...this.testService.DEFAULT_TEST_TYPES];
-    this.configuration.testTypes = this.availableTestTypes.map(type => ({ ...type }));
+    this.configuration.testTypes = this.availableTestTypes.map(type => ({ 
+      ...type, 
+      enabled: type.id === 'flashcard' // Alapértelmezetten a flashcard legyen bekapcsolva
+    }));
   }
 
   toggleTestType(typeId: string): void {
@@ -54,6 +72,27 @@ export class TestConfigModalComponent {
 
   setTimeLimit(minutes: number | null): void {
     this.configuration.timeLimit = minutes || undefined;
+  }
+
+  setQuestionCount(count: number | null): void {
+    this.configuration.questionCount = count || undefined;
+  }
+
+  getMaxQuestions(): number {
+    return this.totalCards;
+  }
+
+  getSelectedQuestionCount(): number {
+    return this.configuration.questionCount || this.totalCards;
+  }
+
+  getTimeLimitDisplay(): string {
+    return this.configuration.timeLimit ? this.configuration.timeLimit.toString() : 'Nincs';
+  }
+
+  getQuestionCountOptions(): number[] {
+    const options = [5, 10, 15, 20, 25, 30, 40, 50];
+    return options.filter(n => n <= this.totalCards);
   }
 
   onStartTest(): void {
@@ -77,9 +116,10 @@ export class TestConfigModalComponent {
       return `${this.configuration.timeLimit} perc (időkorlát)`;
     }
     
-    // Estimate based on card count and types
+    // Estimate based on selected question count and types
+    const questionCount = this.getSelectedQuestionCount();
     const baseTimePerCard = 30; // seconds
-    const estimatedSeconds = this.totalCards * baseTimePerCard;
+    const estimatedSeconds = questionCount * baseTimePerCard;
     const estimatedMinutes = Math.ceil(estimatedSeconds / 60);
     
     return `~${estimatedMinutes} perc (becsült)`;

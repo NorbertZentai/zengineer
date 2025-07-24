@@ -20,6 +20,7 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
   userAnswer: string = '';
   selectedAnswers: string[] = [];
   showHint = false;
+  showSolution = false;
   isAnswerSubmitted = false;
   isFlipped = false;
   
@@ -80,6 +81,7 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
     this.userAnswer = '';
     this.selectedAnswers = [];
     this.showHint = false;
+    this.showSolution = false;
     this.isAnswerSubmitted = false;
     this.isFlipped = false;
   }
@@ -123,6 +125,14 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
     this.showHint = !this.showHint;
   }
 
+  toggleSolution(): void {
+    this.showSolution = !this.showSolution;
+    // Ha megmutatjuk a megoldást, az számít segítség használatnak
+    if (this.showSolution) {
+      // A segítség használatát már a submitAnswer-ben fogjuk követni
+    }
+  }
+
   flipCard(): void {
     if (this.currentQuestion?.type === 'flashcard') {
       this.isFlipped = !this.isFlipped;
@@ -136,7 +146,15 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
     if (index > -1) {
       this.selectedAnswers.splice(index, 1);
     } else {
-      this.selectedAnswers.push(answer);
+      // Clear previous selection (single choice) and select new answer
+      this.selectedAnswers = [answer];
+      
+      // Automatically submit the answer after a short delay
+      setTimeout(() => {
+        if (!this.isAnswerSubmitted) {
+          this.submitAnswer();
+        }
+      }, 300);
     }
   }
 
@@ -187,15 +205,19 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
         this.currentQuestion.id,
         answer,
         questionTime,
-        this.showHint
+        this.showHint || this.showSolution
       );
       
       this.isAnswerSubmitted = true;
       
       // For immediate feedback mode or flashcards, show result briefly
-      if (this.session?.configuration.immediateResultsForMC || this.currentQuestion.type === 'flashcard') {
+      if (this.session?.configuration.immediateResultsForMC && this.currentQuestion.type === 'multiple_choice') {
+        setTimeout(() => this.nextQuestion(), 1500);
+      } else if (this.currentQuestion.type === 'flashcard') {
+        // For flashcards, always auto-advance
         setTimeout(() => this.nextQuestion(), 1500);
       }
+      // For non-immediate mode, user needs to manually click next
       
     } catch (error: any) {
       this.error = error.message || 'Hiba történt a válasz mentésekor';
@@ -244,6 +266,8 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     
     try {
+      console.log('🔄 Starting test completion process...');
+      
       // Get quiz name for the result
       const quizId = this.session?.quiz_id;
       let quizName = 'Ismeretlen kvíz';
@@ -251,16 +275,60 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
       if (quizId) {
         const quiz = this.quizService.quizzes().find(q => q.id === quizId);
         quizName = quiz?.name || quizName;
+        console.log('📚 Quiz name found:', quizName);
       }
       
+      console.log('💾 Calling test service completeTest...');
       const result = await this.testService.completeTest();
       result.quiz_name = quizName;
       
+      console.log('✅ Test completion successful:', result);
       this.testResult = result;
       this.showResult = true;
       
     } catch (error: any) {
-      this.error = error.message || 'Hiba történt a teszt befejezésekor';
+      console.error('❌ Test completion failed:', error);
+      
+      // Create detailed error message
+      let detailedError = 'Hiba történt a teszt befejezésekor:\n\n';
+      
+      if (error.message) {
+        detailedError += `Üzenet: ${error.message}\n`;
+      }
+      
+      if (error.code) {
+        detailedError += `Hibakód: ${error.code}\n`;
+      }
+      
+      if (error.details) {
+        detailedError += `Részletek: ${error.details}\n`;
+      }
+      
+      if (error.hint) {
+        detailedError += `Javaslat: ${error.hint}\n`;
+      }
+      
+      // Database specific errors
+      if (error.message?.includes('column')) {
+        detailedError += '\n🔧 Ez egy adatbázis oszlop hiba. Futtasd le a database fix scriptet a Supabase-ben.';
+      }
+      
+      if (error.message?.includes('test_results')) {
+        detailedError += '\n📋 A test_results táblával van probléma.';
+      }
+      
+      if (error.message?.includes('test_configuration')) {
+        detailedError += '\n⚙️ A test_configuration oszlop hiányzik vagy rossz nevű.';
+      }
+      
+      if (error.message?.includes('wrong_answers')) {
+        detailedError += '\n🎯 A wrong_answers oszlop hiányzik vagy rossz nevű.';
+      }
+      
+      // Add full error object for debugging
+      detailedError += `\n\n🔍 Teljes hiba objektum:\n${JSON.stringify(error, null, 2)}`;
+      
+      this.error = detailedError;
     } finally {
       this.isLoading = false;
     }
@@ -284,10 +352,11 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
   }
 
   getAnswerClass(answer: string): string {
-    if (!this.isAnswerSubmitted || !this.currentQuestion) return '';
+    // Only show answer classes if immediate results is enabled and answer is submitted
+    if (!this.isAnswerSubmitted || !this.currentQuestion || !this.session?.configuration?.immediateResultsForMC) return '';
     
     if (this.currentQuestion.type === 'multiple_choice') {
-      const isCorrect = this.currentQuestion.correct_answers?.includes(answer);
+      const isCorrect = this.currentQuestion.correct_answer === answer;
       const isSelected = this.selectedAnswers.includes(answer);
       
       if (isSelected && isCorrect) return 'correct-selected';
@@ -310,5 +379,58 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
 
   isPaused(): boolean {
     return this.session?.status === 'paused';
+  }
+
+  formatAnswerForDisplay(answer: any): string {
+    if (!answer) return '';
+    
+    if (typeof answer === 'string') {
+      try {
+        // Try to parse as JSON if it looks like JSON
+        if (answer.trim().startsWith('{') || answer.trim().startsWith('[')) {
+          const parsed = JSON.parse(answer);
+          
+          // If it's an object with a 'correct' property, extract that
+          if (typeof parsed === 'object' && parsed.correct) {
+            return parsed.correct;
+          }
+          
+          // If it's an array, join with commas and line breaks for better readability
+          if (Array.isArray(parsed)) {
+            return parsed.join('\n• ');
+          }
+          
+          // If it's a simple object, try to extract meaningful text
+          if (typeof parsed === 'object') {
+            // Look for common answer fields
+            const answerFields = ['answer', 'text', 'value', 'correct', 'solution'];
+            for (const field of answerFields) {
+              if (parsed[field]) {
+                return parsed[field];
+              }
+            }
+            
+            // If no specific field found, format the object nicely
+            const entries = Object.entries(parsed)
+              .filter(([key, value]) => typeof value === 'string' || typeof value === 'number')
+              .map(([key, value]) => `${key}: ${value}`);
+            
+            if (entries.length > 0) {
+              return entries.join('\n');
+            }
+          }
+          
+          return JSON.stringify(parsed, null, 2);
+        }
+        
+        return answer;
+      } catch (e) {
+        // If parsing fails, return the original string
+        return answer;
+      }
+    }
+    
+    // If it's not a string, convert to string
+    return String(answer || '');
   }
 }

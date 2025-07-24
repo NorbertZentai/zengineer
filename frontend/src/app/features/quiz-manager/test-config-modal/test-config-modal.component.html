@@ -61,74 +61,40 @@
       <div class="config-section">
         <h3>
           <mat-icon>schedule</mat-icon>
-          Idő beállítások
+          Idő és kérdések beállítások
         </h3>
         
-        <div class="time-options">
-          <label class="time-option" [class.selected]="!configuration.timeLimit">
-            <input 
-              type="radio" 
-              name="timeLimit" 
-              [value]="null"
-              (change)="setTimeLimit(null)"
-              [checked]="!configuration.timeLimit">
-            <div class="option-content">
-              <span class="option-title">Nincs időkorlát</span>
-              <span class="option-description">Annyi időd van, amennyire szükséged van</span>
-            </div>
-          </label>
+        <div class="time-question-grid">
+          <!-- Time Limit Dropdown -->
+          <div class="setting-group">
+            <label for="timeLimit">Időkorlát</label>
+            <select 
+              id="timeLimit"
+              [(ngModel)]="configuration.timeLimit"
+              class="dropdown-select">
+              <option 
+                *ngFor="let option of timeLimitOptions" 
+                [value]="option.value">
+                {{ option.label }}
+              </option>
+            </select>
+          </div>
 
-          <label class="time-option" [class.selected]="configuration.timeLimit === 5">
-            <input 
-              type="radio" 
-              name="timeLimit" 
-              value="5"
-              (change)="setTimeLimit(5)"
-              [checked]="configuration.timeLimit === 5">
-            <div class="option-content">
-              <span class="option-title">5 perc</span>
-              <span class="option-description">Gyors teszt</span>
-            </div>
-          </label>
-
-          <label class="time-option" [class.selected]="configuration.timeLimit === 10">
-            <input 
-              type="radio" 
-              name="timeLimit" 
-              value="10"
-              (change)="setTimeLimit(10)"
-              [checked]="configuration.timeLimit === 10">
-            <div class="option-content">
-              <span class="option-title">10 perc</span>
-              <span class="option-description">Közepes teszt</span>
-            </div>
-          </label>
-
-          <label class="time-option" [class.selected]="configuration.timeLimit === 15">
-            <input 
-              type="radio" 
-              name="timeLimit" 
-              value="15"
-              (change)="setTimeLimit(15)"
-              [checked]="configuration.timeLimit === 15">
-            <div class="option-content">
-              <span class="option-title">15 perc</span>
-              <span class="option-description">Hosszabb teszt</span>
-            </div>
-          </label>
-
-          <label class="time-option" [class.selected]="configuration.timeLimit === 30">
-            <input 
-              type="radio" 
-              name="timeLimit" 
-              value="30"
-              (change)="setTimeLimit(30)"
-              [checked]="configuration.timeLimit === 30">
-            <div class="option-content">
-              <span class="option-title">30 perc</span>
-              <span class="option-description">Részletes teszt</span>
-            </div>
-          </label>
+          <!-- Question Count -->
+          <div class="setting-group">
+            <label for="questionCount">Kérdések száma</label>
+            <select 
+              id="questionCount"
+              [(ngModel)]="configuration.questionCount"
+              class="dropdown-select">
+              <option [value]="null">Összes kártya ({{ totalCards }})</option>
+              <option 
+                *ngFor="let num of getQuestionCountOptions()" 
+                [value]="num">
+                {{ num }} kérdés
+              </option>
+            </select>
+          </div>
         </div>
 
         <div class="estimated-time">
@@ -238,8 +204,8 @@
         <div class="summary-stats">
           <div class="stat-item">
             <mat-icon>quiz</mat-icon>
-            <span class="stat-number">{{ totalCards }}</span>
-            <span class="stat-label">kártya</span>
+            <span class="stat-number">{{ getSelectedQuestionCount() }}</span>
+            <span class="stat-label">kérdés</span>
           </div>
           
           <div class="stat-item">
@@ -248,10 +214,10 @@
             <span class="stat-label">teszt típus</span>
           </div>
           
-          <div class="stat-item" *ngIf="configuration.timeLimit">
+          <div class="stat-item">
             <mat-icon>schedule</mat-icon>
-            <span class="stat-number">{{ configuration.timeLimit }}</span>
-            <span class="stat-label">perc</span>
+            <span class="stat-number">{{ getTimeLimitDisplay() }}</span>
+            <span class="stat-label">{{ configuration.timeLimit ? 'perc limit' : 'időkorlát' }}</span>
           </div>
         </div>
       </div>

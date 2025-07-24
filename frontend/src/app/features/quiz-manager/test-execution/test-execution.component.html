@@ -80,23 +80,34 @@
       <div class="question-header">
         <div class="question-meta">
           <span class="question-type">
-            {{ currentQuestion.type === 'flashcard' ? 'Kártya teszt' :
-               currentQuestion.type === 'multiple_choice' ? 'Feleletválasztós' :
-               'Írásos válasz' }}
+            {{ currentQuestion.type === 'flashcard' ? ('TEST.EXECUTION.QUESTION_TYPE_FLASHCARD' | translate) :
+               currentQuestion.type === 'multiple_choice' ? ('TEST.EXECUTION.QUESTION_TYPE_MULTIPLE_CHOICE' | translate) :
+               ('TEST.EXECUTION.QUESTION_TYPE_WRITTEN' | translate) }}
           </span>
           <span class="difficulty" *ngIf="currentQuestion.difficulty">
             {{ '★'.repeat(currentQuestion.difficulty) }}
           </span>
         </div>
 
-        <button 
-          class="hint-btn" 
-          *ngIf="currentQuestion?.hint && session?.configuration?.showHints"
-          (click)="toggleHint()"
-          [class.active]="showHint">
-          <mat-icon>lightbulb</mat-icon>
-          <span>Tipp</span>
-        </button>
+        <div class="question-buttons">
+          <button 
+            class="hint-btn" 
+            *ngIf="currentQuestion?.hint && session?.configuration?.showHints"
+            (click)="toggleHint()"
+            [class.active]="showHint">
+            <mat-icon>lightbulb</mat-icon>
+            <span>{{ 'TEST.EXECUTION.HINT' | translate }}</span>
+          </button>
+
+          <button 
+            class="solution-btn" 
+            *ngIf="session?.configuration?.showHints && !isAnswerSubmitted"
+            (click)="toggleSolution()"
+            [class.active]="showSolution">
+            <mat-icon>help</mat-icon>
+            <span>{{ 'TEST.EXECUTION.SHOW_SOLUTION' | translate }}</span>
+          </button>
+        </div>
       </div>
 
       <!-- Question Text -->
@@ -112,33 +123,45 @@
         </div>
       </div>
 
+      <!-- Solution -->
+      <div class="solution-container" *ngIf="showSolution && !isAnswerSubmitted">
+        <div class="solution-content">
+          <mat-icon>check_circle</mat-icon>
+          <div class="solution-text">
+            <h4>{{ 'TEST.EXECUTION.CORRECT_ANSWER' | translate }}:</h4>
+            <p class="solution-answer">{{ formatAnswerForDisplay(currentQuestion.correct_answer) }}</p>
+            <small class="solution-warning">{{ 'TEST.EXECUTION.SOLUTION_WARNING' | translate }}</small>
+          </div>
+        </div>
+      </div>
+
       <!-- Flashcard Answer -->
       <div class="flashcard-container" *ngIf="currentQuestion.type === 'flashcard'">
         <div class="flashcard" [class.flipped]="isFlipped" (click)="flipCard()">
           <div class="card-front">
             <div class="flip-instruction">
               <mat-icon>touch_app</mat-icon>
-              <span>Kattints a válaszért</span>
+              <span>{{ 'TEST.EXECUTION.CLICK_FOR_ANSWER' | translate }}</span>
             </div>
           </div>
           
           <div class="card-back">
             <div class="answer-content">
-              <p>{{ currentQuestion.correct_answer }}</p>
+              <p>{{ formatAnswerForDisplay(currentQuestion.correct_answer) }}</p>
             </div>
           </div>
         </div>
 
         <div class="flashcard-actions" *ngIf="isFlipped && !isAnswerSubmitted">
-          <p class="self-assessment">Tudtad a helyes választ?</p>
+          <p class="self-assessment">{{ 'TEST.EXECUTION.DID_YOU_KNOW' | translate }}</p>
           <div class="assessment-buttons">
             <button class="incorrect-btn" (click)="markFlashcardAnswer(false)" [disabled]="isLoading">
               <mat-icon>close</mat-icon>
-              Nem tudtam
+              {{ 'TEST.EXECUTION.I_DIDNT_KNOW' | translate }}
             </button>
             <button class="correct-btn" (click)="markFlashcardAnswer(true)" [disabled]="isLoading">
               <mat-icon>check</mat-icon>
-              Tudtam
+              {{ 'TEST.EXECUTION.I_KNEW' | translate }}
             </button>
           </div>
         </div>
@@ -159,9 +182,12 @@
               <mat-icon *ngIf="!isAnswerSubmitted">
                 {{ isAnswerSelected(option) ? 'radio_button_checked' : 'radio_button_unchecked' }}
               </mat-icon>
-              <mat-icon *ngIf="isAnswerSubmitted" class="result-icon">
+              <mat-icon *ngIf="isAnswerSubmitted && session?.configuration?.immediateResultsForMC" class="result-icon">
                 {{ getAnswerClass(option).includes('correct') ? 'check_circle' : 
                    getAnswerClass(option).includes('incorrect') ? 'cancel' : 'radio_button_unchecked' }}
+              </mat-icon>
+              <mat-icon *ngIf="isAnswerSubmitted && !session?.configuration?.immediateResultsForMC">
+                {{ isAnswerSelected(option) ? 'radio_button_checked' : 'radio_button_unchecked' }}
               </mat-icon>
             </div>
             
@@ -169,13 +195,23 @@
           </button>
         </div>
 
-        <div class="submit-container" *ngIf="!isAnswerSubmitted">
+        <div class="submit-container" *ngIf="!isAnswerSubmitted && selectedAnswers.length === 0">
           <button 
             class="submit-btn" 
             (click)="submitAnswer()"
             [disabled]="!canSubmitAnswer() || isLoading">
             <mat-icon>send</mat-icon>
-            Válasz beküldése
+            {{ 'TEST.EXECUTION.SUBMIT_ANSWER' | translate }}
+          </button>
+        </div>
+
+        <div class="next-container" *ngIf="isAnswerSubmitted && !session?.configuration?.immediateResultsForMC">
+          <button 
+            class="next-btn" 
+            (click)="nextQuestion()"
+            [disabled]="isLoading">
+            <mat-icon>arrow_forward</mat-icon>
+            {{ 'TEST.EXECUTION.NEXT_QUESTION' | translate }}
           </button>
         </div>
       </div>
@@ -183,11 +219,11 @@
       <!-- Written Answer -->
       <div class="written-answer-container" *ngIf="currentQuestion.type === 'written'">
         <div class="answer-input">
-          <label for="userAnswer">Írj be a válaszod:</label>
+          <label for="userAnswer">{{ 'TEST.EXECUTION.ENTER_YOUR_ANSWER' | translate }}</label>
           <textarea 
             id="userAnswer"
             [(ngModel)]="userAnswer"
-            placeholder="Írd be a válaszod ide..."
+            [placeholder]="'TEST.EXECUTION.TYPE_ANSWER_HERE' | translate"
             rows="4"
             [disabled]="isAnswerSubmitted">
           </textarea>
@@ -199,17 +235,19 @@
             (click)="submitAnswer()"
             [disabled]="!canSubmitAnswer() || isLoading">
             <mat-icon>send</mat-icon>
-            Válasz beküldése
+            {{ 'TEST.EXECUTION.SUBMIT_ANSWER' | translate }}
           </button>
         </div>
-      </div>
 
-      <!-- Next Question Button -->
-      <div class="next-container" *ngIf="isAnswerSubmitted && currentQuestion.type !== 'flashcard'">
-        <button class="next-btn" (click)="nextQuestion()" [disabled]="isLoading">
-          <span>Következő kérdés</span>
-          <mat-icon>arrow_forward</mat-icon>
-        </button>
+        <div class="next-container" *ngIf="isAnswerSubmitted">
+          <button 
+            class="next-btn" 
+            (click)="nextQuestion()"
+            [disabled]="isLoading">
+            <mat-icon>arrow_forward</mat-icon>
+            {{ 'TEST.EXECUTION.NEXT_QUESTION' | translate }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -227,8 +265,8 @@
       
       <h2>Teszt befejezve!</h2>
       <p class="result-message">
-        {{ testResult.percentage >= 80 ? 'Kiváló eredmény!' : 
-           testResult.percentage >= 60 ? 'Jó eredmény!' : 'Gyakorolj még egy kicsit!' }}
+        {{ testResult.percentage >= 80 ? ('TEST.RESULTS.EXCELLENT_RESULT' | translate) : 
+           testResult.percentage >= 60 ? ('TEST.RESULTS.GOOD_RESULT' | translate) : ('TEST.RESULTS.PRACTICE_MORE' | translate) }}
       </p>
     </div>
 
