@@ -125,6 +125,27 @@ body.light-theme {
   --info: #{$info};
   --info-light: #{$info-light};
   --info-dark: #{$info-dark};
+  
+  // Rich Text Editor - Light Theme
+  --editor-bg: #ffffff;
+  --editor-border: #e2e8f0;
+  --editor-border-focus: #{$primary};
+  --editor-border-active: rgba(102, 126, 234, 0.4);
+  --editor-toolbar-bg: #f8fafc;
+  --editor-toolbar-border: #e2e8f0;
+  --editor-btn-bg: #ffffff;
+  --editor-btn-bg-hover: #f1f5f9;
+  --editor-btn-bg-active: #{$primary};
+  --editor-btn-color: #64748b;
+  --editor-btn-color-hover: #334155;
+  --editor-btn-color-active: #ffffff;
+  --editor-btn-border: #e2e8f0;
+  --editor-btn-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --editor-btn-shadow-hover: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --editor-content-bg: #ffffff;
+  --editor-placeholder-color: #94a3b8;
+  --editor-selection-bg: rgba(102, 126, 234, 0.15);
+  --editor-group-separator: #e2e8f0;
 }
 
 // =============================================================================
@@ -204,6 +225,27 @@ body.dark-theme {
   --info: #29b6f6;
   --info-light: #014c5e;
   --info-dark: #4fc3f7;
+  
+  // Rich Text Editor - Dark Theme
+  --editor-bg: #1e293b;
+  --editor-border: #334155;
+  --editor-border-focus: #{$primary-light};
+  --editor-border-active: rgba(143, 167, 243, 0.5);
+  --editor-toolbar-bg: #0f172a;
+  --editor-toolbar-border: #334155;
+  --editor-btn-bg: #1e293b;
+  --editor-btn-bg-hover: #334155;
+  --editor-btn-bg-active: #{$primary-light};
+  --editor-btn-color: #94a3b8;
+  --editor-btn-color-hover: #e2e8f0;
+  --editor-btn-color-active: #0f172a;
+  --editor-btn-border: #334155;
+  --editor-btn-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --editor-btn-shadow-hover: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --editor-content-bg: #1e293b;
+  --editor-placeholder-color: #64748b;
+  --editor-selection-bg: rgba(143, 167, 243, 0.2);
+  --editor-group-separator: #334155;
 }
 
 // =============================================================================

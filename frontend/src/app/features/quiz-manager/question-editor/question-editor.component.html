@@ -1,1 +1,258 @@
-<!-- Question editor UI -->
+<div class="question-editor-container">
+  <div class="question-editor-header">
+    <h3>{{ isEditMode ? 'Kérdés szerkesztése' : 'Új kérdés hozzáadása' }}</h3>
+    <button type="button" class="close-btn" (click)="onCancel()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form class="question-form" (ngSubmit)="onSave()">
+    <!-- Kérdés szövege -->
+    <div class="form-section">
+      <label class="form-label">Kérdés szövege *</label>
+      
+      <!-- Rich Text Editor toolbar -->
+      <div class="editor-toolbar">
+        <div class="toolbar-group">
+          <button type="button" class="toolbar-btn" 
+                  (click)="formatText('bold')" 
+                  [class.active]="isFormatActive('bold')"
+                  title="Félkövér">
+            <mat-icon>format_bold</mat-icon>
+          </button>
+          <button type="button" class="toolbar-btn" 
+                  (click)="formatText('italic')" 
+                  [class.active]="isFormatActive('italic')"
+                  title="Dőlt">
+            <mat-icon>format_italic</mat-icon>
+          </button>
+          <button type="button" class="toolbar-btn" 
+                  (click)="formatText('underline')" 
+                  [class.active]="isFormatActive('underline')"
+                  title="Aláhúzott">
+            <mat-icon>format_underlined</mat-icon>
+          </button>
+        </div>
+        
+        <div class="toolbar-group">
+          <button type="button" class="toolbar-btn" 
+                  (click)="formatText('insertOrderedList')"
+                  title="Számozott lista">
+            <mat-icon>format_list_numbered</mat-icon>
+          </button>
+          <button type="button" class="toolbar-btn" 
+                  (click)="formatText('insertUnorderedList')"
+                  title="Felsorolásjeles lista">
+            <mat-icon>format_list_bulleted</mat-icon>
+          </button>
+        </div>
+
+        <div class="toolbar-group">
+          <button type="button" class="toolbar-btn" 
+                  (click)="insertImage()"
+                  title="Kép beszúrása">
+            <mat-icon>image</mat-icon>
+          </button>
+          <button type="button" class="toolbar-btn" 
+                  (click)="insertLink()"
+                  title="Link beszúrása">
+            <mat-icon>link</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Rich Text Editor -->
+      <div class="rich-editor" 
+           #questionEditor
+           contenteditable="true"
+           (input)="onQuestionChange($event)"
+           (blur)="onQuestionBlur()"
+           [innerHTML]="question.text"
+           placeholder="Írd be a kérdést...">
+      </div>
+      
+      <!-- Image upload input -->
+      <input type="file" 
+             #imageInput 
+             accept="image/*" 
+             (change)="onImageSelect($event)"
+             style="display: none;">
+    </div>
+
+    <!-- Kérdés típusa -->
+    <div class="form-section">
+      <label class="form-label">Kérdés típusa</label>
+      <div class="question-type-selector">
+        <label class="radio-option">
+          <input type="radio" 
+                 name="questionType" 
+                 value="multiple-choice" 
+                 [(ngModel)]="question.type">
+          <span class="radio-label">Feleletválasztós</span>
+        </label>
+        <label class="radio-option">
+          <input type="radio" 
+                 name="questionType" 
+                 value="true-false" 
+                 [(ngModel)]="question.type">
+          <span class="radio-label">Igaz/Hamis</span>
+        </label>
+        <label class="radio-option">
+          <input type="radio" 
+                 name="questionType" 
+                 value="text-input" 
+                 [(ngModel)]="question.type">
+          <span class="radio-label">Szöveges válasz</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Válaszok -->
+    <div class="form-section answers-section">
+      <label class="form-label">Válaszlehetőségek</label>
+      
+      <!-- Multiple Choice Answers -->
+      <div *ngIf="question.type === 'multiple-choice'" class="answers-list">
+        <div *ngFor="let answer of question.answers; let i = index" 
+             class="answer-item" 
+             [class.correct]="answer.isCorrect">
+          
+          <div class="answer-controls">
+            <label class="correct-checkbox">
+              <input type="radio" 
+                     name="correctAnswer" 
+                     [checked]="answer.isCorrect"
+                     (change)="setCorrectAnswer(i)">
+              <span class="checkmark"></span>
+              <span class="label-text">Helyes válasz</span>
+            </label>
+            
+            <button type="button" 
+                    class="remove-answer-btn" 
+                    (click)="removeAnswer(i)"
+                    *ngIf="question.answers && question.answers.length > 2">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+
+          <!-- Rich Text Editor for Answer -->
+          <div class="answer-editor-toolbar">
+            <button type="button" class="toolbar-btn-small" 
+                    (click)="formatAnswerText('bold', i)" 
+                    title="Félkövér">
+              <mat-icon>format_bold</mat-icon>
+            </button>
+            <button type="button" class="toolbar-btn-small" 
+                    (click)="formatAnswerText('italic', i)" 
+                    title="Dőlt">
+              <mat-icon>format_italic</mat-icon>
+            </button>
+            <button type="button" class="toolbar-btn-small" 
+                    (click)="formatAnswerText('underline', i)" 
+                    title="Aláhúzott">
+              <mat-icon>format_underlined</mat-icon>
+            </button>
+          </div>
+          
+          <div class="rich-editor answer-editor" 
+               contenteditable="true"
+               (input)="onAnswerChange($event, i)"
+               [innerHTML]="answer.text"
+               [attr.data-placeholder]="'Válasz ' + (i + 1)">>
+          </div>
+        </div>
+        
+        <button type="button" 
+                class="add-answer-btn" 
+                (click)="addAnswer()"
+                *ngIf="question.answers && question.answers.length < 6">
+          <mat-icon>add</mat-icon>
+          Újabb válasz hozzáadása
+        </button>
+      </div>
+
+      <!-- True/False Answers -->
+      <div *ngIf="question.type === 'true-false'" class="true-false-answers">
+        <label class="radio-option">
+          <input type="radio" 
+                 name="trueFalseAnswer" 
+                 value="true" 
+                 [(ngModel)]="question.correctAnswer">
+          <span class="radio-label">Igaz</span>
+        </label>
+        <label class="radio-option">
+          <input type="radio" 
+                 name="trueFalseAnswer" 
+                 value="false" 
+                 [(ngModel)]="question.correctAnswer">
+          <span class="radio-label">Hamis</span>
+        </label>
+      </div>
+
+      <!-- Text Input Answer -->
+      <div *ngIf="question.type === 'text-input'" class="text-answer">
+        <label class="form-label">Helyes válasz</label>
+        <input type="text" 
+               [(ngModel)]="question.correctAnswer" 
+               name="textAnswer"
+               placeholder="Add meg a helyes választ"
+               class="text-input">
+        <small class="help-text">A válasz automatikusan kis- és nagybetű érzéketlen lesz</small>
+      </div>
+    </div>
+
+    <!-- Pontszám -->
+    <div class="form-section">
+      <label class="form-label">Pontszám</label>
+      <div class="points-selector">
+        <button type="button" 
+                *ngFor="let point of pointOptions" 
+                class="point-btn"
+                [class.selected]="question.points === point"
+                (click)="question.points = point">
+          {{ point }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Magyarázat -->
+    <div class="form-section">
+      <label class="form-label">Magyarázat (opcionális)</label>
+      
+      <div class="explanation-toolbar">
+        <button type="button" class="toolbar-btn-small" 
+                (click)="formatExplanationText('bold')" 
+                title="Félkövér">
+          <mat-icon>format_bold</mat-icon>
+        </button>
+        <button type="button" class="toolbar-btn-small" 
+                (click)="formatExplanationText('italic')" 
+                title="Dőlt">
+          <mat-icon>format_italic</mat-icon>
+        </button>
+        <button type="button" class="toolbar-btn-small" 
+                (click)="formatExplanationText('underline')" 
+                title="Aláhúzott">
+          <mat-icon>format_underlined</mat-icon>
+        </button>
+      </div>
+      
+      <div class="rich-editor explanation-editor" 
+           contenteditable="true"
+           (input)="onExplanationChange($event)"
+           [innerHTML]="question.explanation"
+           placeholder="Add meg a magyarázatot...">
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button type="button" class="cancel-btn" (click)="onCancel()">
+        Mégse
+      </button>
+      <button type="submit" class="save-btn" [disabled]="!isValid()">
+        {{ isEditMode ? 'Mentés' : 'Hozzáadás' }}
+      </button>
+    </div>
+  </form>
+</div>

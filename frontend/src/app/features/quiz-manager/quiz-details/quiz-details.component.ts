@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -28,6 +28,9 @@ import { AuthService } from '../../../core/services/auth.service';
   ]
 })
 export class QuizDetailsComponent implements OnInit {
+  @ViewChild('questionEditor') questionEditor!: ElementRef;
+  @ViewChild('imageInput') imageInput!: ElementRef;
+
   quiz: Quiz | null = null;
   cards: QuizCard[] = [];
   isLoading = false;
@@ -370,5 +373,77 @@ export class QuizDetailsComponent implements OnInit {
         hint: error.hint
       });
     }
+  }
+
+  // Rich text editor methods
+  formatText(command: string) {
+    document.execCommand(command, false, undefined);
+    if (this.questionEditor) {
+      this.questionEditor.nativeElement.focus();
+    }
+  }
+
+  isFormatActive(command: string): boolean {
+    return document.queryCommandState(command);
+  }
+
+  insertImage() {
+    if (this.imageInput) {
+      this.imageInput.nativeElement.click();
+    }
+  }
+
+  onImageSelect(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        const img = `<img src="${e.target.result}" style="max-width: 100%; height: auto; margin: 10px 0;" alt="Inserted image">`;
+        this.insertHtmlAtCursor(img);
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  insertLink() {
+    const url = prompt('Add meg a link URL-jét:');
+    if (url) {
+      const text = prompt('Add meg a link szövegét:') || url;
+      const link = `<a href="${url}" target="_blank">${text}</a>`;
+      this.insertHtmlAtCursor(link);
+    }
+  }
+
+  private insertHtmlAtCursor(html: string) {
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+      range.deleteContents();
+      const div = document.createElement('div');
+      div.innerHTML = html;
+      const fragment = document.createDocumentFragment();
+      let node;
+      while ((node = div.firstChild)) {
+        fragment.appendChild(node);
+      }
+      range.insertNode(fragment);
+    }
+  }
+
+  onQuestionChange(event: any) {
+    this.newCard.question = event.target.innerHTML;
+  }
+
+  onQuestionBlur() {
+    // Clean up empty tags and normalize content
+    this.newCard.question = this.cleanupHtml(this.newCard.question);
+  }
+
+  private cleanupHtml(html: string): string {
+    // Remove empty tags and normalize whitespace
+    return html
+      .replace(/<[^>]*>(\s*)<\/[^>]*>/g, '') // Remove empty tags
+      .replace(/\s+/g, ' ') // Normalize whitespace
+      .trim();
   }
 }

@@ -145,13 +145,78 @@
         <span>Új kártya hozzáadása</span>
       </div>
       
-      <!-- Main question input -->
-      <div class="question-input">
-        <input type="text" 
-               [(ngModel)]="newCard.question" 
-               placeholder="Kérdés vagy fogalom..."
-               class="main-input"
-               (keydown.enter)="focusFirstAnswer()">
+      <!-- Rich Text Editor for Question -->
+      <div class="question-editor-container">
+        <div class="editor-toolbar">
+          <div class="toolbar-group">
+            <button type="button" 
+                    class="toolbar-btn" 
+                    [class.active]="isFormatActive('bold')"
+                    (click)="formatText('bold')"
+                    title="Félkövér">
+              <mat-icon>format_bold</mat-icon>
+            </button>
+            <button type="button" 
+                    class="toolbar-btn" 
+                    [class.active]="isFormatActive('italic')"
+                    (click)="formatText('italic')"
+                    title="Dőlt">
+              <mat-icon>format_italic</mat-icon>
+            </button>
+            <button type="button" 
+                    class="toolbar-btn" 
+                    [class.active]="isFormatActive('underline')"
+                    (click)="formatText('underline')"
+                    title="Aláhúzott">
+              <mat-icon>format_underlined</mat-icon>
+            </button>
+          </div>
+          
+          <div class="toolbar-group">
+            <button type="button" 
+                    class="toolbar-btn" 
+                    (click)="formatText('insertUnorderedList')"
+                    title="Felsorolás">
+              <mat-icon>format_list_bulleted</mat-icon>
+            </button>
+            <button type="button" 
+                    class="toolbar-btn" 
+                    (click)="formatText('insertOrderedList')"
+                    title="Számozott lista">
+              <mat-icon>format_list_numbered</mat-icon>
+            </button>
+          </div>
+          
+          <div class="toolbar-group">
+            <button type="button" 
+                    class="toolbar-btn" 
+                    (click)="insertImage()"
+                    title="Kép beszúrása">
+              <mat-icon>image</mat-icon>
+            </button>
+            <button type="button" 
+                    class="toolbar-btn" 
+                    (click)="insertLink()"
+                    title="Link beszúrása">
+              <mat-icon>link</mat-icon>
+            </button>
+          </div>
+        </div>
+        
+        <div class="question-editor" 
+             #questionEditor
+             contenteditable="true"
+             (input)="onQuestionChange($event)"
+             (blur)="onQuestionBlur()"
+             [attr.data-placeholder]="'Kérdés vagy fogalom...'">
+        </div>
+        
+        <!-- Hidden file input for images -->
+        <input type="file" 
+               #imageInput
+               accept="image/*"
+               (change)="onImageSelect($event)"
+               style="display: none;">
       </div>
 
       <!-- Dynamic answers list -->
