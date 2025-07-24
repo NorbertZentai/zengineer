@@ -13,6 +13,14 @@
           <div class="quiz-title-row">
             <h1 class="quiz-title">{{ quiz.name }}</h1>
             <div class="quiz-header-actions">
+              <button class="test-btn" 
+                      (click)="openTestConfig()" 
+                      [disabled]="cards.length === 0"
+                      [title]="'TEST.START_TEST' | translate">
+                <mat-icon>play_arrow</mat-icon>
+                <span>{{ 'TEST.START_TEST' | translate }}</span>
+              </button>
+              
               <button class="expand-btn" 
                       (click)="toggleSettings()" 
                       [class.expanded]="showSettings"
@@ -349,3 +357,13 @@
     </div>
   </div>
 </div>
+
+<!-- Test Configuration Modal -->
+<app-test-config-modal 
+  *ngIf="showTestConfig"
+  [quizId]="quiz?.id || ''"
+  [quizName]="quiz?.name || ''"
+  [totalCards]="cards.length"
+  (close)="closeTestConfig()"
+  (startTest)="startTest($event)">
+</app-test-config-modal>

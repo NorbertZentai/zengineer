@@ -1,0 +1,192 @@
+<div class="test-history-container">
+  <!-- Header -->
+  <div class="history-header">
+    <div class="header-content">
+      <div class="header-icon">
+        <mat-icon>analytics</mat-icon>
+      </div>
+      <div class="header-text">
+        <h2>Teszt előzmények</h2>
+        <p>Itt követheted nyomon a korábbi tesztjeid eredményeit</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics Overview -->
+  <div class="stats-overview" *ngIf="!isLoading && testHistory.length > 0">
+    <div class="stat-card">
+      <div class="stat-icon">
+        <mat-icon>quiz</mat-icon>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ getTotalTests() }}</div>
+        <div class="stat-label">Elvégzett teszt</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon" [class]="getPerformanceClass(getAverageScore())">
+        <mat-icon>{{ getPerformanceIcon(getAverageScore()) }}</mat-icon>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ getAverageScore() }}%</div>
+        <div class="stat-label">Átlagos eredmény</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">
+        <mat-icon>schedule</mat-icon>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ formatTime(getTotalTimeSpent()) }}</div>
+        <div class="stat-label">Összesen eltöltött idő</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Teszt előzmények betöltése...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-container" *ngIf="error && !isLoading">
+    <mat-icon>error</mat-icon>
+    <p>{{ error }}</p>
+    <button class="retry-btn" (click)="loadTestHistory()">
+      <mat-icon>refresh</mat-icon>
+      Újrapróbálkozás
+    </button>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && !error && testHistory.length === 0">
+    <div class="empty-icon">
+      <mat-icon>quiz</mat-icon>
+    </div>
+    <h3>Még nincsenek teszt eredményeid</h3>
+    <p>Kezdj el tesztelni a kvízeid segítségével, hogy lásd az előrehaladásod!</p>
+    <a routerLink="/quiz-manager" class="start-testing-btn">
+      <mat-icon>play_arrow</mat-icon>
+      Teszt indítása
+    </a>
+  </div>
+
+  <!-- Test History List -->
+  <div class="history-content" *ngIf="!isLoading && !error && testHistory.length > 0">
+    <!-- Recent Tests Section -->
+    <div class="section">
+      <div class="section-header">
+        <h3>
+          <mat-icon>history</mat-icon>
+          Legutóbbi tesztek
+        </h3>
+      </div>
+
+      <div class="recent-tests">
+        <div 
+          *ngFor="let test of getRecentTests()" 
+          class="test-card recent"
+          [class]="getPerformanceClass(test.percentage)">
+          
+          <div class="test-header">
+            <div class="quiz-info">
+              <h4 class="quiz-name">{{ test.quiz_name }}</h4>
+              <span class="test-type">{{ test.test_type }}</span>
+            </div>
+            <div class="performance-badge" [class]="getPerformanceClass(test.percentage)">
+              <mat-icon>{{ getPerformanceIcon(test.percentage) }}</mat-icon>
+              <span>{{ test.percentage }}%</span>
+            </div>
+          </div>
+
+          <div class="test-stats">
+            <div class="stat">
+              <mat-icon>check_circle</mat-icon>
+              <span>{{ test.correct_answers }}/{{ test.total_questions }}</span>
+            </div>
+            <div class="stat">
+              <mat-icon>schedule</mat-icon>
+              <span>{{ formatTime(test.time_spent) }}</span>
+            </div>
+            <div class="stat">
+              <mat-icon>event</mat-icon>
+              <span>{{ formatDate(test.completed_at) }}</span>
+            </div>
+          </div>
+
+          <div class="test-actions">
+            <button class="action-btn secondary" (click)="retryTest(test.quiz_id)">
+              <mat-icon>refresh</mat-icon>
+              <span>Újra</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- All Tests Section -->
+    <div class="section" *ngIf="testHistory.length > 5">
+      <div class="section-header">
+        <h3>
+          <mat-icon>list</mat-icon>
+          Összes teszt ({{ testHistory.length }})
+        </h3>
+      </div>
+
+      <div class="all-tests-table">
+        <div class="table-header">
+          <div class="col-quiz">Kvíz neve</div>
+          <div class="col-score">Eredmény</div>
+          <div class="col-questions">Kérdések</div>
+          <div class="col-time">Idő</div>
+          <div class="col-date">Dátum</div>
+          <div class="col-actions">Műveletek</div>
+        </div>
+
+        <div class="table-body">
+          <div 
+            *ngFor="let test of testHistory" 
+            class="table-row"
+            [class]="getPerformanceClass(test.percentage)">
+            
+            <div class="col-quiz">
+              <div class="quiz-info">
+                <span class="quiz-name">{{ test.quiz_name }}</span>
+                <span class="test-type">{{ test.test_type }}</span>
+              </div>
+            </div>
+
+            <div class="col-score">
+              <div class="score-badge" [class]="getPerformanceClass(test.percentage)">
+                <mat-icon>{{ getPerformanceIcon(test.percentage) }}</mat-icon>
+                <span>{{ test.percentage }}%</span>
+              </div>
+            </div>
+
+            <div class="col-questions">
+              <span class="correct">{{ test.correct_answers }}</span>
+              <span class="total">/{{ test.total_questions }}</span>
+            </div>
+
+            <div class="col-time">
+              {{ formatTime(test.time_spent) }}
+            </div>
+
+            <div class="col-date">
+              {{ formatDate(test.completed_at) }}
+            </div>
+
+            <div class="col-actions">
+              <button class="action-btn icon-only" (click)="retryTest(test.quiz_id)" title="Teszt újra">
+                <mat-icon>refresh</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,2 +1,24 @@
-<h1>{{ 'DASHBOARD.TITLE' | translate }}</h1>
-<p>{{ 'DASHBOARD.LOGGED_IN_USER' | translate }}: {{ auth.currentUser?.['email'] }}</p>
+<div class="dashboard-container">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <div class="welcome-section">
+        <h1>{{ 'DASHBOARD.TITLE' | translate }}</h1>
+        <p class="welcome-text">{{ 'DASHBOARD.LOGGED_IN_USER' | translate }}: {{ auth.currentUser?.['email'] }}</p>
+      </div>
+      
+      <div class="quick-actions">
+        <a routerLink="/quiz-manager" class="action-btn primary">
+          <mat-icon>quiz</mat-icon>
+          <span>Kvízek kezelése</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="dashboard-content">
+    <!-- Test History Section -->
+    <app-test-history></app-test-history>
+  </div>
+</div>

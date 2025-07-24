@@ -4,16 +4,27 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { TranslateModule } from '@ngx-translate/core';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { QuizService, Quiz, QuizCard } from '../../../core/services/quiz.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { TestService, TestConfiguration } from '../../../core/services/test.service';
+import { TestConfigModalComponent } from '../test-config-modal/test-config-modal.component';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-quiz-details',
   templateUrl: './quiz-details.component.html',
   styleUrls: ['./quiz-details.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule],
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    MatIconModule, 
+    MatButtonModule,
+    TranslateModule,
+    TestConfigModalComponent
+  ],
   animations: [
     trigger('slideDown', [
       transition(':enter', [
@@ -51,6 +62,9 @@ export class QuizDetailsComponent implements OnInit {
   
   tagsString = ''; // Címkék stringként a form-hoz
   
+  // Test-related properties
+  showTestConfig = false;
+  
   // Színpaletta
   colorPalette = [
     { name: 'Kék', value: '#667eea' },
@@ -80,7 +94,8 @@ export class QuizDetailsComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private quizService: QuizService,
-    private authService: AuthService
+    private authService: AuthService,
+    private testService: TestService
   ) {}
 
   async ngOnInit() {
@@ -445,5 +460,46 @@ export class QuizDetailsComponent implements OnInit {
       .replace(/<[^>]*>(\s*)<\/[^>]*>/g, '') // Remove empty tags
       .replace(/\s+/g, ' ') // Normalize whitespace
       .trim();
+  }
+
+  // Test-related methods
+  openTestConfig(): void {
+    if (this.cards.length === 0) {
+      this.error = 'Nem lehet tesztet indítani, ha nincsenek kártyák!';
+      return;
+    }
+    this.showTestConfig = true;
+  }
+
+  closeTestConfig(): void {
+    this.showTestConfig = false;
+  }
+
+  async startTest(config: TestConfiguration): Promise<void> {
+    if (!this.quiz?.id) {
+      this.error = 'Kvíz azonosító hiányzik!';
+      return;
+    }
+
+    try {
+      this.isLoading = true;
+      this.error = null;
+      
+      if (this.cards.length === 0) {
+        this.error = 'A kvízhez nincsenek kártyák. Adjon hozzá kártyákat a teszt indításához.';
+        return;
+      }
+      
+      const session = await this.testService.createTestSession(this.quiz.id, config);
+      
+      // Navigate to test execution page
+      this.router.navigate(['/quiz-manager/test', session.id]);
+      
+    } catch (error: any) {
+      this.error = error.message || 'Hiba történt a teszt indításakor';
+    } finally {
+      this.isLoading = false;
+      this.showTestConfig = false;
+    }
   }
 }

@@ -1,6 +1,88 @@
 @use '../../../scss/variables' as *;
 @use '../../../scss/mixins' as *;
 
+.dashboard-container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  background-image: 
+    radial-gradient(circle at 20% 20%, rgba(102, 126, 234, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.05) 0%, transparent 50%);
+}
+
+.dashboard-header {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-primary);
+  padding: $spacing-6 $spacing-8;
+  box-shadow: var(--shadow-sm);
+
+  .header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-6;
+
+    .welcome-section {
+      flex: 1;
+
+      h1 {
+        margin: 0 0 $spacing-2 0;
+        color: var(--text-primary);
+        font-size: $font-size-3xl;
+        font-weight: $font-weight-bold;
+        background: linear-gradient(135deg, var(--text-primary), var(--primary));
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .welcome-text {
+        margin: 0;
+        color: var(--text-secondary);
+        font-size: $font-size-base;
+      }
+    }
+
+    .quick-actions {
+      display: flex;
+      gap: $spacing-3;
+
+      .action-btn {
+        display: flex;
+        align-items: center;
+        gap: $spacing-2;
+        text-decoration: none;
+        border-radius: $radius-lg;
+        padding: $spacing-3 $spacing-5;
+        font-weight: $font-weight-semibold;
+        transition: all 0.2s ease;
+
+        &.primary {
+          background: linear-gradient(135deg, var(--primary), var(--secondary));
+          color: white;
+
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+          }
+        }
+
+        mat-icon {
+          font-size: 1.25rem;
+          width: auto;
+          height: auto;
+        }
+      }
+    }
+  }
+}
+
+.dashboard-content {
+  padding: 0; // Test history component will handle its own styling
+}
+
+// Legacy dashboard styles for backward compatibility
 .dashboard {
   h1 {
     color: $gray-800;
@@ -9,6 +91,32 @@
 
     @include dark-theme {
       color: $dark-text-primary;
+    }
+  }
+}
+
+// Mobile responsiveness
+@media (max-width: 768px) {
+  .dashboard-header {
+    padding: $spacing-4;
+
+    .header-content {
+      flex-direction: column;
+      text-align: center;
+      gap: $spacing-4;
+
+      .welcome-section h1 {
+        font-size: $font-size-2xl;
+      }
+
+      .quick-actions {
+        width: 100%;
+
+        .action-btn {
+          flex: 1;
+          justify-content: center;
+        }
+      }
     }
   }
 }

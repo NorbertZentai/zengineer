@@ -1,0 +1,272 @@
+<div class="test-execution-container" [class.paused]="isPaused()">
+  <!-- Header with Progress and Timer -->
+  <div class="test-header">
+    <div class="header-left">
+      <button class="exit-btn" (click)="exitTest()" [disabled]="isLoading">
+        <mat-icon>close</mat-icon>
+        <span>{{ 'TEST.EXECUTION.EXIT' | translate }}</span>
+      </button>
+      
+      <div class="progress-info">
+        <div class="progress-bar">
+          <div 
+            class="progress-fill" 
+            [style.width.%]="getProgress().percentage">
+          </div>
+        </div>
+        <span class="progress-text">
+          {{ getProgress().current }} / {{ getProgress().total }}
+        </span>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <div class="timer" *ngIf="remainingTime !== null" [class.warning]="remainingTime < 300">
+        <mat-icon>schedule</mat-icon>
+        <span>{{ formatTime(remainingTime) }}</span>
+      </div>
+
+      <div class="elapsed-time">
+        <mat-icon>access_time</mat-icon>
+        <span>{{ formatTime(timeSpent) }}</span>
+      </div>
+
+      <button 
+        class="pause-btn" 
+        (click)="isPaused() ? resumeTest() : pauseTest()"
+        [disabled]="isLoading">
+        <mat-icon>{{ isPaused() ? 'play_arrow' : 'pause' }}</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Pause Overlay -->
+  <div class="pause-overlay" *ngIf="isPaused()">
+    <div class="pause-content">
+      <mat-icon>pause_circle</mat-icon>
+      <h2>{{ 'TEST.EXECUTION.PAUSE' | translate }}</h2>
+      <p>Kattints a folytatás gombra a teszt folytatásához</p>
+      <button class="resume-btn" (click)="resumeTest()">
+        <mat-icon>play_arrow</mat-icon>
+        {{ 'TEST.EXECUTION.RESUME' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="test-content" *ngIf="!showResult && !isPaused()">
+    <!-- Loading -->
+    <div class="loading-container" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <p>Betöltés...</p>
+    </div>
+
+    <!-- Error -->
+    <div class="error-container" *ngIf="error">
+      <mat-icon>error</mat-icon>
+      <p>{{ error }}</p>
+            <button 
+        class="retry-btn secondary" 
+        *ngIf="session?.configuration?.allowRetry && !hasMaxAttemptsReached"
+        (click)="restartTest()">
+        <mat-icon>refresh</mat-icon>
+        Újrapróbálkozás
+      </button>
+    </div>
+
+    <!-- Question Content -->
+    <div class="question-container" *ngIf="currentQuestion && !isLoading && !error">
+      <!-- Question Header -->
+      <div class="question-header">
+        <div class="question-meta">
+          <span class="question-type">
+            {{ currentQuestion.type === 'flashcard' ? 'Kártya teszt' :
+               currentQuestion.type === 'multiple_choice' ? 'Feleletválasztós' :
+               'Írásos válasz' }}
+          </span>
+          <span class="difficulty" *ngIf="currentQuestion.difficulty">
+            {{ '★'.repeat(currentQuestion.difficulty) }}
+          </span>
+        </div>
+
+        <button 
+          class="hint-btn" 
+          *ngIf="currentQuestion?.hint && session?.configuration?.showHints"
+          (click)="toggleHint()"
+          [class.active]="showHint">
+          <mat-icon>lightbulb</mat-icon>
+          <span>Tipp</span>
+        </button>
+      </div>
+
+      <!-- Question Text -->
+      <div class="question-text">
+        <h2>{{ currentQuestion.question }}</h2>
+      </div>
+
+      <!-- Hint -->
+      <div class="hint-container" *ngIf="showHint && currentQuestion.hint">
+        <div class="hint-content">
+          <mat-icon>lightbulb</mat-icon>
+          <p>{{ currentQuestion.hint }}</p>
+        </div>
+      </div>
+
+      <!-- Flashcard Answer -->
+      <div class="flashcard-container" *ngIf="currentQuestion.type === 'flashcard'">
+        <div class="flashcard" [class.flipped]="isFlipped" (click)="flipCard()">
+          <div class="card-front">
+            <div class="flip-instruction">
+              <mat-icon>touch_app</mat-icon>
+              <span>Kattints a válaszért</span>
+            </div>
+          </div>
+          
+          <div class="card-back">
+            <div class="answer-content">
+              <p>{{ currentQuestion.correct_answer }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flashcard-actions" *ngIf="isFlipped && !isAnswerSubmitted">
+          <p class="self-assessment">Tudtad a helyes választ?</p>
+          <div class="assessment-buttons">
+            <button class="incorrect-btn" (click)="markFlashcardAnswer(false)" [disabled]="isLoading">
+              <mat-icon>close</mat-icon>
+              Nem tudtam
+            </button>
+            <button class="correct-btn" (click)="markFlashcardAnswer(true)" [disabled]="isLoading">
+              <mat-icon>check</mat-icon>
+              Tudtam
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Multiple Choice -->
+      <div class="multiple-choice-container" *ngIf="currentQuestion.type === 'multiple_choice'">
+        <div class="options-list">
+          <button 
+            *ngFor="let option of currentQuestion.options"
+            class="option-btn"
+            [class.selected]="isAnswerSelected(option)"
+            [class]="getAnswerClass(option)"
+            (click)="onMultipleChoiceSelect(option)"
+            [disabled]="isAnswerSubmitted">
+            
+            <div class="option-indicator">
+              <mat-icon *ngIf="!isAnswerSubmitted">
+                {{ isAnswerSelected(option) ? 'radio_button_checked' : 'radio_button_unchecked' }}
+              </mat-icon>
+              <mat-icon *ngIf="isAnswerSubmitted" class="result-icon">
+                {{ getAnswerClass(option).includes('correct') ? 'check_circle' : 
+                   getAnswerClass(option).includes('incorrect') ? 'cancel' : 'radio_button_unchecked' }}
+              </mat-icon>
+            </div>
+            
+            <span class="option-text">{{ option }}</span>
+          </button>
+        </div>
+
+        <div class="submit-container" *ngIf="!isAnswerSubmitted">
+          <button 
+            class="submit-btn" 
+            (click)="submitAnswer()"
+            [disabled]="!canSubmitAnswer() || isLoading">
+            <mat-icon>send</mat-icon>
+            Válasz beküldése
+          </button>
+        </div>
+      </div>
+
+      <!-- Written Answer -->
+      <div class="written-answer-container" *ngIf="currentQuestion.type === 'written'">
+        <div class="answer-input">
+          <label for="userAnswer">Írj be a válaszod:</label>
+          <textarea 
+            id="userAnswer"
+            [(ngModel)]="userAnswer"
+            placeholder="Írd be a válaszod ide..."
+            rows="4"
+            [disabled]="isAnswerSubmitted">
+          </textarea>
+        </div>
+
+        <div class="submit-container" *ngIf="!isAnswerSubmitted">
+          <button 
+            class="submit-btn" 
+            (click)="submitAnswer()"
+            [disabled]="!canSubmitAnswer() || isLoading">
+            <mat-icon>send</mat-icon>
+            Válasz beküldése
+          </button>
+        </div>
+      </div>
+
+      <!-- Next Question Button -->
+      <div class="next-container" *ngIf="isAnswerSubmitted && currentQuestion.type !== 'flashcard'">
+        <button class="next-btn" (click)="nextQuestion()" [disabled]="isLoading">
+          <span>Következő kérdés</span>
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Test Results -->
+  <div class="test-results" *ngIf="showResult && testResult">
+    <div class="results-header">
+      <div class="result-icon" [class]="testResult.percentage >= 80 ? 'excellent' : 
+                                       testResult.percentage >= 60 ? 'good' : 'needs-improvement'">
+        <mat-icon>
+          {{ testResult.percentage >= 80 ? 'emoji_events' : 
+             testResult.percentage >= 60 ? 'thumb_up' : 'trending_up' }}
+        </mat-icon>
+      </div>
+      
+      <h2>Teszt befejezve!</h2>
+      <p class="result-message">
+        {{ testResult.percentage >= 80 ? 'Kiváló eredmény!' : 
+           testResult.percentage >= 60 ? 'Jó eredmény!' : 'Gyakorolj még egy kicsit!' }}
+      </p>
+    </div>
+
+    <div class="results-stats">
+      <div class="stat-card">
+        <div class="stat-value">{{ testResult.percentage }}%</div>
+        <div class="stat-label">Pontosság</div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-value">{{ testResult.correct_answers }}</div>
+        <div class="stat-label">Helyes válaszok</div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-value">{{ testResult.wrong_answers }}</div>
+        <div class="stat-label">Hibás válaszok</div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-value">{{ formatTime(testResult.time_spent) }}</div>
+        <div class="stat-label">Idő</div>
+      </div>
+    </div>
+
+    <div class="results-actions">
+      <button class="secondary-btn" (click)="exitTest()">
+        <mat-icon>home</mat-icon>
+        Vissza a kvízekhez
+      </button>
+      
+      <button 
+        class="primary-btn" 
+        *ngIf="session?.configuration?.allowRetry"
+        (click)="retryTest()">
+        <mat-icon>refresh</mat-icon>
+        Újra próbálom
+      </button>
+    </div>
+  </div>
+</div>

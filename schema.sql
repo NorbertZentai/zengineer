@@ -81,12 +81,52 @@ CREATE TABLE quiz_sessions (
   completed_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+-- Test sessions table for quiz testing
+CREATE TABLE test_sessions (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  quiz_id uuid REFERENCES quizzes(id) ON DELETE CASCADE NOT NULL,
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  configuration jsonb NOT NULL DEFAULT '{}'::jsonb,
+  status text DEFAULT 'active' CHECK (status IN ('active', 'paused', 'completed', 'abandoned')),
+  start_time timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
+  end_time timestamp with time zone,
+  current_question_index integer DEFAULT 0,
+  questions jsonb NOT NULL DEFAULT '[]'::jsonb,
+  answers jsonb NOT NULL DEFAULT '[]'::jsonb,
+  created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Test results table for completed tests
+CREATE TABLE test_results (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  session_id uuid REFERENCES test_sessions(id) ON DELETE CASCADE NOT NULL,
+  quiz_id uuid REFERENCES quizzes(id) ON DELETE CASCADE NOT NULL,
+  quiz_name text NOT NULL,
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  score integer NOT NULL DEFAULT 0,
+  max_score integer NOT NULL DEFAULT 0,
+  percentage real NOT NULL DEFAULT 0,
+  total_questions integer NOT NULL DEFAULT 0,
+  correct_answers integer NOT NULL DEFAULT 0,
+  incorrect_answers integer NOT NULL DEFAULT 0,
+  skipped_questions integer NOT NULL DEFAULT 0,
+  time_spent integer NOT NULL DEFAULT 0, -- in seconds
+  hints_used integer NOT NULL DEFAULT 0,
+  configuration jsonb NOT NULL DEFAULT '{}'::jsonb,
+  answers jsonb NOT NULL DEFAULT '[]'::jsonb,
+  completed_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
+  created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
 -- Enable Row Level Security
 ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE quiz_folders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE quizzes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE quiz_cards ENABLE ROW LEVEL SECURITY;
 ALTER TABLE quiz_sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE test_sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE test_results ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
 -- Users can only see their own data
@@ -158,6 +198,26 @@ CREATE POLICY "Users can view own sessions" ON quiz_sessions
 CREATE POLICY "Users can insert own sessions" ON quiz_sessions
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 
+-- Test sessions policies
+CREATE POLICY "Users can view own test sessions" ON test_sessions
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own test sessions" ON test_sessions
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own test sessions" ON test_sessions
+  FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own test sessions" ON test_sessions
+  FOR DELETE USING (auth.uid() = user_id);
+
+-- Test results policies
+CREATE POLICY "Users can view own test results" ON test_results
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own test results" ON test_results
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
 -- Indexes for performance
 CREATE INDEX idx_projects_user_id ON projects(user_id);
 CREATE INDEX idx_quiz_folders_project_id ON quiz_folders(project_id);
@@ -168,6 +228,11 @@ CREATE INDEX idx_quizzes_user_id ON quizzes(user_id);
 CREATE INDEX idx_quiz_cards_quiz_id ON quiz_cards(quiz_id);
 CREATE INDEX idx_quiz_sessions_user_id ON quiz_sessions(user_id);
 CREATE INDEX idx_quiz_sessions_quiz_id ON quiz_sessions(quiz_id);
+CREATE INDEX idx_test_sessions_user_id ON test_sessions(user_id);
+CREATE INDEX idx_test_sessions_quiz_id ON test_sessions(quiz_id);
+CREATE INDEX idx_test_results_user_id ON test_results(user_id);
+CREATE INDEX idx_test_results_quiz_id ON test_results(quiz_id);
+CREATE INDEX idx_test_results_session_id ON test_results(session_id);
 
 -- Updated_at trigger function
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -189,4 +254,7 @@ CREATE TRIGGER update_quizzes_updated_at BEFORE UPDATE ON quizzes
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_quiz_cards_updated_at BEFORE UPDATE ON quiz_cards
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_test_sessions_updated_at BEFORE UPDATE ON test_sessions
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

@@ -207,6 +207,64 @@
       "DELETE_QUIZ_WARNING": "kvízt?"
     }
   },
+  "TEST": {
+    "START_TEST": "Teszt indítása",
+    "TEST_CONFIG": "Teszt beállítások",
+    "TEST_MODE": "Teszt mód",
+    "TIME_LIMIT": "Időkorlát",
+    "QUESTION_COUNT": "Kérdések száma",
+    "SHOW_HINTS": "Tippek megjelenítése",
+    "IMMEDIATE_FEEDBACK": "Azonnali visszajelzés",
+    "ALLOW_RETRY": "Újrapróbálkozás engedélyezése",
+    "RANDOM_ORDER": "Véletlenszerű sorrend",
+    "START": "Indítás",
+    "CANCEL": "Mégse",
+    "MINUTES": "perc",
+    "ALL_QUESTIONS": "Összes kérdés",
+    "MODES": {
+      "PRACTICE": "Gyakorlás",
+      "EXAM": "Vizsga",
+      "TIMED": "Időkorláttal"
+    },
+    "EXECUTION": {
+      "QUESTION": "Kérdés",
+      "OF": "/",
+      "TIME_REMAINING": "Hátralévő idő",
+      "HINT": "Tipp",
+      "SUBMIT": "Válasz küldése",
+      "NEXT": "Következő",
+      "PAUSE": "Szünet",
+      "RESUME": "Folytatás",
+      "EXIT": "Kilépés",
+      "FLIP_CARD": "Kártya megfordítása",
+      "MARK_CORRECT": "Helyes",
+      "MARK_INCORRECT": "Helytelen",
+      "ANSWER": "Válasz",
+      "YOUR_ANSWER": "Az Ön válasza"
+    },
+    "RESULTS": {
+      "TEST_COMPLETED": "Teszt befejezve",
+      "SCORE": "Eredmény",
+      "PERCENTAGE": "Százalék",
+      "CORRECT_ANSWERS": "Helyes válaszok",
+      "INCORRECT_ANSWERS": "Hibás válaszok",
+      "SKIPPED": "Kihagyott",
+      "TIME_SPENT": "Eltöltött idő",
+      "HINTS_USED": "Használt tippek",
+      "BACK_TO_QUIZZES": "Vissza a kvízekhez",
+      "TRY_AGAIN": "Újra próbálom"
+    },
+    "HISTORY": {
+      "TITLE": "Teszt előzmények",
+      "NO_TESTS": "Még nincsenek befejezett tesztek",
+      "COMPLETED_ON": "Befejezve",
+      "VIEW_DETAILS": "Részletek",
+      "RETRY": "Újrapróbálkozás",
+      "AVERAGE_SCORE": "Átlagos eredmény",
+      "BEST_SCORE": "Legjobb eredmény",
+      "TOTAL_TESTS": "Összes teszt"
+    }
+  },
   "DASHBOARD": {
     "TITLE": "Irányítópult",
     "LOGGED_IN_USER": "Bejelentkezett felhasználó",

@@ -207,6 +207,64 @@
       "DELETE_QUIZ_WARNING": "quiz?"
     }
   },
+  "TEST": {
+    "START_TEST": "Start Test",
+    "TEST_CONFIG": "Test Configuration",
+    "TEST_MODE": "Test Mode",
+    "TIME_LIMIT": "Time Limit",
+    "QUESTION_COUNT": "Number of Questions",
+    "SHOW_HINTS": "Show Hints",
+    "IMMEDIATE_FEEDBACK": "Immediate Feedback",
+    "ALLOW_RETRY": "Allow Retry",
+    "RANDOM_ORDER": "Random Order",
+    "START": "Start",
+    "CANCEL": "Cancel",
+    "MINUTES": "minutes",
+    "ALL_QUESTIONS": "All questions",
+    "MODES": {
+      "PRACTICE": "Practice",
+      "EXAM": "Exam",
+      "TIMED": "Timed"
+    },
+    "EXECUTION": {
+      "QUESTION": "Question",
+      "OF": "of",
+      "TIME_REMAINING": "Time Remaining",
+      "HINT": "Hint",
+      "SUBMIT": "Submit Answer",
+      "NEXT": "Next",
+      "PAUSE": "Pause",
+      "RESUME": "Resume",
+      "EXIT": "Exit",
+      "FLIP_CARD": "Flip Card",
+      "MARK_CORRECT": "Correct",
+      "MARK_INCORRECT": "Incorrect",
+      "ANSWER": "Answer",
+      "YOUR_ANSWER": "Your Answer"
+    },
+    "RESULTS": {
+      "TEST_COMPLETED": "Test Completed",
+      "SCORE": "Score",
+      "PERCENTAGE": "Percentage",
+      "CORRECT_ANSWERS": "Correct Answers",
+      "INCORRECT_ANSWERS": "Incorrect Answers",
+      "SKIPPED": "Skipped",
+      "TIME_SPENT": "Time Spent",
+      "HINTS_USED": "Hints Used",
+      "BACK_TO_QUIZZES": "Back to Quizzes",
+      "TRY_AGAIN": "Try Again"
+    },
+    "HISTORY": {
+      "TITLE": "Test History",
+      "NO_TESTS": "No completed tests yet",
+      "COMPLETED_ON": "Completed on",
+      "VIEW_DETAILS": "View Details",
+      "RETRY": "Retry",
+      "AVERAGE_SCORE": "Average Score",
+      "BEST_SCORE": "Best Score",
+      "TOTAL_TESTS": "Total Tests"
+    }
+  },
   "DASHBOARD": {
     "TITLE": "Dashboard",
     "LOGGED_IN_USER": "Logged in user",
