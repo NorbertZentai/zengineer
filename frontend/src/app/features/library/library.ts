@@ -127,7 +127,7 @@ export class LibraryPage implements OnInit {
 
       const copiedQuiz = await this.quizService.createQuiz(newQuiz);
       if (copiedQuiz) {
-        console.log('Quiz copied successfully');
+        // ...existing code...
       }
     } catch (error) {
       console.error('Error copying quiz:', error);

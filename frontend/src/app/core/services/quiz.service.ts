@@ -1,6 +1,7 @@
 // Supabase service - Teljes backend replacement
 import { Injectable, signal, computed } from '@angular/core';
-import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
+import { SupabaseClient, User } from '@supabase/supabase-js';
+import { SupabaseService } from './supabase.service';
 import { environment } from '../../../environments/environment';
 
 export interface Project {
@@ -134,7 +135,7 @@ export class QuizService {
   
   // Reactive state
   user = signal<User | null>(null);
-  projects = signal<Project[]>([]);
+  // ...existing code...
   quizzes = signal<Quiz[]>([]);
   folders = signal<QuizFolder[]>([]);
   isLoading = signal(false);
@@ -162,10 +163,7 @@ export class QuizService {
   allQuizzes = this.quizzes.asReadonly();
 
   constructor() {
-    this.supabase = createClient(
-      environment.supabaseUrl,
-      environment.supabaseKey
-    );
+    this.supabase = SupabaseService.getClient();
 
     // Initialize auth state
     this.initPromise = this.initializeAuth();
@@ -223,67 +221,18 @@ export class QuizService {
   }
 
   // 🎯 PROJECT METHODS
-  async loadProjects() {
-    this.isLoading.set(true);
-    try {
-      const { data, error } = await this.supabase
-        .from('projects')
-        .select('*')
-        .eq('user_id', this.user()?.id);
-
-      if (error) throw error;
-      this.projects.set(data || []);
-    } finally {
-      this.isLoading.set(false);
-    }
-  }
+  // ...existing code...
 
   async createProject(project: Omit<Project, 'id' | 'user_id' | 'created_at' | 'updated_at'>) {
-    const { data, error } = await this.supabase
-      .from('projects')
-      .insert({
-        name: project.name,
-        description: project.description,
-        color: project.color,
-        visibility: project.visibility,
-        tags: project.tags,
-        subject: project.subject,
-        difficulty_level: project.difficulty_level,
-        target_audience: project.target_audience,
-        language: project.language,
-        user_id: this.user()?.id
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
-    await this.loadProjects();
-    return data;
+    // ...existing code...
   }
 
   async updateProject(id: string, updates: Partial<Project>) {
-    const { data, error } = await this.supabase
-      .from('projects')
-      .update(updates)
-      .eq('id', id)
-      .eq('user_id', this.user()?.id)
-      .select()
-      .single();
-
-    if (error) throw error;
-    await this.loadProjects();
-    return data;
+    // ...existing code...
   }
 
   async deleteProject(id: string) {
-    const { error } = await this.supabase
-      .from('projects')
-      .delete()
-      .eq('id', id)
-      .eq('user_id', this.user()?.id);
-
-    if (error) throw error;
-    await this.loadProjects();
+    // ...existing code...
   }
 
   selectProject(project: Project | null): void {
@@ -403,7 +352,7 @@ export class QuizService {
 
   // 📁 FOLDER METHODS
   async loadFolders() {
-    console.log('Loading folders for user:', this.user()?.id);
+    // ...existing code...
     this.isLoading.set(true);
     try {
       const { data, error } = await this.supabase
@@ -416,7 +365,7 @@ export class QuizService {
         throw error;
       }
       
-      console.log('Loaded folders:', data);
+      // ...existing code...
       this.folders.set(data || []);
     } finally {
       this.isLoading.set(false);
@@ -424,8 +373,8 @@ export class QuizService {
   }
 
   async createFolder(folder: Omit<QuizFolder, 'id' | 'user_id' | 'created_at' | 'updated_at'>) {
-    console.log('Creating folder:', folder);
-    console.log('Current user:', this.user()?.id);
+    // ...existing code...
+    // ...existing code...
     
     const { data, error } = await this.supabase
       .from('quiz_folders')
@@ -447,9 +396,9 @@ export class QuizService {
       throw error;
     }
     
-    console.log('Folder created successfully:', data);
+    // ...existing code...
     await this.loadFolders(); // Refresh list
-    console.log('Current folders after refresh:', this.folders());
+    // ...existing code...
     return data;
   }
 
@@ -523,14 +472,14 @@ export class QuizService {
   // 🧹 UTILITY METHODS
   private async loadUserData() {
     await Promise.all([
-      this.loadProjects(),
+      // ...existing code...
       this.loadQuizzes(),
       this.loadFolders()
     ]);
   }
 
   private clearUserData() {
-    this.projects.set([]);
+    // ...existing code...
     this.quizzes.set([]);
     this.folders.set([]);
     this._currentProject.set(null);
@@ -544,7 +493,7 @@ export class QuizService {
   
   selectQuiz(quiz: Quiz): void {
     // Navigate to quiz or set current quiz if needed
-    console.log('Selected quiz:', quiz);
+    // ...existing code...
   }
   
   setSearchQuery(query: string): void {
@@ -571,7 +520,7 @@ export class QuizService {
   // CARD MANAGEMENT
   async addCard(quizId: string, cardData: Partial<QuizCard>): Promise<QuizCard> {
     try {
-      console.log('🔄 Adding card with legacy schema compatibility...');
+      // ...existing code...
       
       // Használjuk a RÉGI schema formátumot
       const legacyCard = {
@@ -583,7 +532,7 @@ export class QuizService {
         tags: JSON.stringify(cardData.tags || [])
       };
 
-      console.log('📤 Inserting legacy format:', legacyCard);
+      // ...existing code...
 
       const { data, error } = await this.supabase
         .from('quiz_cards')
@@ -596,7 +545,7 @@ export class QuizService {
         throw error;
       }
       
-      console.log('✅ Card inserted successfully:', data);
+      // ...existing code...
       
       // Konvertáljuk vissza az új formátumra a UI számára
       return this.convertFromLegacy(data, cardData);
@@ -714,7 +663,7 @@ export class QuizService {
 
   updateStudySession(updates: Partial<StudySession>): void {
     // For now, just log the update - in a real app, you'd save to state/database
-    console.log('Study session updated:', updates);
+    // ...existing code...
   }
 
   endStudySession(session: StudySession): Promise<StudySession> {

@@ -32,20 +32,19 @@
             class="test-type-card"
             [class.enabled]="testType.enabled"
             (click)="toggleTestType(testType.id)">
-            
             <div class="card-header">
               <div class="type-icon">
                 <mat-icon>
                   {{ testType.id === 'flashcard' ? 'flip_to_front' : 
                      testType.id === 'multiple_choice' ? 'radio_button_checked' :
-                     testType.id === 'written' ? 'edit' : 'shuffle' }}
+                     testType.id === 'multi_select' ? 'checklist' :
+                     testType.id === 'written' ? 'edit' : '' }}
                 </mat-icon>
               </div>
               <div class="checkbox" [class.checked]="testType.enabled">
                 <mat-icon>{{ testType.enabled ? 'check' : '' }}</mat-icon>
               </div>
             </div>
-            
             <h4>{{ testType.name }}</h4>
             <p>{{ testType.description }}</p>
           </div>
@@ -111,6 +110,23 @@
         </h3>
         
         <div class="settings-grid">
+          <label class="setting-toggle">
+            <input 
+              type="checkbox" 
+              checked
+              disabled
+              [(ngModel)]="configuration.answerMode"
+              [value]="'own_answers'">
+            <div class="toggle-content">
+              <div class="toggle-header">
+                <span class="setting-title">Csak saját kártyák</span>
+                <div class="toggle-switch enabled">
+                  <div class="toggle-thumb"></div>
+                </div>
+              </div>
+              <span class="setting-description">A tesztben csak a saját kártyáid szerepelnek</span>
+            </div>
+          </label>
           <label class="setting-toggle">
             <input 
               type="checkbox" 

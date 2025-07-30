@@ -1,3 +1,4 @@
+// ...existing code...
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -15,6 +16,25 @@ import { QuizService } from '../../../core/services/quiz.service';
   styleUrls: ['./test-execution.component.scss']
 })
 export class TestExecutionComponent implements OnInit, OnDestroy {
+  onMultiSelectToggle(answer: string): void {
+    if (this.isAnswerSubmitted) return;
+    const index = this.selectedAnswers.indexOf(answer);
+    if (index > -1) {
+      this.selectedAnswers.splice(index, 1);
+    } else {
+      this.selectedAnswers.push(answer);
+    }
+  }
+
+  // Timer
+  remainingTime: number | null = null;
+  timeSpent = 0;
+  questionStartTime = Date.now();
+  timerInterval: any;
+
+  isLimitedTime(): boolean {
+    return this.remainingTime !== null && this.remainingTime !== Infinity && Number.isFinite(this.remainingTime);
+  }
   session: TestSession | null = null;
   currentQuestion: TestQuestion | null = null;
   userAnswer: string = '';
@@ -24,11 +44,7 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
   isAnswerSubmitted = false;
   isFlipped = false;
   
-  // Timer
-  remainingTime: number | null = null;
-  timeSpent = 0;
-  questionStartTime = Date.now();
-  timerInterval: any;
+  // ...existing code...
   
   // State
   isLoading = false;
@@ -69,9 +85,21 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
 
   loadCurrentQuestion(): void {
     this.currentQuestion = this.testService.getCurrentQuestion();
+    // DEBUG: Log test configuration and current question
+    const session = this.testService.currentSession();
+    if (session) {
+      const selectedTypes = session.configuration.testTypes.filter(t => t.enabled).map(t => t.id);
+      console.debug('[DEBUG] Teszt indítva:', selectedTypes.length === 1 ? selectedTypes[0] : selectedTypes);
+    }
+    if (this.currentQuestion) {
+      console.debug('[DEBUG] Folyamatban lévő teszt:', this.currentQuestion.type);
+      console.debug('[DEBUG] Kérdés:', this.currentQuestion.question);
+      if (this.currentQuestion.options) {
+        console.debug('[DEBUG] Válaszlehetőségek:', this.currentQuestion.options);
+      }
+    }
     this.resetQuestionState();
     this.questionStartTime = Date.now();
-    
     if (this.testService.isTestCompleted()) {
       this.completeTest();
     }
@@ -88,12 +116,11 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
 
   startTimer(): void {
     this.remainingTime = this.testService.getRemainingTime();
-    
     this.timerInterval = setInterval(() => {
       this.timeSpent++;
       this.remainingTime = this.testService.getRemainingTime();
-      
-      if (this.remainingTime !== null && this.remainingTime <= 0) {
+      // Only auto-complete if time limit is set and reached
+      if (this.remainingTime !== null && this.remainingTime !== Infinity && this.remainingTime <= 0) {
         this.timeUp();
       }
     }, 1000);
@@ -168,6 +195,8 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
     switch (this.currentQuestion.type) {
       case 'multiple_choice':
         return this.selectedAnswers.length > 0;
+      case 'multi_select':
+        return this.selectedAnswers.length > 0;
       case 'written':
         return this.userAnswer.trim().length > 0;
       case 'flashcard':
@@ -188,6 +217,7 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
       
       switch (this.currentQuestion.type) {
         case 'multiple_choice':
+        case 'multi_select':
           answer = this.selectedAnswers;
           break;
         case 'written':
@@ -266,7 +296,7 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     
     try {
-      console.log('🔄 Starting test completion process...');
+      // ...existing code...
       
       // Get quiz name for the result
       const quizId = this.session?.quiz_id;
@@ -275,14 +305,14 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
       if (quizId) {
         const quiz = this.quizService.quizzes().find(q => q.id === quizId);
         quizName = quiz?.name || quizName;
-        console.log('📚 Quiz name found:', quizName);
+        // ...existing code...
       }
       
-      console.log('💾 Calling test service completeTest...');
+      // ...existing code...
       const result = await this.testService.completeTest();
       result.quiz_name = quizName;
       
-      console.log('✅ Test completion successful:', result);
+      // ...existing code...
       this.testResult = result;
       this.showResult = true;
       

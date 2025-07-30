@@ -260,8 +260,8 @@
       "MULTIPLE_CHOICE_DESC": "Többválasztásos kérdések",
       "WRITTEN": "Írásos válasz",
       "WRITTEN_DESC": "Szöveges válaszok begépelése",
-      "MIXED": "Vegyes",
-      "MIXED_DESC": "Különböző típusú kérdések keverve"
+      "MULTI_SELECT": "Többszörös válasz",
+      "MULTI_SELECT_DESC": "Több helyes válasz kiválasztása a lehetőségek közül"
     },
     "MODES": {
       "PRACTICE": "Gyakorlás",
@@ -423,6 +423,6 @@
     "FLASHCARD": "Kártya teszt",
     "MULTIPLE_CHOICE": "Feleletválasztós",
     "WRITTEN": "Írásbeli",
-    "MIXED": "Vegyes"
+    "MULTI_SELECT": "Többszörös válasz"
   }
 }

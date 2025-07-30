@@ -260,8 +260,8 @@
       "MULTIPLE_CHOICE_DESC": "Multiple choice questions",
       "WRITTEN": "Written Answer",
       "WRITTEN_DESC": "Type text answers",
-      "MIXED": "Mixed",
-      "MIXED_DESC": "Mix of different question types"
+      "MULTI_SELECT": "Multi-select",
+      "MULTI_SELECT_DESC": "Select multiple correct answers from the options"
     },
     "MODES": {
       "PRACTICE": "Practice",
@@ -421,8 +421,8 @@
   },
   "TEST_TYPES": {
     "FLASHCARD": "Flashcard",
-    "MULTIPLE_CHOICE": "Multiple Choice", 
+    "MULTIPLE_CHOICE": "Multiple Choice",
     "WRITTEN": "Written",
-    "MIXED": "Mixed"
+    "MULTI_SELECT": "Multi-select"
   }
 }

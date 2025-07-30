@@ -97,7 +97,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   toggleNotifications() {
     // Mock implementation - replace with actual notification handling
-    console.log('Toggle notifications');
+    // ...existing code...
   }
 
   toggleUserDropdown() {
@@ -117,13 +117,13 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   toggleLanguage() {
-    console.log('toggleLanguage called, current state:', this.showLanguageDropdown);
+    // ...existing code...
     this.showLanguageDropdown = !this.showLanguageDropdown;
     if (this.showLanguageDropdown) {
       this.showUserDropdown = false;
       this.showCreateDropdown = false;
     }
-    console.log('new state:', this.showLanguageDropdown);
+    // ...existing code...
   }
 
   selectLanguage(lang: string) {

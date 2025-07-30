@@ -85,6 +85,6 @@ export class TestHistoryComponent implements OnInit {
   async retryTest(quizId: string): Promise<void> {
     // This would trigger the test configuration modal for the specific quiz
     // Implementation depends on your routing setup
-    console.log('Retry test for quiz:', quizId);
+    // ...existing code...
   }
 }

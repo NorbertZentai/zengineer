@@ -228,7 +228,7 @@ export class QuizDetailsComponent implements OnInit {
         cardData.incorrect_answers = incorrectAnswers;
       }
 
-      console.log('Kártya adatok mentése:', cardData);
+      // ...existing code...
       
       const card = await this.quizService.addCard(this.quiz.id, cardData);
       
@@ -237,7 +237,7 @@ export class QuizDetailsComponent implements OnInit {
       this.cards.unshift(cardWithFlip);
       
       this.resetNewCard();
-      console.log('Kártya sikeresen létrehozva:', cardWithFlip);
+      // ...existing code...
       
     } catch (err: any) {
       console.error('Hiba a kártya mentése során:', err);
@@ -252,7 +252,7 @@ export class QuizDetailsComponent implements OnInit {
 
   editCard(card: any) {
     // TODO: Implementáld a szerkesztést
-    console.log('Kártya szerkesztése:', card);
+    // ...existing code...
   }
 
   trackByIndex(index: number): number {
@@ -278,7 +278,7 @@ export class QuizDetailsComponent implements OnInit {
 
   async editQuiz() {
     // TODO: Implement quiz editing
-    console.log('Edit quiz:', this.quiz);
+    // ...existing code...
   }
 
   toggleSettings() {
@@ -348,7 +348,7 @@ export class QuizDetailsComponent implements OnInit {
 
   // Debug function to test database structure
   async testDatabaseStructure() {
-    console.log('🔍 Testing database structure...');
+    // ...existing code...
     
     if (!this.quiz?.id) {
       console.error('❌ No quiz loaded');
@@ -357,16 +357,16 @@ export class QuizDetailsComponent implements OnInit {
     
     try {
       // Test 1: Try to query existing cards
-      console.log('📋 Checking existing cards...');
+      // ...existing code...
       const cards = await this.quizService.getQuizCards(this.quiz.id);
-      console.log('✅ Existing cards:', cards);
+      // ...existing code...
       
       if (cards.length > 0) {
-        console.log('📋 First card structure:', Object.keys(cards[0]));
+        // ...existing code...
       }
       
       // Test 2: Try a minimal card insert
-      console.log('🧪 Testing minimal card insert...');
+      // ...existing code...
       const testCard: Partial<QuizCard> = {
         question: 'Database test question',
         card_type: 'flashcard',
@@ -375,12 +375,12 @@ export class QuizDetailsComponent implements OnInit {
       };
       
       const result = await this.quizService.addCard(this.quiz.id, testCard);
-      console.log('✅ Card insert successful:', result);
+      // ...existing code...
       
       // Clean up - remove test card
       if (result.id) {
         await this.quizService.deleteQuizCard(result.id);
-        console.log('🧹 Test card cleaned up');
+        // ...existing code...
       }
       
     } catch (error: any) {
