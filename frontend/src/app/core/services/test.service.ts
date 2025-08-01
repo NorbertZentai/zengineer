@@ -1,3 +1,5 @@
+
+// ...existing code...
 // ...existing code...
 import { Injectable, signal } from '@angular/core';
 import { SupabaseClient } from '@supabase/supabase-js';
@@ -60,6 +62,7 @@ export interface TestAnswer {
   question_id: string;
   answer: string | string[];
   is_correct: boolean;
+  partial_score?: number;
   time_spent: number; // in seconds
   attempts: number;
   hint_used: boolean;
@@ -125,7 +128,7 @@ export class TestService {
   testHistory = signal<TestHistory[]>([]);
   isLoading = signal(false);
 
-  // Default test types
+
   readonly DEFAULT_TEST_TYPES: TestType[] = [
     {
       id: 'flashcard',
@@ -153,8 +156,101 @@ export class TestService {
     },
   ];
 
+  // ...existing code...
+
+  // ...existing code...
+
   constructor(private authService: AuthService) {
     this.supabase = SupabaseService.getClient();
+  }
+
+  /**
+   * Lekéri a session-t a backendről (Supabase) az adott id alapján.
+   */
+  async fetchSessionFromBackend(sessionId: string): Promise<TestSession | null> {
+    try {
+      const { data, error } = await this.supabase
+        .from('test_sessions')
+        .select('*')
+        .eq('id', sessionId)
+        .single();
+      if (error) {
+        console.error('❌ fetchSessionFromBackend error:', error);
+        return null;
+      }
+      return data as TestSession;
+    } catch (e) {
+      console.error('❌ fetchSessionFromBackend exception:', e);
+      return null;
+    }
+  }
+
+  /**
+   * Quiz kártyákból generál teszt kérdéseket a konfiguráció alapján.
+   */
+  generateTestQuestions(selectedCards: any[], config: TestConfiguration): TestQuestion[] {
+    const questions: TestQuestion[] = [];
+    for (let index = 0; index < selectedCards.length; index++) {
+      const card = selectedCards[index];
+      let answerObj: any = {};
+      try {
+        answerObj = JSON.parse(card.answer ?? '');
+      } catch {
+        answerObj = {};
+      }
+      let detectedType = answerObj.type;
+      const enabledTypesForType = config.testTypes.filter(t => t.enabled);
+      if (enabledTypesForType.length === 1) {
+        detectedType = enabledTypesForType[0].id;
+      } else {
+        if (
+          Array.isArray(answerObj.correct) && answerObj.correct.length >= 2 &&
+          Array.isArray(answerObj.incorrect) && answerObj.incorrect.length >= 3
+        ) {
+          detectedType = 'multi_select';
+        } else if (
+          Array.isArray(answerObj.correct) && answerObj.correct.length === 1 &&
+          Array.isArray(answerObj.incorrect) && answerObj.incorrect.length >= 1
+        ) {
+          detectedType = 'multiple_choice';
+        }
+      }
+      const question: any = {
+        id: `${card.id}-${index}`,
+        card_id: card.id!,
+        question: card.question,
+        type: detectedType,
+        hint: config.showHints ? card.hint : undefined,
+        order: index
+      };
+      // Always set options for multiple_choice and multi_select
+      if (Array.isArray(answerObj.correct) && Array.isArray(answerObj.incorrect)) {
+        if (question.type === 'multiple_choice') {
+          const correctAnswer = String(this.shuffleArray(answerObj.correct)[0] ?? '');
+          const incorrectOptions = this.shuffleArray(
+            answerObj.incorrect.filter((opt: any) => typeof opt === 'string' && opt.trim().toLowerCase() !== correctAnswer.trim().toLowerCase())
+          ).slice(0, 3);
+          if (incorrectOptions.length < 3) continue;
+          const allOptions = [correctAnswer, ...incorrectOptions];
+          question.options = this.shuffleArray(allOptions);
+          question.correct_answer = correctAnswer;
+        } else if (question.type === 'multi_select') {
+          if (answerObj.correct.length < 2 || answerObj.incorrect.length < 3) continue;
+          const allOptions = [...answerObj.correct, ...answerObj.incorrect];
+          question.options = this.shuffleArray(allOptions);
+          question.correct_answers = answerObj.correct;
+        }
+      }
+      if (question.type === 'written' || question.type === 'flashcard') {
+        question.correct_answer = Array.isArray(answerObj.correct) ? answerObj.correct[0] : answerObj.correct;
+      }
+      questions.push(question);
+    }
+    let finalQuestions = config.shuffleQuestions ? this.shuffleArray(questions) : questions;
+    if (config.questionCount && config.questionCount > 0 && finalQuestions.length > config.questionCount) {
+      finalQuestions = finalQuestions.slice(0, config.questionCount);
+    }
+    return finalQuestions;
   }
 
   // --- Missing methods for test-execution.component.ts ---
@@ -215,7 +311,6 @@ export class TestService {
     }
 
     this.isLoading.set(true);
-    
     try {
       // Get quiz cards
       const { data: cards, error: cardsError } = await this.supabase
@@ -226,7 +321,6 @@ export class TestService {
       if (cardsError) {
         throw new Error(`Kártyák lekérdezési hiba: ${cardsError.message}`);
       }
-      
       if (!cards || cards.length === 0) {
         throw new Error('A kvízhez nincsenek kártyák');
       }
@@ -260,97 +354,15 @@ export class TestService {
 
       const savedSession = { ...session, id: data.id };
       this.currentSession.set(savedSession);
-      
       return savedSession;
     } catch (error: any) {
-      // Re-throw with more context
       if (error.message?.includes('Adatbázis hiba:')) {
-        throw error; // Already formatted
-      } else {
-        throw new Error(`TestService hiba: ${error.message || 'Ismeretlen hiba'}`);
+        throw error;
       }
+      throw error;
     } finally {
       this.isLoading.set(false);
     }
-  }
-
-  private generateTestQuestions(cards: QuizCard[], config: TestConfiguration): TestQuestion[] {
-    const enabledTypes = config.testTypes.filter(t => t.enabled).map(t => t.id);
-    let selectedCards = cards.filter(card => {
-      let answerObj: any = {};
-      try {
-        answerObj = JSON.parse(card.answer ?? '');
-      } catch {
-        answerObj = {};
-      }
-      // Relaxed filtering: allow any card with at least one correct answer
-      return Array.isArray(answerObj.correct) && answerObj.correct.length >= 1;
-    });
-    if (config.questionCount && config.questionCount > 0 && config.questionCount < selectedCards.length) {
-      if (config.shuffleQuestions) {
-        selectedCards = this.shuffleArray(selectedCards);
-      }
-      selectedCards = selectedCards.slice(0, config.questionCount);
-    }
-    const questions: TestQuestion[] = [];
-    for (let index = 0; index < selectedCards.length; index++) {
-      const card = selectedCards[index];
-      let answerObj: any = {};
-      try {
-        answerObj = JSON.parse(card.answer ?? '');
-      } catch {
-        answerObj = {};
-      }
-      let detectedType = answerObj.type;
-      const enabledTypesForType = config.testTypes.filter(t => t.enabled);
-      if (enabledTypesForType.length === 1) {
-        detectedType = enabledTypesForType[0].id;
-      } else {
-        if (
-          Array.isArray(answerObj.correct) && answerObj.correct.length >= 2 &&
-          Array.isArray(answerObj.incorrect) && answerObj.incorrect.length >= 3
-        ) {
-          detectedType = 'multi_select';
-        } else if (
-          Array.isArray(answerObj.correct) && answerObj.correct.length === 1 &&
-          Array.isArray(answerObj.incorrect) && answerObj.incorrect.length >= 1
-        ) {
-          detectedType = 'multiple_choice';
-        }
-      }
-      const question: any = {
-        id: `${card.id}-${index}`,
-        card_id: card.id!,
-        question: card.question,
-        type: detectedType,
-        hint: config.showHints ? card.hint : undefined,
-        order: index
-      };
-      // Always set options for multiple_choice and multi_select
-      if (Array.isArray(answerObj.correct) && Array.isArray(answerObj.incorrect)) {
-        if (question.type === 'multiple_choice') {
-          const correctAnswer = String(this.shuffleArray(answerObj.correct)[0] ?? '');
-          const incorrectOptions = this.shuffleArray(
-            answerObj.incorrect.filter((opt: any) => typeof opt === 'string' && opt.trim().toLowerCase() !== correctAnswer.trim().toLowerCase())
-          ).slice(0, 3);
-          if (incorrectOptions.length < 3) continue;
-          const allOptions = [correctAnswer, ...incorrectOptions];
-          question.options = this.shuffleArray(allOptions);
-          question.correct_answer = correctAnswer;
-        } else if (question.type === 'multi_select') {
-          if (answerObj.correct.length < 2 || answerObj.incorrect.length < 3) continue;
-          const allOptions = [...answerObj.correct, ...answerObj.incorrect];
-          question.options = this.shuffleArray(allOptions);
-          question.correct_answers = answerObj.correct;
-        }
-      }
-      if (question.type === 'written' || question.type === 'flashcard') {
-        question.correct_answer = Array.isArray(answerObj.correct) ? answerObj.correct[0] : answerObj.correct;
-      }
-      questions.push(question);
-    }
-    console.debug('Generated questions:', questions);
-    return config.shuffleQuestions ? this.shuffleArray(questions) : questions;
   }
 
   private shuffleArray<T>(array: T[]): T[] {
@@ -431,33 +443,92 @@ export class TestService {
     const question = session.questions.find(q => q.id === questionId);
     if (!question) throw new Error('Kérdés nem található');
     let isCorrect = false;
-    if (question.type === 'multiple_choice' || question.type === 'written' || question.type === 'flashcard') {
-      if (typeof answer === 'string' && question.correct_answer) {
-        isCorrect = answer.trim().toLowerCase() === question.correct_answer.trim().toLowerCase();
+    let partialScore = undefined;
+    if (question.type === 'flashcard') {
+      let userAnswer = answer;
+      if (Array.isArray(answer)) {
+        userAnswer = answer[0] ?? '';
+      }
+      if (typeof userAnswer === 'string') {
+        isCorrect = userAnswer.trim().toLowerCase() === 'correct';
+      }
+    } else if (question.type === 'written') {
+      let userAnswer = answer;
+      if (Array.isArray(answer)) {
+        userAnswer = answer[0] ?? '';
+      }
+      let corrects: string[] = [];
+      if (question.correct_answers && Array.isArray(question.correct_answers)) {
+        corrects = question.correct_answers.map(a => a.trim().toLowerCase());
+      } else if (question.correct_answer) {
+        corrects = [question.correct_answer.trim().toLowerCase()];
+      }
+      let maxPercent = 0;
+      if (typeof userAnswer === 'string' && corrects.length > 0) {
+        const user = userAnswer.trim().toLowerCase();
+        for (const correct of corrects) {
+          // Egyszerű szöveg összehasonlítás: karakterek egyezése
+          let matchCount = 0;
+          const minLen = Math.min(user.length, correct.length);
+          for (let i = 0; i < minLen; i++) {
+            if (user[i] === correct[i]) matchCount++;
+          }
+          const percent = Math.round((matchCount / correct.length) * 100);
+          if (percent > maxPercent) maxPercent = percent;
+        }
+        partialScore = maxPercent / 100;
+        isCorrect = maxPercent >= 60;
+      }
+    } else if (question.type === 'multiple_choice') {
+      let userAnswer = answer;
+      if (Array.isArray(answer)) {
+        userAnswer = answer[0] ?? '';
+      }
+      if (typeof userAnswer === 'string' && question.correct_answer) {
+        isCorrect = userAnswer.trim().toLowerCase() === question.correct_answer.trim().toLowerCase();
       }
     } else if (question.type === 'multi_select') {
       if (Array.isArray(answer) && Array.isArray(question.correct_answers)) {
-        const sortedUser = [...answer].map(a => a.trim().toLowerCase()).sort();
-        const sortedCorrect = [...question.correct_answers].map(a => a.trim().toLowerCase()).sort();
-        isCorrect = JSON.stringify(sortedUser) === JSON.stringify(sortedCorrect);
+        const userAnswers = answer.map(a => a.trim().toLowerCase());
+        const correctAnswers = question.correct_answers.map(a => a.trim().toLowerCase());
+        const totalCorrect = correctAnswers.length;
+        const userCorrect = userAnswers.filter(a => correctAnswers.includes(a)).length;
+        const userIncorrect = userAnswers.filter(a => !correctAnswers.includes(a)).length;
+        // Részpont: csak a helyesekért jár pont, hibásért nem
+        partialScore = userCorrect / totalCorrect;
+        isCorrect = userCorrect === totalCorrect && userIncorrect === 0;
       }
     }
     console.debug('Answer checked:', { questionId, answer, isCorrect });
     const testAnswer: TestAnswer = {
-      question_id: questionId,
-      answer,
-      is_correct: isCorrect,
-      time_spent: timeSpent,
-      attempts: 1,
-      hint_used: hintUsed,
-      answered_at: new Date().toISOString()
+    question_id: questionId,
+    answer,
+    is_correct: isCorrect,
+    partial_score: partialScore,
+    time_spent: timeSpent,
+    attempts: 1,
+    hint_used: hintUsed,
+    answered_at: new Date().toISOString()
     };
-    const updatedAnswers = [...session.answers, testAnswer];
+    // Replace previous answer for this question if exists
+    const updatedAnswers = session.answers.filter(a => a.question_id !== questionId);
+    updatedAnswers.push(testAnswer);
     const correctAnswers = updatedAnswers.filter(a => a.is_correct).length;
+    let nextIndex = session.current_question_index;
+    let status = session.status;
+    // Ha az utolsó kérdésnél vagyunk, akkor növeljük az indexet és zárjuk le a tesztet
+    if (nextIndex >= session.questions.length - 1) {
+      nextIndex = session.questions.length; // túlmutat az utolsó kérdésen
+      status = 'completed';
+    } else {
+      nextIndex++;
+    }
     const updatedSession = {
       ...session,
       answers: updatedAnswers,
-      correct_answers: correctAnswers
+      correct_answers: correctAnswers,
+      current_question_index: nextIndex,
+      status
     };
     this.currentSession.set(updatedSession);
     await this.updateSession(updatedSession);
@@ -473,16 +544,20 @@ export class TestService {
       const endTime = new Date().toISOString();
       const timeSpent = Math.floor((new Date(endTime).getTime() - new Date(session.start_time).getTime()) / 1000);
       
+      // Helyes és hibás válaszok újraszámolása a válaszok alapján
+      const correctCount = session.answers.filter(a => a.is_correct).length;
+      const wrongCount = session.total_questions - correctCount;
+      const percentage = session.total_questions > 0 ? Math.round((correctCount / session.total_questions) * 100) : 0;
       const result: TestResult = {
         session_id: session.id!,
         quiz_id: session.quiz_id,
         user_id: session.user_id,
         quiz_name: '', // Will be filled by caller
-        score: session.correct_answers,
-        percentage: Math.round((session.correct_answers / session.total_questions) * 100),
+        score: correctCount,
+        percentage,
         total_questions: session.total_questions,
-        correct_answers: session.correct_answers,
-        wrong_answers: session.total_questions - session.correct_answers,
+        correct_answers: correctCount,
+        wrong_answers: wrongCount,
         time_spent: timeSpent,
         test_configuration: session.configuration,
         answers: session.answers,
@@ -591,80 +666,63 @@ export class TestService {
     }
   }
 
-  private async updateCardPerformance(cardId: string, isCorrect: boolean, timeSpent: number, hintUsed: boolean): Promise<void> {
+  private async updateCardPerformance(cardId: string, isCorrect: boolean, timeSpent: number, hintUsed: boolean): Promise<TestResult> {
     const user = this.authService.currentUser;
-    if (!user) return;
-
     try {
-      // Check if performance record exists
-      const { data: existingPerformance, error: fetchError } = await this.supabase
-        .from('card_performance')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('card_id', cardId)
-        .single();
-
-      if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 = no rows found
-        console.error('Error fetching card performance:', fetchError);
-        return;
+      let session = this.currentSession();
+      if (!session) {
+        throw new Error('Nincs aktív teszt session');
       }
-
-      const now = new Date().toISOString();
-
-      if (existingPerformance) {
-        // Update existing record
-        const newCorrectCount = existingPerformance.correct_count + (isCorrect ? 1 : 0);
-        const newIncorrectCount = existingPerformance.incorrect_count + (isCorrect ? 0 : 1);
-        const newTotalAttempts = existingPerformance.total_attempts + 1;
-        const newHintsUsed = existingPerformance.hints_used_count + (hintUsed ? 1 : 0);
-        
-        // Calculate new average response time
-        const totalTime = (existingPerformance.average_response_time * existingPerformance.total_attempts) + timeSpent;
-        const newAverageTime = totalTime / newTotalAttempts;
-
-        const { error: updateError } = await this.supabase
-          .from('card_performance')
-          .update({
-            correct_count: newCorrectCount,
-            incorrect_count: newIncorrectCount,
-            total_attempts: newTotalAttempts,
-            average_response_time: newAverageTime,
-            hints_used_count: newHintsUsed,
-            last_answered_at: now,
-            updated_at: now
-          })
-          .eq('id', existingPerformance.id);
-
-        if (updateError) {
-          console.error('Error updating card performance:', updateError);
-        }
-      } else {
-        // Create new record
-        const session = this.currentSession();
-        if (!session) return;
-
-        const newPerformance: CardPerformance = {
-          user_id: user.id,
-          quiz_id: session.quiz_id,
-          card_id: cardId,
-          correct_count: isCorrect ? 1 : 0,
-          incorrect_count: isCorrect ? 0 : 1,
-          total_attempts: 1,
-          average_response_time: timeSpent,
-          hints_used_count: hintUsed ? 1 : 0,
-          last_answered_at: now
-        };
-
-        const { error: insertError } = await this.supabase
-          .from('card_performance')
-          .insert(newPerformance);
-
-        if (insertError) {
-          console.error('Error creating card performance:', insertError);
+      // Mindig frissítsük a session-t a backendről, hogy a legutolsó válasz is benne legyen
+      if (session.id) {
+        const backendSession = await this.fetchSessionFromBackend(session.id);
+        if (backendSession) {
+          session = backendSession;
         }
       }
+      if (!session) throw new Error('Nincs aktív teszt session');
+      const endTime = new Date().toISOString();
+      const timeSpent = Math.floor((new Date(endTime).getTime() - new Date(session.start_time).getTime()) / 1000);
+      // Helyes és hibás válaszok újraszámolása a válaszok alapján
+      const correctCount = session.answers?.filter(a => a.is_correct).length ?? 0;
+      const wrongCount = (session.total_questions ?? 0) - correctCount;
+      const percentage = (session.total_questions ?? 0) > 0 ? Math.round((correctCount / session.total_questions) * 100) : 0;
+      const result: TestResult = {
+        session_id: session.id || '',
+        quiz_id: session.quiz_id || '',
+        user_id: session.user_id || '',
+        quiz_name: '', // Will be filled by caller
+        score: correctCount,
+        percentage,
+        total_questions: session.total_questions ?? 0,
+        correct_answers: correctCount,
+        wrong_answers: wrongCount,
+        time_spent: timeSpent,
+        test_configuration: session.configuration,
+        answers: session.answers ?? [],
+        completed_at: endTime
+      };
+      // Update session status
+      const completedSession: TestSession = {
+        ...session,
+        status: 'completed',
+        end_time: endTime,
+        quiz_id: session.quiz_id || '',
+        user_id: session.user_id || '',
+        total_questions: session.total_questions ?? 0,
+        correct_answers: correctCount,
+      };
+
+      await this.updateSession(completedSession);
+
+      // Save result to history
+      await this.saveTestResult(result);
+
+      this.currentSession.set(null);
+      return result;
     } catch (error) {
-      console.error('Error in updateCardPerformance:', error);
+      console.error('❌ completeTest failed:', error);
+      throw error;
     }
   }
 

@@ -1,5 +1,74 @@
 @use '../../../../scss/variables' as *;
 @use '../../../../scss/mixins' as *;
+// Eredmény kártya dizájn
+.result-question-card {
+  background: var(--bg-card);
+  border-radius: $radius-xl;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-primary);
+  padding: $spacing-6 $spacing-8;
+  margin-bottom: $spacing-6;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+  transition: box-shadow 0.2s;
+  &:hover {
+    box-shadow: var(--shadow-xl);
+  }
+  .result-question-header {
+    display: flex;
+    align-items: center;
+    gap: $spacing-3;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: var(--text-primary);
+    margin-bottom: $spacing-2;
+    .result-question-index {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      border-radius: $radius-full;
+      padding: $spacing-1 $spacing-3;
+      font-size: $font-size-base;
+      font-weight: $font-weight-bold;
+      margin-right: $spacing-2;
+    }
+    .result-question-text {
+      flex: 1;
+      font-size: $font-size-lg;
+      font-weight: $font-weight-semibold;
+      color: var(--text-primary);
+    }
+  }
+  .result-options {
+    margin-bottom: $spacing-2;
+  }
+  .result-user-answer, .result-correct-answer {
+    font-size: $font-size-base;
+    margin-bottom: $spacing-2;
+    strong {
+      font-weight: $font-weight-semibold;
+      margin-right: $spacing-2;
+    }
+  }
+  .result-status {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    margin-top: $spacing-2;
+    &.correct {
+      color: #16a34a;
+    }
+    &.incorrect {
+      color: #dc2626;
+    }
+    mat-icon {
+      font-size: 1.25rem;
+      margin-right: $spacing-2;
+    }
+  }
+}
 
 // Multi Select options use same style as multiple choice
 .multi-select-container .option-btn {
@@ -219,12 +288,10 @@
 
       mat-icon {
         font-size: 1.25rem;
-        width: auto;
-        height: auto;
       }
     }
   }
-}
+}   
 
 // Pause Overlay
 .pause-overlay {
@@ -266,34 +333,53 @@
       margin: 0 0 $spacing-6 0;
       color: var(--text-secondary);
     }
-
-    .resume-btn {
-      display: flex;
-      align-items: center;
-      gap: $spacing-2;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      border: none;
-      border-radius: $radius-lg;
-      padding: $spacing-3 $spacing-6;
-      color: white;
-      cursor: pointer;
-      font-size: $font-size-base;
-      font-weight: $font-weight-semibold;
-      transition: all 0.2s ease;
-      margin: 0 auto;
-
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-lg);
-      }
-
-      mat-icon {
-        font-size: 1.25rem;
-        width: auto;
-        height: auto;
-      }
-    }
   }
+}
+
+// Részletes eredmény opciók színezése
+.result-option {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  padding: $spacing-2 $spacing-4;
+  border-radius: $radius-lg;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  margin-bottom: $spacing-2;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+  .correct-icon {
+    color: #16a34a;
+    margin-right: $spacing-2;
+  }
+  .incorrect-icon {
+    color: #dc2626;
+    margin-right: $spacing-2;
+  }
+  &.correct-selected {
+    border-color: #16a34a;
+    background: #dcfce7;
+    color: #16a34a;
+  }
+  &.incorrect-selected {
+    border-color: #dc2626;
+    background: #fee2e2;
+    color: #dc2626;
+  }
+  &.correct-unselected {
+    border-color: #16a34a;
+    background: #f0fdf4;
+    color: #16a34a;
+  }
+}
+
+.text-green {
+  color: #16a34a !important;
+}
+.text-red {
+  color: #dc2626 !important;
 }
 
 // Main Content

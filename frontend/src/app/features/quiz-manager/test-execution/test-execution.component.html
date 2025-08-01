@@ -395,7 +395,6 @@
         <mat-icon>home</mat-icon>
         Vissza a kvízekhez
       </button>
-      
       <button 
         class="primary-btn" 
         *ngIf="session?.configuration?.allowRetry"
@@ -403,6 +402,52 @@
         <mat-icon>refresh</mat-icon>
         Újra próbálom
       </button>
+    </div>
+
+    <!-- Részletes kérdés-válasz kimutatás -->
+    <div class="results-details">
+      <h3>Kérdésenkénti eredmények</h3>
+      <div *ngFor="let answer of testResult.answers; let i = index" class="result-question-card">
+        <ng-container *ngIf="session && session.questions && session.questions.length > i">
+          <div class="result-question-header">
+            <span class="result-question-index">{{ i + 1 }}.</span>
+            <span class="result-question-text">{{ session.questions[i].question }}</span>
+          </div>
+          <!-- Multi Select, Multiple Choice -->
+          <div class="result-options" *ngIf="session.questions[i].options && (session.questions[i].options?.length || 0) > 0">
+            <div *ngFor="let opt of session.questions[i].options"
+                 class="result-option"
+                 [ngClass]="{
+                   'correct-selected': isOptionSelected(opt, answer) && isOptionCorrect(opt, session.questions[i]),
+                   'incorrect-selected': isOptionSelected(opt, answer) && !isOptionCorrect(opt, session.questions[i]),
+                   'correct-unselected': !isOptionSelected(opt, answer) && isOptionCorrect(opt, session.questions[i])
+                 }">
+              <mat-icon *ngIf="isOptionSelected(opt, answer) && isOptionCorrect(opt, session.questions[i])" class="correct-icon">check_circle</mat-icon>
+              <mat-icon *ngIf="isOptionSelected(opt, answer) && !isOptionCorrect(opt, session.questions[i])" class="incorrect-icon">cancel</mat-icon>
+              <mat-icon *ngIf="!isOptionSelected(opt, answer) && isOptionCorrect(opt, session.questions[i])" class="correct-icon">check_circle</mat-icon>
+              <span>{{ opt }}</span>
+            </div>
+          </div>
+          <!-- Written, Flashcard -->
+          <div *ngIf="!session.questions[i].options || (!!session.questions[i].options && session.questions[i].options?.length === 0)">
+            <div class="result-user-answer">
+              <strong>Jelölted:</strong>
+              <span [ngClass]="answer.is_correct ? 'text-green' : 'text-red'">{{ formatAnswerForDisplay(answer.answer) }}</span>
+              <span class="answer-status" [ngClass]="answer.is_correct ? 'text-green' : 'text-red'">
+                ({{ answer.is_correct ? 'Helyes' : 'Hibás' }})
+              </span>
+            </div>
+            <div class="result-correct-answer">
+              <strong>Helyes válasz:</strong>
+              <span class="text-green">{{ formatAnswerForDisplay(session.questions[i].correct_answer ? session.questions[i].correct_answer : session.questions[i].correct_answers) }}</span>
+            </div>
+          </div>
+          <div class="result-status" [class.correct]="answer.is_correct" [class.incorrect]="!answer.is_correct">
+            <mat-icon>{{ answer.is_correct ? 'check_circle' : 'cancel' }}</mat-icon>
+            <span>{{ answer.is_correct ? 'Helyes' : 'Hibás' }}</span>
+          </div>
+        </ng-container>
+      </div>
     </div>
   </div>
 </div>

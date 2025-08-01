@@ -16,6 +16,24 @@ import { QuizService } from '../../../core/services/quiz.service';
   styleUrls: ['./test-execution.component.scss']
 })
 export class TestExecutionComponent implements OnInit, OnDestroy {
+  // Segédfüggvények a részletes eredmény kimutatáshoz
+  isOptionCorrect(opt: string, question: TestQuestion | undefined): boolean {
+    if (!question) return false;
+    if (question.type === 'multi_select' && Array.isArray(question.correct_answers)) {
+      return question.correct_answers.includes(opt);
+    }
+    if ((question.type === 'multiple_choice' || question.type === 'flashcard') && typeof question.correct_answer === 'string') {
+      return question.correct_answer === opt;
+    }
+    return false;
+  }
+
+  isOptionSelected(opt: string, answer: TestAnswer): boolean {
+    if (Array.isArray(answer.answer)) {
+      return answer.answer.includes(opt);
+    }
+    return answer.answer === opt;
+  }
   onMultiSelectToggle(answer: string): void {
     if (this.isAnswerSubmitted) return;
     const index = this.selectedAnswers.indexOf(answer);
@@ -84,9 +102,11 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
   }
 
   loadCurrentQuestion(): void {
+    // Always reload the session to get the latest answers
+    this.session = this.testService.currentSession();
     this.currentQuestion = this.testService.getCurrentQuestion();
     // DEBUG: Log test configuration and current question
-    const session = this.testService.currentSession();
+    const session = this.session;
     if (session) {
       const selectedTypes = session.configuration.testTypes.filter(t => t.enabled).map(t => t.id);
       console.debug('[DEBUG] Teszt indítva:', selectedTypes.length === 1 ? selectedTypes[0] : selectedTypes);
@@ -101,6 +121,8 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
     this.resetQuestionState();
     this.questionStartTime = Date.now();
     if (this.testService.isTestCompleted()) {
+      // Ensure session is up-to-date before completing test
+      this.session = this.testService.currentSession();
       this.completeTest();
     }
   }
@@ -311,7 +333,12 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
       // ...existing code...
       const result = await this.testService.completeTest();
       result.quiz_name = quizName;
-      
+      // DEBUG: Log the result object and key fields
+      console.log('[DEBUG] TestResult:', result);
+      console.log('[DEBUG] Percentage:', result.percentage);
+      console.log('[DEBUG] Correct answers:', result.correct_answers);
+      console.log('[DEBUG] Wrong answers:', result.wrong_answers);
+      console.log('[DEBUG] Answers array:', result.answers);
       // ...existing code...
       this.testResult = result;
       this.showResult = true;
