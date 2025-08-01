@@ -1,3 +1,4 @@
+// ...existing imports and decorators...
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -39,6 +40,12 @@ import { environment } from '../../../../environments/environment';
   ]
 })
 export class QuizDetailsComponent implements OnInit {
+  showScrollTop = false;
+  private scrollListener: (() => void) | null = null;
+
+  scrollToTop(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
   @ViewChild('questionEditor') questionEditor!: ElementRef;
   @ViewChild('imageInput') imageInput!: ElementRef;
 
@@ -100,6 +107,12 @@ export class QuizDetailsComponent implements OnInit {
   ) {}
 
   async ngOnInit() {
+    // Scroll event for scroll-to-top button
+    this.scrollListener = () => {
+      this.showScrollTop = window.scrollY > 400;
+    };
+    window.addEventListener('scroll', this.scrollListener);
+    // ...existing code...
     const quizId = this.route.snapshot.paramMap.get('id');
     if (quizId) {
       await this.loadQuizDetails(quizId);

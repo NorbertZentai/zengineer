@@ -1,3 +1,7 @@
+<!-- Scroll to top button -->
+<button class="scroll-to-top-btn" *ngIf="showScrollTop" (click)="scrollToTop()" title="Ugrás a tetejére">
+  <mat-icon>vertical_align_top</mat-icon>
+</button>
 <div class="quiz-details-container">
   <!-- Header -->
   <div class="quiz-header">
@@ -292,16 +296,6 @@
             </div>
           </div>
           
-          <!-- Card actions jobb felső sarok -->
-          <div class="card-actions" (click)="$event.stopPropagation()">
-            <button class="action-btn edit" (click)="editCard(card)" title="Szerkesztés">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button class="action-btn delete" (click)="deleteCard(card.id!)" title="Törlés">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
-          
           <div class="card-content">
             <div class="card-question">
               {{ card.question }}
@@ -314,17 +308,7 @@
         </div>
 
         <!-- Card Back -->
-        <div class="card-face card-back">
-          <!-- Card actions jobb felső sarok -->
-          <div class="card-actions" (click)="$event.stopPropagation()">
-            <button class="action-btn edit" (click)="editCard(card)" title="Szerkesztés">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button class="action-btn delete" (click)="deleteCard(card.id!)" title="Törlés">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
-          
+        <div class="card-face card-back">    
           <div class="card-content">
             <div class="card-answers">
               <!-- Single answer for flashcard -->
@@ -353,6 +337,15 @@
               <mat-icon>lightbulb</mat-icon>
               <span>{{ card.hint }}</span>
             </div>
+          </div>
+          <!-- Card actions jobb felső sarok -->
+          <div class="card-actions" (click)="$event.stopPropagation()">
+            <button class="action-btn edit" (click)="editCard(card)" title="Szerkesztés">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button class="action-btn delete" (click)="deleteCard(card.id!)" title="Törlés">
+              <mat-icon>delete</mat-icon>
+            </button>
           </div>
         </div>
       </div>

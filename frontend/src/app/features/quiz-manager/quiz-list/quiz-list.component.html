@@ -1,3 +1,7 @@
+<!-- Scroll to top button -->
+<button class="scroll-to-top-btn" *ngIf="showScrollTop" (click)="scrollToTop()" title="Ugrás a tetejére">
+  <mat-icon>vertical_align_top</mat-icon>
+</button>
 <!-- Quiz list UI -->
 <div class="quiz-list-header">
   <input type="text" [(ngModel)]="searchTerm" [placeholder]="'QUIZ_MANAGER.SEARCH_PLACEHOLDER' | translate" class="quiz-search" />

@@ -112,6 +112,7 @@ export interface CardPerformance {
   total_attempts: number;
   average_response_time: number;
   hints_used_count: number;
+  test_appearances: number;
   last_answered_at: string;
   created_at?: string;
   updated_at?: string;
@@ -327,6 +328,8 @@ export class TestService {
 
       // Convert cards to test questions
       const questions = this.generateTestQuestions(cards, config);
+
+      // (A test_appearances növelése mostantól csak a teszt befejezésekor történik)
 
       const session: TestSession = {
         quiz_id: quizId,

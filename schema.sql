@@ -164,6 +164,7 @@ CREATE TABLE card_performance (
   correct_count integer NOT NULL DEFAULT 0,
   incorrect_count integer NOT NULL DEFAULT 0,
   total_attempts integer NOT NULL DEFAULT 0,
+  test_appearances integer NOT NULL DEFAULT 0,
   average_response_time real NOT NULL DEFAULT 0, -- in seconds
   hints_used_count integer NOT NULL DEFAULT 0,
   last_answered_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,

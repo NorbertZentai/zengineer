@@ -13,15 +13,33 @@ import { TestService, TestHistory } from '../../../core/services/test.service';
   styleUrls: ['./test-history.component.scss']
 })
 export class TestHistoryComponent implements OnInit {
+  showScrollTop = false;
+  private scrollListener: (() => void) | null = null;
+
+  scrollToTop(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  async ngOnInit() {
+    this.scrollListener = () => {
+      this.showScrollTop = window.scrollY > 400;
+    };
+    window.addEventListener('scroll', this.scrollListener as EventListener);
+    await this.loadTestHistory();
+  }
+
+  ngOnDestroy(): void {
+    if (this.scrollListener) {
+      window.removeEventListener('scroll', this.scrollListener as EventListener);
+    }
+  }
   testHistory: TestHistory[] = [];
   isLoading = false;
   error: string | null = null;
 
   constructor(private testService: TestService) {}
 
-  async ngOnInit() {
-    await this.loadTestHistory();
-  }
+  // ...existing code...
 
   async loadTestHistory(): Promise<void> {
     this.isLoading = true;

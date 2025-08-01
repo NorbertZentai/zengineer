@@ -16,6 +16,28 @@ import { TranslateModule } from '@ngx-translate/core';
   imports: [CommonModule, FormsModule, MatIconModule, RouterModule, TranslateModule]
 })
 export class QuizListComponent implements OnInit {
+  showScrollTop = false;
+  private scrollListener: (() => void) | null = null;
+
+  // ...existing code...
+
+  async ngOnInit() {
+    this.scrollListener = () => {
+      this.showScrollTop = window.scrollY > 400;
+    };
+    window.addEventListener('scroll', this.scrollListener as EventListener);
+    await this.ngOnInitData();
+  }
+
+  ngOnDestroy(): void {
+    if (this.scrollListener) {
+      window.removeEventListener('scroll', this.scrollListener as EventListener);
+    }
+  }
+
+  scrollToTop(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
   quizzes: Quiz[] = [];
   searchTerm: string = '';
   sortBy: 'name' | 'date' | 'status' = 'name';
@@ -35,21 +57,18 @@ export class QuizListComponent implements OnInit {
     private router: Router
   ) {}
 
-  async ngOnInit() {
+  async ngOnInitData() {
     this.isLoading = true;
     this.error = null;
-    
     try {
       // Várjuk meg hogy az auth service inicializálódjon
       await this.authService.waitForInit();
-      
       // Ellenőrizzük hogy be van-e jelentkezve a felhasználó
       if (!this.authService.isAuthenticated()) {
         this.error = 'Nincs bejelentkezett felhasználó. Jelentkezz be!';
         this.isLoading = false;
         return;
       }
-      
       // Betöltjük a kvízeket
       await this.quizService.loadQuizzes();
       this.quizzes = this.quizService.quizzes();

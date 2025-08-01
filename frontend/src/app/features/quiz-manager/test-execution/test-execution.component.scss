@@ -1,5 +1,37 @@
 @use '../../../../scss/variables' as *;
 @use '../../../../scss/mixins' as *;
+// Hide edit/delete buttons on the left/top of flashcard if any remnants exist
+.flashcard .card-front .edit-btn,
+.flashcard .card-front .delete-btn {
+  display: none !important;
+  pointer-events: none !important;
+}
+// Scroll to top button
+.scroll-to-top-btn {
+  position: fixed;
+  right: 2rem;
+  bottom: 2rem;
+  z-index: 100;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  &:hover {
+    background: var(--primary-dark);
+    box-shadow: var(--shadow-xl);
+  }
+  mat-icon {
+    font-size: 28px;
+  }
+}
 // Eredmény kártya dizájn
 .result-question-card {
   background: var(--bg-card);

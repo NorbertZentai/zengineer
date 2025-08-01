@@ -273,9 +273,8 @@
             class="option-btn"
             [class.selected]="isAnswerSelected(option)"
             [class]="getAnswerClass(option)"
-            (click)="onMultipleChoiceSelect(option)"
+            (click)="isAnswerSubmitted ? null : handleImmediateMultipleChoice(option)"
             [disabled]="isAnswerSubmitted">
-            
             <div class="option-indicator">
               <mat-icon *ngIf="!isAnswerSubmitted">
                 {{ isAnswerSelected(option) ? 'radio_button_checked' : 'radio_button_unchecked' }}
@@ -288,28 +287,7 @@
                 {{ isAnswerSelected(option) ? 'radio_button_checked' : 'radio_button_unchecked' }}
               </mat-icon>
             </div>
-            
             <span class="option-text">{{ option }}</span>
-          </button>
-        </div>
-
-        <div class="submit-container" *ngIf="!isAnswerSubmitted && selectedAnswers.length === 0">
-          <button 
-            class="submit-btn" 
-            (click)="submitAnswer()"
-            [disabled]="!canSubmitAnswer() || isLoading">
-            <mat-icon>send</mat-icon>
-            {{ 'TEST.EXECUTION.SUBMIT_ANSWER' | translate }}
-          </button>
-        </div>
-
-        <div class="next-container" *ngIf="isAnswerSubmitted && !session?.configuration?.immediateResultsForMC">
-          <button 
-            class="next-btn" 
-            (click)="nextQuestion()"
-            [disabled]="isLoading">
-            <mat-icon>arrow_forward</mat-icon>
-            {{ 'TEST.EXECUTION.NEXT_QUESTION' | translate }}
           </button>
         </div>
       </div>
@@ -352,6 +330,10 @@
 
   <!-- Test Results -->
   <div class="test-results" *ngIf="showResult && testResult">
+  <!-- Scroll to top button -->
+  <button class="scroll-to-top-btn" *ngIf="showScrollTop" (click)="scrollToTop()" title="Ugrás a tetejére">
+    <mat-icon>vertical_align_top</mat-icon>
+  </button>
     <div class="results-header">
       <div class="result-icon" [class]="testResult.percentage >= 80 ? 'excellent' : 
                                        testResult.percentage >= 60 ? 'good' : 'needs-improvement'">

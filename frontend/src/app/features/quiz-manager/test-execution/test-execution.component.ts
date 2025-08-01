@@ -16,6 +16,19 @@ import { QuizService } from '../../../core/services/quiz.service';
   styleUrls: ['./test-execution.component.scss']
 })
 export class TestExecutionComponent implements OnInit, OnDestroy {
+  showScrollTop = false;
+  private scrollListener: (() => void) | null = null;
+
+  ngOnDestroy() {
+    this.stopTimer();
+    if (this.scrollListener) {
+      window.removeEventListener('scroll', this.scrollListener as EventListener);
+    }
+  }
+
+  scrollToTop(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
   // Segédfüggvények a részletes eredmény kimutatáshoz
   isOptionCorrect(opt: string, question: TestQuestion | undefined): boolean {
     if (!question) return false;
@@ -86,20 +99,20 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
   async ngOnInit() {
     // Get the current session
     this.session = this.testService.currentSession();
-    
     if (!this.session) {
       // No active session, redirect back
       this.router.navigate(['/quiz-manager']);
       return;
     }
-
     this.loadCurrentQuestion();
     this.startTimer();
+    // Scroll event for scroll-to-top button
+    this.scrollListener = () => {
+      this.showScrollTop = window.scrollY > 400;
+    };
+    window.addEventListener('scroll', this.scrollListener);
   }
 
-  ngOnDestroy() {
-    this.stopTimer();
-  }
 
   loadCurrentQuestion(): void {
     // Always reload the session to get the latest answers
@@ -228,15 +241,21 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
     }
   }
 
+  handleImmediateMultipleChoice(answer: string): void {
+    if (this.isAnswerSubmitted) return;
+    this.selectedAnswers = [answer];
+    this.submitAnswer();
+    setTimeout(() => {
+      this.nextQuestion();
+    }, 400);
+  }
+
   async submitAnswer(): Promise<void> {
     if (!this.currentQuestion || !this.canSubmitAnswer()) return;
-    
     this.isLoading = true;
-    
     try {
       const questionTime = Math.floor((Date.now() - this.questionStartTime) / 1000);
       let answer: string | string[];
-      
       switch (this.currentQuestion.type) {
         case 'multiple_choice':
         case 'multi_select':
@@ -246,31 +265,23 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
           answer = this.userAnswer.trim();
           break;
         case 'flashcard':
-          // For flashcards, we'll mark as correct by default and let user self-assess
           answer = 'correct';
           break;
         default:
           answer = '';
       }
-      
       await this.testService.answerQuestion(
         this.currentQuestion.id,
         answer,
         questionTime,
         this.showHint || this.showSolution
       );
-      
       this.isAnswerSubmitted = true;
-      
-      // For immediate feedback mode or flashcards, show result briefly
       if (this.session?.configuration.immediateResultsForMC && this.currentQuestion.type === 'multiple_choice') {
         setTimeout(() => this.nextQuestion(), 1500);
       } else if (this.currentQuestion.type === 'flashcard') {
-        // For flashcards, always auto-advance
         setTimeout(() => this.nextQuestion(), 1500);
       }
-      // For non-immediate mode, user needs to manually click next
-      
     } catch (error: any) {
       this.error = error.message || 'Hiba történt a válasz mentésekor';
     } finally {
@@ -280,9 +291,16 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
 
   markFlashcardAnswer(isCorrect: boolean): void {
     if (!this.currentQuestion || this.currentQuestion.type !== 'flashcard') return;
-    
-    this.submitFlashcardAnswer(isCorrect ? 'correct' : 'incorrect');
+    // Submit the answer, load the next question, then flip the card
+    this.submitFlashcardAnswer(isCorrect ? 'correct' : 'incorrect').then(() => {
+      this.nextQuestion();
+      // Flip the card immediately after loading the new question
+      this.isFlipped = false;
+    });
   }
+
+    
+
 
   async submitFlashcardAnswer(result: string): Promise<void> {
     if (!this.currentQuestion) return;
@@ -301,7 +319,7 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
       
       this.isAnswerSubmitted = true;
       setTimeout(() => this.nextQuestion(), 1000);
-      
+
     } catch (error: any) {
       this.error = error.message || 'Hiba történt a válasz mentésekor';
     } finally {
