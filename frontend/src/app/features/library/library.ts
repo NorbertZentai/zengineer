@@ -56,7 +56,7 @@ export class LibraryPage implements OnInit {
           *,
           profiles!inner(username, email)
         `)
-        .eq('is_public', true)
+        .eq('visibility', 'public')
         .order('created_at', { ascending: false });
 
       if (error) throw error;

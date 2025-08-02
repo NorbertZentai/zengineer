@@ -89,7 +89,7 @@ CREATE TABLE quizzes (
   language text DEFAULT 'hu',
   project_id uuid REFERENCES projects(id) ON DELETE SET NULL,
   folder_id uuid REFERENCES quiz_folders(id) ON DELETE SET NULL,
-  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  user_id uuid REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
