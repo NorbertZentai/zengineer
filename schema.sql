@@ -1,3 +1,14 @@
+-- View: quizzes with card count and profile info
+CREATE OR REPLACE VIEW quiz_with_card_count AS
+SELECT
+  q.*,
+  p.username,
+  p.email,
+  (
+    SELECT COUNT(*) FROM quiz_cards c WHERE c.quiz_id = q.id
+  ) AS card_count
+FROM quizzes q
+LEFT JOIN profiles p ON q.user_id = p.id;
 -- Supabase SQL Schema for Zengineer
 
 -- Enable RLS (Row Level Security)

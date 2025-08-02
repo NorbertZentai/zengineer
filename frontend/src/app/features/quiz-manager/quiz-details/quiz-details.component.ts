@@ -40,6 +40,7 @@ import { environment } from '../../../../environments/environment';
   ]
 })
 export class QuizDetailsComponent implements OnInit {
+  isOwner = false;
   showScrollTop = false;
   private scrollListener: (() => void) | null = null;
 

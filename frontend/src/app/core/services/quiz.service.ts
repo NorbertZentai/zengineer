@@ -747,19 +747,25 @@ export class QuizService {
     front: string;
     back: string;
     hint?: string;
+    card_type?: 'flashcard' | 'multiple_choice';
+    correct_answers?: string[];
+    incorrect_answers?: string[];
+    tags?: string[];
+    difficulty?: number;
   }): Promise<QuizCard> {
-    // Csak az alapvető mezőket küldjük el, amelyek biztosan léteznek az adatbázisban
+    // Minden releváns mezőt elmentünk
     const cardPayload: any = {
       quiz_id: cardData.quiz_id,
       front: cardData.front,
       back: cardData.back,
       user_id: this.user()?.id
     };
-
-    // Opcionális mezők hozzáadása, ha meg vannak adva
-    if (cardData.hint) {
-      cardPayload.hint = cardData.hint;
-    }
+    if (cardData.hint) cardPayload.hint = cardData.hint;
+    if (cardData.card_type) cardPayload.card_type = cardData.card_type;
+    if (cardData.correct_answers) cardPayload.correct_answers = cardData.correct_answers;
+    if (cardData.incorrect_answers) cardPayload.incorrect_answers = cardData.incorrect_answers;
+    if (cardData.tags) cardPayload.tags = cardData.tags;
+    if (cardData.difficulty) cardPayload.difficulty = cardData.difficulty;
 
     const { data, error } = await this.supabase
       .from('quiz_cards')
@@ -768,7 +774,6 @@ export class QuizService {
       .single();
 
     if (error) throw error;
-    
     // A visszaadott adatot kiegészítjük a hiányzó mezőkkel
     return {
       ...data,

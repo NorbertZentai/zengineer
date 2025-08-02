@@ -7,8 +7,10 @@ import { QuizEditorComponent } from './quiz-editor/quiz-editor.component';
 import { QuizStatsComponent } from './quiz-stats/quiz-stats.component';
 import { QuizPreviewComponent } from './quiz-preview/quiz-preview.component';
 import { QuizListComponent } from './quiz-list/quiz-list.component';
+import { ViewChild } from '@angular/core';
 import { QuizCreateModalComponent } from './quiz-create-modal/quiz-create-modal.component';
 import { Quiz } from '../../core/services/quiz.service';
+import { QuizService } from '../../core/services/quiz.service';
 
 @Component({
   selector: 'app-quiz-manager',
@@ -28,9 +30,12 @@ import { Quiz } from '../../core/services/quiz.service';
   ]
 })
 export class QuizManagerComponent {
+  @ViewChild(QuizListComponent) quizListComponent?: QuizListComponent;
   selectedQuiz: any = null;
   viewMode: 'list' | 'edit' | 'stats' | 'preview' = 'list';
   showCreateModal = false;
+
+  constructor(public quizService: QuizService) {}
 
   // Események kezelése
   onEdit(quiz: any) {
@@ -38,7 +43,20 @@ export class QuizManagerComponent {
     this.viewMode = 'edit';
   }
   onDelete(quiz: any) {
-    // TODO: API hívás törléshez
+    if (!quiz?.id) return;
+    this.quizService.deleteQuiz(quiz.id)
+      .then(async () => {
+        // Sikeres törlés után frissítjük a listát
+        if (this.quizListComponent) {
+          await this.quizListComponent.ngOnInitData();
+        }
+        this.selectedQuiz = null;
+        this.viewMode = 'list';
+      })
+      .catch((err: any) => {
+        // Hibakezelés
+        alert('Hiba történt a törlés során: ' + (err?.message || err));
+      });
   }
   onStats(quiz: any) {
     this.selectedQuiz = quiz;

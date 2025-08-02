@@ -94,7 +94,7 @@
           <div class="quiz-meta">
             <span class="meta-item">
               <span class="meta-icon">📚</span>
-              {{ quiz.cards?.length || 0 }} {{ 'LIBRARY.CARDS' | translate }}
+              {{ quiz.card_count || 0 }} {{ 'LIBRARY.CARDS' | translate }}
             </span>
             <span class="meta-item" *ngIf="quiz.subject">
               <span class="meta-icon">🏷️</span>
@@ -121,6 +121,19 @@
             <div class="quiz-date">
               {{ quiz.created_at | date:'MMM d, y' }}
             </div>
+          </div>
+          <div *ngIf="expandedQuizId === quiz.id && quiz.id" class="quiz-cards-preview">
+            <h4>{{ 'LIBRARY.CARDS_PREVIEW' | translate }}</h4>
+            <div *ngIf="hasCards(quiz); else noCards">
+              <div *ngFor="let card of quizCards[quiz.id]" class="card-preview">
+                <div class="card-question">{{ card.question || card.front }}</div>
+                <div class="card-answer" *ngIf="card.answer || card.back">{{ card.answer || card.back }}</div>
+                <div class="card-type">{{ card.card_type }}</div>
+              </div>
+            </div>
+            <ng-template #noCards>
+              <div class="no-cards">{{ 'LIBRARY.NO_CARDS' | translate }}</div>
+            </ng-template>
           </div>
         </div>
       </div>

@@ -1,8 +1,16 @@
+@use '../../../scss/variables' as *;
+@use '../../../scss/mixins' as *;
+
 .library-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
-
+  background: $light-bg-primary;
+  color: $light-text-primary;
+  @include dark-theme {
+    background: $dark-bg-primary;
+    color: $dark-text-primary;
+  }
   @media (max-width: 768px) {
     padding: 1rem;
   }
@@ -11,19 +19,24 @@
 .library-header {
   text-align: center;
   margin-bottom: 2rem;
-
   h1 {
     margin: 0 0 0.5rem 0;
     font-size: 2rem;
     font-weight: bold;
-    color: #111827;
+    color: $light-text-primary;
+    @include dark-theme {
+      color: $dark-text-primary;
+    }
   }
-
   p {
     margin: 0;
-    color: #6b7280;
+    color: $light-text-secondary;
     font-size: 1.1rem;
+    @include dark-theme {
+      color: $dark-text-secondary;
+    }
   }
+// removed unmatched closing bracket
 }
 
 .loading-container {
@@ -33,19 +46,24 @@
   justify-content: center;
   min-height: 50vh;
   gap: 1rem;
-
   .spinner {
     width: 2rem;
     height: 2rem;
-    border: 3px solid #f3f4f6;
-    border-top: 3px solid #374151;
+    border: 3px solid $light-bg-tertiary;
+    border-top: 3px solid $light-border-primary;
     border-radius: 50%;
     animation: spin 1s linear infinite;
+    @include dark-theme {
+      border: 3px solid $dark-bg-tertiary;
+      border-top: 3px solid $dark-border-primary;
+    }
   }
-
   p {
-    color: #6b7280;
+    color: $light-text-secondary;
     font-size: 1rem;
+    @include dark-theme {
+      color: $dark-text-secondary;
+    }
   }
 }
 
@@ -57,29 +75,34 @@
   min-height: 50vh;
   gap: 1rem;
   text-align: center;
-
   .error-icon {
     font-size: 3rem;
   }
-
   p {
-    color: #dc2626;
+    color: $error;
     font-size: 1.1rem;
     margin: 0;
   }
-
   .retry-btn {
-    background: #374151;
-    color: white;
+    background: $light-border-primary;
+    color: $light-text-inverse;
     border: none;
     padding: 0.75rem 1.5rem;
     border-radius: 0.5rem;
     cursor: pointer;
     font-size: 1rem;
     transition: background-color 0.2s;
-
+    @include dark-theme {
+      background: $dark-bg-secondary;
+      color: $dark-text-primary;
+    }
     &:hover {
-      background: #2563eb;
+      background: $primary;
+      color: $light-text-inverse;
+      @include dark-theme {
+        background: $primary-dark;
+        color: $dark-text-primary;
+      }
     }
   }
 }
@@ -91,13 +114,33 @@
 }
 
 .filters-section {
-  background: white;
+  gap: 1.5rem;
+  .search-bar {
+    margin-right: 0;
+    @media (min-width: 768px) {
+      margin-right: 1.5rem;
+    }
+  }
+  .filter-controls {
+    gap: 1rem;
+    @media (max-width: 767px) {
+      margin-top: 1rem;
+    }
+    @media (min-width: 768px) {
+      margin-top: 0;
+    }
+  }
+  background: $light-bg-card;
   border-radius: 1rem;
   padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: $shadow-sm;
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  @include dark-theme {
+    background: $dark-bg-card;
+    box-shadow: $shadow-dark-sm;
+  }
 
   @media (min-width: 768px) {
     flex-direction: row;
@@ -109,27 +152,37 @@
 .search-bar {
   position: relative;
   flex: 1;
-
   .search-input {
     width: 100%;
     padding: 0.75rem 2.5rem 0.75rem 1rem;
-    border: 1px solid #d1d5db;
+    border: 1px solid $light-border-primary;
     border-radius: 0.5rem;
     font-size: 1rem;
     transition: border-color 0.2s;
-
+    background: $light-bg-secondary;
+    color: $light-text-primary;
+    @include dark-theme {
+      border: 1px solid $dark-border-primary;
+      background: $dark-bg-secondary;
+      color: $dark-text-primary;
+    }
     &:focus {
       outline: none;
-      border-color: #374151;
+      border-color: $primary;
+      @include dark-theme {
+        border-color: $primary-dark;
+      }
     }
   }
-
   .search-icon {
     position: absolute;
     right: 0.75rem;
     top: 50%;
     transform: translateY(-50%);
-    color: #6b7280;
+    color: $light-text-secondary;
+    @include dark-theme {
+      color: $dark-text-secondary;
+    }
   }
 }
 
@@ -138,40 +191,60 @@
   gap: 1rem;
   align-items: center;
   flex-wrap: wrap;
-
+  justify-content: flex-end;
   .filter-select {
     padding: 0.5rem 1rem;
-    border: 1px solid #d1d5db;
+    border: 1px solid $light-border-primary;
     border-radius: 0.5rem;
     font-size: 0.875rem;
-    min-width: 120px;
-
+    min-width: 140px;
+    margin-bottom: 0;
+    background: $light-bg-secondary;
+    color: $light-text-primary;
+    @include dark-theme {
+      border: 1px solid $dark-border-primary;
+      background: $dark-bg-secondary;
+      color: $dark-text-primary;
+    }
     &:focus {
       outline: none;
-      border-color: #374151;
+      border-color: $primary;
+      @include dark-theme {
+        border-color: $primary-dark;
+      }
     }
   }
-
   .clear-filters-btn {
-    background: #ef4444;
-    color: white;
+    background: $error;
+    color: $light-text-inverse;
     border: none;
     padding: 0.5rem 1rem;
     border-radius: 0.5rem;
     cursor: pointer;
     font-size: 0.875rem;
     transition: background-color 0.2s;
-
+    margin-bottom: 0;
+    @include dark-theme {
+      background: $error-dark;
+      color: $dark-text-primary;
+    }
     &:hover {
-      background: #dc2626;
+      background: $error-dark;
+      color: $light-text-inverse;
+      @include dark-theme {
+        background: $error;
+        color: $dark-text-primary;
+      }
     }
   }
 }
 
 .results-info {
-  color: #6b7280;
+  color: $light-text-secondary;
   font-size: 0.875rem;
-
+  @include dark-theme {
+    color: $dark-text-secondary;
+  }
   p {
     margin: 0;
   }
@@ -189,15 +262,21 @@
 }
 
 .quiz-card {
-  background: white;
+  background: $light-bg-card;
   border-radius: 1rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: $shadow-sm;
   overflow: hidden;
   transition: transform 0.2s, box-shadow 0.2s;
-
+  @include dark-theme {
+    background: $dark-bg-card;
+    box-shadow: $shadow-dark-sm;
+  }
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: $shadow-md;
+    @include dark-theme {
+      box-shadow: $shadow-dark-md;
+    }
   }
 }
 
@@ -206,45 +285,51 @@
   align-items: flex-start;
   padding: 1.5rem;
   gap: 1rem;
-
   .quiz-color {
     width: 1rem;
     height: 4rem;
     border-radius: 0.25rem;
     flex-shrink: 0;
   }
-
   .quiz-info {
     flex: 1;
-
     h3 {
       margin: 0 0 0.5rem 0;
       font-size: 1.125rem;
       font-weight: 600;
-      color: #111827;
+      color: $light-text-primary;
       line-height: 1.4;
+      @include dark-theme {
+        color: $dark-text-primary;
+      }
     }
-
     .quiz-description {
       margin: 0;
-      color: #6b7280;
+      color: $light-text-secondary;
       font-size: 0.875rem;
       line-height: 1.5;
+      @include dark-theme {
+        color: $dark-text-secondary;
+      }
     }
   }
-
   .quiz-actions {
     .copy-btn {
-      background: #f3f4f6;
+      background: $light-bg-tertiary;
       border: none;
       padding: 0.5rem;
       border-radius: 0.375rem;
       cursor: pointer;
       font-size: 1rem;
       transition: background-color 0.2s;
-
+      @include dark-theme {
+        background: $dark-bg-tertiary;
+      }
       &:hover {
-        background: #e5e7eb;
+        background: $light-bg-quaternary;
+        @include dark-theme {
+          background: $dark-bg-quaternary;
+        }
       }
     }
   }
@@ -261,14 +346,15 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
-
   .meta-item {
     display: flex;
     align-items: center;
     gap: 0.25rem;
     font-size: 0.75rem;
-    color: #6b7280;
-
+    color: $light-text-secondary;
+    @include dark-theme {
+      color: $dark-text-secondary;
+    }
     .meta-icon {
       font-size: 0.875rem;
     }
@@ -279,14 +365,17 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-
   .tag {
-    background: #f3f4f6;
-    color: #4b5563;
+    background: $light-bg-tertiary;
+    color: $light-text-secondary;
     padding: 0.25rem 0.5rem;
     border-radius: 0.25rem;
     font-size: 0.75rem;
     font-weight: 500;
+    @include dark-theme {
+      background: $dark-bg-tertiary;
+      color: $dark-text-tertiary;
+    }
   }
 }
 
@@ -295,10 +384,13 @@
   justify-content: space-between;
   align-items: center;
   font-size: 0.75rem;
-  color: #9ca3af;
+  color: $light-text-tertiary;
   padding-top: 1rem;
-  border-top: 1px solid #f3f4f6;
-
+  border-top: 1px solid $light-bg-tertiary;
+  @include dark-theme {
+    color: $dark-text-tertiary;
+    border-top: 1px solid $dark-bg-tertiary;
+  }
   .quiz-author {
     font-weight: 500;
   }
@@ -307,40 +399,54 @@
 .empty-filtered-state, .empty-state {
   text-align: center;
   padding: 3rem 2rem;
-  background: white;
+  background: $light-bg-card;
   border-radius: 1rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-
+  box-shadow: $shadow-sm;
+  @include dark-theme {
+    background: $dark-bg-card;
+    box-shadow: $shadow-dark-sm;
+  }
   .empty-icon {
     font-size: 4rem;
     margin-bottom: 1rem;
     opacity: 0.6;
   }
-
   h3 {
     margin: 0 0 1rem 0;
     font-size: 1.5rem;
-    color: #111827;
+    color: $light-text-primary;
+    @include dark-theme {
+      color: $dark-text-primary;
+    }
   }
-
   p {
     margin: 0 0 2rem 0;
-    color: #6b7280;
+    color: $light-text-secondary;
     font-size: 1rem;
+    @include dark-theme {
+      color: $dark-text-secondary;
+    }
   }
-
   .clear-filters-btn {
-    background: #374151;
-    color: white;
+    background: $light-border-primary;
+    color: $light-text-inverse;
     border: none;
     padding: 0.75rem 2rem;
     border-radius: 0.5rem;
     cursor: pointer;
     font-size: 1rem;
     transition: background-color 0.2s;
-
+    @include dark-theme {
+      background: $dark-bg-secondary;
+      color: $dark-text-primary;
+    }
     &:hover {
-      background: #2563eb;
+      background: $primary;
+      color: $light-text-inverse;
+      @include dark-theme {
+        background: $primary-dark;
+        color: $dark-text-primary;
+      }
     }
   }
 }

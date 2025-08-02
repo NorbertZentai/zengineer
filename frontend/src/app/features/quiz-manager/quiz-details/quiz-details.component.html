@@ -25,7 +25,7 @@
                 <span>{{ 'TEST.START_TEST' | translate }}</span>
               </button>
               
-              <button class="expand-btn" 
+              <button *ngIf="isOwner" class="expand-btn" 
                       (click)="toggleSettings()" 
                       [class.expanded]="showSettings"
                       title="Beállítások megjelenítése/elrejtése">
@@ -41,7 +41,7 @@
       </div>
 
       <!-- Beállítások szekció - a quiz-info blokkon belül -->
-      <div class="settings-panel" *ngIf="showSettings" [@slideDown]>
+      <div class="settings-panel" *ngIf="showSettings && isOwner" [@slideDown]>
         <div class="settings-content">
           <form class="settings-form" (ngSubmit)="saveSettings()">
             <div class="form-row">
@@ -151,7 +151,7 @@
     </div>
 
     <!-- Quick Card Creator - Always visible at top -->
-    <div class="quick-card-creator">
+    <div class="quick-card-creator" *ngIf="isOwner">
       <div class="creator-header">
         <mat-icon>quiz</mat-icon>
         <span>Új kártya hozzáadása</span>
@@ -339,7 +339,7 @@
             </div>
           </div>
           <!-- Card actions jobb felső sarok -->
-          <div class="card-actions" (click)="$event.stopPropagation()">
+          <div class="card-actions" (click)="$event.stopPropagation()" *ngIf="isOwner">
             <button class="action-btn edit" (click)="editCard(card)" title="Szerkesztés">
               <mat-icon>edit</mat-icon>
             </button>
