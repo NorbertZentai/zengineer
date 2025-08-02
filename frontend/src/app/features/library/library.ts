@@ -174,6 +174,10 @@ export class LibraryPage implements OnInit {
             difficulty: card.difficulty
           });
         }
+        // Frissítjük a quiz listát, hogy azonnal látszódjon az új kvíz
+        await this.quizService.loadQuizzes();
+        // Navigálunk az új kvíz szerkesztő oldalára
+        this.router.navigate(['/quiz-manager', copiedQuiz.id]);
       }
     } catch (error) {
       console.error('Error copying quiz:', error);
