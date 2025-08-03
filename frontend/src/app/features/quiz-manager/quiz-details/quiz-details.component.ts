@@ -47,11 +47,25 @@ import { environment } from '../../../../environments/environment';
 export class QuizDetailsComponent implements OnInit {
   // --- Test start menu logic ---
   startLearningMode() {
-    // Tanulás: 5-20 random kártya, csak flashcard, nincs határidő
+    // Tanulás: 5-20 random kártya, csak flashcard logika (answer nem JSON, vagy csak egy helyes válasz van)
     const cardCount = Math.floor(Math.random() * 16) + 5;
-    const selectedCards = this.shuffleArray(this.cards).filter(card => card.card_type === 'flashcard').slice(0, cardCount);
+    let selectedCards = this.shuffleArray(this.cards).filter(card => {
+      if (!card.answer) return true;
+      try {
+        const ans = JSON.parse(card.answer);
+        const isMultipleChoice = Array.isArray(ans.correct) && ans.correct.length === 1 && Array.isArray(ans.incorrect) && ans.incorrect.length >= 2;
+        const isMultiSelect = Array.isArray(ans.correct) && ans.correct.length >= 2 && Array.isArray(ans.incorrect) && ans.incorrect.length >= 3;
+        return !isMultipleChoice && !isMultiSelect;
+      } catch {
+        return true;
+      }
+    });
+    if (selectedCards.length === 0) {
+      selectedCards = this.shuffleArray(this.cards);
+    }
+    selectedCards = selectedCards.slice(0, cardCount);
     const config: TestConfiguration = {
-      testTypes: [{ id: 'flashcard', enabled: true, name: 'Flashcard', description: 'Flashcard teszt' }],
+      testTypes: [{ id: 'flashcard', enabled: true, name: 'Tanulás', description: 'Tanuló mód' }],
       questionCount: cardCount,
       shuffleQuestions: true,
       showHints: true,
@@ -63,24 +77,29 @@ export class QuizDetailsComponent implements OnInit {
   }
 
   startEasyMode() {
-    // Könnyű: 5-15 kártya, egyszeri választásos, határidővel, lehet flashcard (csak 0%-osak)
+    // Könnyű: 5-15 kérdés, flashcard és multiple_choice (answer-ben 1 helyes, legalább 2 rossz), multi_select csak ha legalább 2 helyes és 3 rossz
     const cardCount = Math.floor(Math.random() * 11) + 5;
-    let easyCards = this.cards.filter(card => {
-      if (!card.id) return false;
-      // Flashcard csak ha 0%-os tudás
-      const successRate = this.getCardSuccessRate(card.id);
-      return card.card_type === 'multiple_choice' || (card.card_type === 'flashcard' && successRate === 0);
-    });
-    easyCards = this.shuffleArray(easyCards).slice(0, cardCount);
+    let easyCards = this.shuffleArray(this.cards).filter(card => {
+      if (!card.answer) return true;
+      try {
+        const ans = JSON.parse(card.answer);
+        if (Array.isArray(ans.correct) && ans.correct.length === 1 && Array.isArray(ans.incorrect) && ans.incorrect.length >= 2) return true;
+        if (Array.isArray(ans.correct) && ans.correct.length >= 2 && Array.isArray(ans.incorrect) && ans.incorrect.length >= 3) return true;
+        return false;
+      } catch {
+        return true;
+      }
+    }).slice(0, cardCount);
     const config: TestConfiguration = {
       testTypes: [
-        { id: 'multiple_choice', enabled: true, name: 'Egyszeri választás', description: 'Egyszeri választásos teszt' },
-        { id: 'flashcard', enabled: true, name: 'Flashcard', description: 'Flashcard teszt' }
+        { id: 'multiple_choice', enabled: true, name: 'Egyszerű választás', description: 'Egyszerű választás' },
+        { id: 'multi_select', enabled: true, name: 'Összetett választás', description: 'Összetett választás' },
+        { id: 'flashcard', enabled: true, name: 'Flashcard', description: 'Flashcard' }
       ],
       questionCount: cardCount,
       shuffleQuestions: true,
       showHints: true,
-      timeLimit: cardCount * 45,
+      timeLimit: cardCount * 60,
       allowRetry: true,
       immediateResultsForMC: false
     };
@@ -88,19 +107,28 @@ export class QuizDetailsComponent implements OnInit {
   }
 
   startMediumMode() {
-    // Közepes: 5-20 kártya, egyszeri/többszöri választás, határidővel, arányos idő
-    const cardCount = Math.floor(Math.random() * 16) + 5;
-    let mediumCards = this.cards.filter(card => String(card.card_type) === 'multiple_choice' || String(card.card_type) === 'multi_select');
-    mediumCards = this.shuffleArray(mediumCards).slice(0, cardCount);
+    // Közepes: 10-20 kérdés, csak multiple_choice (1 helyes, legalább 2 rossz) és multi_select (legalább 2 helyes, 3 rossz)
+    const cardCount = Math.floor(Math.random() * 11) + 10;
+    let mediumCards = this.shuffleArray(this.cards).filter(card => {
+      if (!card.answer) return false;
+      try {
+        const ans = JSON.parse(card.answer);
+        if (Array.isArray(ans.correct) && ans.correct.length === 1 && Array.isArray(ans.incorrect) && ans.incorrect.length >= 2) return true;
+        if (Array.isArray(ans.correct) && ans.correct.length >= 2 && Array.isArray(ans.incorrect) && ans.incorrect.length >= 3) return true;
+        return false;
+      } catch {
+        return false;
+      }
+    }).slice(0, cardCount);
     const config: TestConfiguration = {
       testTypes: [
-        { id: 'multiple_choice', enabled: true, name: 'Egyszeri választás', description: 'Egyszeri választásos teszt' },
-        { id: 'multi_select', enabled: true, name: 'Többszöri választás', description: 'Többszöri választásos teszt' }
+        { id: 'multiple_choice', enabled: true, name: 'Egyszerű választás', description: 'Egyszerű választás' },
+        { id: 'multi_select', enabled: true, name: 'Összetett választás', description: 'Összetett választás' }
       ],
       questionCount: cardCount,
       shuffleQuestions: true,
       showHints: false,
-      timeLimit: cardCount * 40,
+      timeLimit: cardCount * 45,
       allowRetry: true,
       immediateResultsForMC: true
     };
@@ -108,27 +136,59 @@ export class QuizDetailsComponent implements OnInit {
   }
 
   startHardMode() {
-    // Nehéz: 10-30 kártya, több multi_select, kevesebb multiple_choice/írásos, arányos idő
+    // Nehéz: 10-30 kérdés, főleg multi_select (legalább 2 helyes, 3 rossz), kevesebb multiple_choice (1 helyes, 2 rossz), írásos kérdés nem szűrhető answer alapján
     const cardCount = Math.floor(Math.random() * 21) + 10;
-    let hardCards = this.cards.filter(card => String(card.card_type) === 'multiple_choice' || String(card.card_type) === 'multi_select' || String(card.card_type) === 'written');
-    hardCards = this.shuffleArray(hardCards).slice(0, cardCount);
-    // Arányos idő: written: 60s, multi_select: 45s, multiple_choice: 35s
+    let hardCards = this.shuffleArray(this.cards).filter(card => {
+      if (!card.answer) return true;
+      try {
+        const ans = JSON.parse(card.answer);
+        if (Array.isArray(ans.correct) && ans.correct.length >= 2 && Array.isArray(ans.incorrect) && ans.incorrect.length >= 3) return true;
+        if (Array.isArray(ans.correct) && ans.correct.length === 1 && Array.isArray(ans.incorrect) && ans.incorrect.length >= 2) return true;
+        return false;
+      } catch {
+        return true;
+      }
+    }).slice(0, cardCount);
+    // Több multi_select, kevesebb multiple_choice
+    hardCards = hardCards.sort((a, b) => {
+      if (!a.answer) return 1;
+      if (!b.answer) return -1;
+      try {
+        const ansA = JSON.parse(a.answer);
+        const ansB = JSON.parse(b.answer);
+        const aIsMulti = Array.isArray(ansA.correct) && ansA.correct.length >= 2 && Array.isArray(ansA.incorrect) && ansA.incorrect.length >= 3;
+        const bIsMulti = Array.isArray(ansB.correct) && ansB.correct.length >= 2 && Array.isArray(ansB.incorrect) && ansB.incorrect.length >= 3;
+        return aIsMulti === bIsMulti ? 0 : aIsMulti ? -1 : 1;
+      } catch {
+        return 1;
+      }
+    });
+    // Arányos idő: multi_select: 40s, multiple_choice: 30s, írásos: 50s
     let timeLimit = 0;
     hardCards.forEach(card => {
-      if (String(card.card_type) === 'written') timeLimit += 60;
-      else if (String(card.card_type) === 'multi_select') timeLimit += 45;
-      else if (String(card.card_type) === 'multiple_choice') timeLimit += 35;
+      if (!card.answer) {
+        timeLimit += 50;
+        return;
+      }
+      try {
+        const ans = JSON.parse(card.answer);
+        if (Array.isArray(ans.correct) && ans.correct.length >= 2 && Array.isArray(ans.incorrect) && ans.incorrect.length >= 3) timeLimit += 40;
+        else if (Array.isArray(ans.correct) && ans.correct.length === 1 && Array.isArray(ans.incorrect) && ans.incorrect.length >= 2) timeLimit += 30;
+        else timeLimit += 50;
+      } catch {
+        timeLimit += 50;
+      }
     });
     const config: TestConfiguration = {
       testTypes: [
-        { id: 'multiple_choice', enabled: true, name: 'Egyszeri választás', description: 'Egyszeri választásos teszt' },
-        { id: 'multi_select', enabled: true, name: 'Többszöri választás', description: 'Többszöri választásos teszt' },
+        { id: 'multiple_choice', enabled: true, name: 'Egyszerű választás', description: 'Egyszerű választás' },
+        { id: 'multi_select', enabled: true, name: 'Összetett választás', description: 'Összetett választás' },
         { id: 'written', enabled: true, name: 'Írásos', description: 'Írásos teszt' }
       ],
       questionCount: cardCount,
       shuffleQuestions: true,
       showHints: false,
-      timeLimit,
+      timeLimit: timeLimit,
       allowRetry: false,
       immediateResultsForMC: true
     };
@@ -146,13 +206,25 @@ export class QuizDetailsComponent implements OnInit {
   }
 
   // Helper: start test with config
-  startTestWithConfig(selectedCards: QuizCard[], config: TestConfiguration) {
-    // Use testService to create session and navigate
-    // Feltételezve, hogy a tesztService.createTestSession(quizId, config) signature-t használ
-    // Ha a selectedCards tömb kell, akkor a metódust módosítani kell, de most quizId-t adunk át
-    if (selectedCards.length > 0 && selectedCards[0].quiz_id) {
-      this.testService.createTestSession(selectedCards[0].quiz_id, config);
-      this.router.navigate(['/quiz-manager/test-execution']);
+  async startTestWithConfig(selectedCards: QuizCard[], config: TestConfiguration) {
+    // Egységes tesztindítás: this.quiz.id, session.id, async/await
+    if (!this.quiz?.id) {
+      this.error = 'Kvíz azonosító hiányzik!';
+      return;
+    }
+    if (selectedCards.length === 0) {
+      this.error = 'Nincsenek kiválasztott kártyák a teszthez.';
+      return;
+    }
+    try {
+      this.isLoading = true;
+      this.error = null;
+      const session = await this.testService.createTestSession(this.quiz.id, config);
+      this.router.navigate(['/quiz-manager/test', session.id]);
+    } catch (error: any) {
+      this.error = error.message || 'Hiba történt a teszt indításakor';
+    } finally {
+      this.isLoading = false;
     }
   }
   // Helper to parse correct/incorrect answers from card.answer JSON
