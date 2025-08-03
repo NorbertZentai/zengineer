@@ -109,7 +109,8 @@
           <div class="test-stats">
             <div class="stat">
               <mat-icon>check_circle</mat-icon>
-              <span>{{ test.correct_answers }}/{{ test.total_questions }}</span>
+              <span>{{ test.score }}/{{ test.total_questions }}</span>
+              <span>{{ getScoreString(test) }}</span>
             </div>
             <div class="stat">
               <mat-icon>schedule</mat-icon>
@@ -171,8 +172,8 @@
             </div>
 
             <div class="col-questions">
-              <span class="correct">{{ test.correct_answers }}</span>
-              <span class="total">/{{ test.total_questions }}</span>
+              <span class="correct">{{ test.score }}</span>
+              <span class="total">{{ getTotalQuestionsString(test) }}</span>
             </div>
 
             <div class="col-time">

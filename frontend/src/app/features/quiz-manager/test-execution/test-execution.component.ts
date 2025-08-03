@@ -16,6 +16,19 @@ import { QuizService } from '../../../core/services/quiz.service';
   styleUrls: ['./test-execution.component.scss']
 })
 export class TestExecutionComponent implements OnInit, OnDestroy {
+  getQuestionById(id: string): TestQuestion | undefined {
+    return this.session?.questions?.find(q => q.id === id);
+  }
+  // Helper to parse correct answers from question.answer JSON
+  getParsedCorrectAnswers(question?: TestQuestion): string[] {
+    if (!question || !question.answer) return [];
+    try {
+      const parsed = JSON.parse(question.answer);
+      return Array.isArray(parsed.correct) ? parsed.correct : [];
+    } catch {
+      return [];
+    }
+  }
   showScrollTop = false;
   private scrollListener: (() => void) | null = null;
 
@@ -32,8 +45,13 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
   // Segédfüggvények a részletes eredmény kimutatáshoz
   isOptionCorrect(opt: string, question: TestQuestion | undefined): boolean {
     if (!question) return false;
-    if (question.type === 'multi_select' && Array.isArray(question.correct_answers)) {
-      return question.correct_answers.includes(opt);
+    if (question.type === 'multi_select' && question.answer) {
+      try {
+        const parsed = JSON.parse(question.answer);
+        return Array.isArray(parsed.correct) && parsed.correct.includes(opt);
+      } catch {
+        return false;
+      }
     }
     if ((question.type === 'multiple_choice' || question.type === 'flashcard') && typeof question.correct_answer === 'string') {
       return question.correct_answer === opt;
@@ -67,6 +85,50 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
     return this.remainingTime !== null && this.remainingTime !== Infinity && Number.isFinite(this.remainingTime);
   }
   session: TestSession | null = null;
+  formatAnswerForDisplay(answer: any): string {
+    if (answer === undefined || answer === null || (typeof answer === 'string' && answer.trim() === '')) {
+      return 'Nincs válasz';
+    }
+    if (typeof answer === 'string') {
+      try {
+        if (answer.trim().startsWith('{') || answer.trim().startsWith('[')) {
+          const parsed = JSON.parse(answer);
+          if (typeof parsed === 'object' && parsed.correct) {
+            if (Array.isArray(parsed.correct)) {
+              return parsed.correct.join(', ');
+            }
+            return String(parsed.correct);
+          }
+          if (Array.isArray(parsed)) {
+            return parsed.join(', ');
+          }
+          const answerFields = ['answer', 'text', 'value', 'correct', 'solution'];
+          for (const field of answerFields) {
+            if (parsed[field]) {
+              if (Array.isArray(parsed[field])) {
+                return parsed[field].join(', ');
+              }
+              return String(parsed[field]);
+            }
+          }
+          const entries = Object.entries(parsed)
+            .filter(([key, value]) => typeof value === 'string' || typeof value === 'number')
+            .map(([key, value]) => `${key}: ${value}`);
+          if (entries.length > 0) {
+            return entries.join('\n');
+          }
+          return JSON.stringify(parsed, null, 2);
+        }
+        return answer;
+      } catch (e) {
+        return answer;
+      }
+    }
+    if (Array.isArray(answer)) {
+      return answer.length > 0 ? answer.join(', ') : 'Nincs válasz';
+    }
+    return String(answer || 'Nincs válasz');
+  }
   currentQuestion: TestQuestion | null = null;
   userAnswer: string = '';
   selectedAnswers: string[] = [];
@@ -116,6 +178,10 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
 
   loadCurrentQuestion(): void {
     // Always reload the session to get the latest answers
+    if (this.testService.isTestCompleted()) {
+      // If test is completed, do not reload session or question
+      return;
+    }
     this.session = this.testService.currentSession();
     this.currentQuestion = this.testService.getCurrentQuestion();
     // DEBUG: Log test configuration and current question
@@ -133,11 +199,6 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
     }
     this.resetQuestionState();
     this.questionStartTime = Date.now();
-    if (this.testService.isTestCompleted()) {
-      // Ensure session is up-to-date before completing test
-      this.session = this.testService.currentSession();
-      this.completeTest();
-    }
   }
 
   resetQuestionState(): void {
@@ -246,7 +307,9 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
     this.selectedAnswers = [answer];
     this.submitAnswer();
     setTimeout(() => {
-      this.nextQuestion();
+      if (!this.testService.isTestCompleted()) {
+        this.nextQuestion();
+      }
     }, 400);
   }
 
@@ -278,9 +341,17 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
       );
       this.isAnswerSubmitted = true;
       if (this.session?.configuration.immediateResultsForMC && this.currentQuestion.type === 'multiple_choice') {
-        setTimeout(() => this.nextQuestion(), 1500);
+        setTimeout(() => {
+          if (!this.testService.isTestCompleted()) {
+            this.nextQuestion();
+          }
+        }, 1500);
       } else if (this.currentQuestion.type === 'flashcard') {
-        setTimeout(() => this.nextQuestion(), 1500);
+        setTimeout(() => {
+          if (!this.testService.isTestCompleted()) {
+            this.nextQuestion();
+          }
+        }, 1500);
       }
     } catch (error: any) {
       this.error = error.message || 'Hiba történt a válasz mentésekor';
@@ -318,7 +389,13 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
       );
       
       this.isAnswerSubmitted = true;
-      setTimeout(() => this.nextQuestion(), 1000);
+      setTimeout(async () => {
+        if (this.testService.isTestCompleted()) {
+          await this.completeTest();
+        } else {
+          this.nextQuestion();
+        }
+      }, 1000);
 
     } catch (error: any) {
       this.error = error.message || 'Hiba történt a válasz mentésekor';
@@ -351,12 +428,11 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
       // ...existing code...
       const result = await this.testService.completeTest();
       result.quiz_name = quizName;
-      // DEBUG: Log the result object and key fields
-      console.log('[DEBUG] TestResult:', result);
-      console.log('[DEBUG] Percentage:', result.percentage);
-      console.log('[DEBUG] Correct answers:', result.correct_answers);
-      console.log('[DEBUG] Wrong answers:', result.wrong_answers);
-      console.log('[DEBUG] Answers array:', result.answers);
+      // Log only the final result JSON to the console
+      console.log('Végső eredmény JSON:', JSON.stringify(result, null, 2));
+      // Debug: Print session.questions and testResult.answers for ID comparison
+      console.log('session.questions:', this.session?.questions);
+      console.log('testResult.answers:', result.answers);
       // ...existing code...
       this.testResult = result;
       this.showResult = true;
@@ -456,56 +532,4 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
     return this.session?.status === 'paused';
   }
 
-  formatAnswerForDisplay(answer: any): string {
-    if (!answer) return '';
-    
-    if (typeof answer === 'string') {
-      try {
-        // Try to parse as JSON if it looks like JSON
-        if (answer.trim().startsWith('{') || answer.trim().startsWith('[')) {
-          const parsed = JSON.parse(answer);
-          
-          // If it's an object with a 'correct' property, extract that
-          if (typeof parsed === 'object' && parsed.correct) {
-            return parsed.correct;
-          }
-          
-          // If it's an array, join with commas and line breaks for better readability
-          if (Array.isArray(parsed)) {
-            return parsed.join('\n• ');
-          }
-          
-          // If it's a simple object, try to extract meaningful text
-          if (typeof parsed === 'object') {
-            // Look for common answer fields
-            const answerFields = ['answer', 'text', 'value', 'correct', 'solution'];
-            for (const field of answerFields) {
-              if (parsed[field]) {
-                return parsed[field];
-              }
-            }
-            
-            // If no specific field found, format the object nicely
-            const entries = Object.entries(parsed)
-              .filter(([key, value]) => typeof value === 'string' || typeof value === 'number')
-              .map(([key, value]) => `${key}: ${value}`);
-            
-            if (entries.length > 0) {
-              return entries.join('\n');
-            }
-          }
-          
-          return JSON.stringify(parsed, null, 2);
-        }
-        
-        return answer;
-      } catch (e) {
-        // If parsing fails, return the original string
-        return answer;
-      }
-    }
-    
-    // If it's not a string, convert to string
-    return String(answer || '');
-  }
 }

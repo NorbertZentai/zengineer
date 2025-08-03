@@ -34,7 +34,7 @@
        *ngFor="let quiz of filteredQuizzes" 
        [style.border-left-color]="quiz.color"
        [class.menu-active]="activeMenuId === quiz.id"
-       (click)="onQuizClick(quiz)">
+       (click)="onQuizClick(quiz); quiz.name.includes('(Copy)') ? logQuiz(quiz) : null">
     <div class="quiz-card-header">
       <div class="quiz-color-indicator" [style.background-color]="quiz.color"></div>
       <div class="quiz-title-section">

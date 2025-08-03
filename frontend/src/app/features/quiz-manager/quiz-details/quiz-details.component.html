@@ -128,7 +128,15 @@
   <!-- Error -->
   <div *ngIf="error" class="error-container">
     <mat-icon>error</mat-icon>
-    <p>{{ error }}</p>
+    <p>
+      <span *ngIf="error && error.includes('JSON.parse error:')">
+        <b>Részletes hiba:</b><br>
+        {{ error }}
+      </span>
+      <span *ngIf="!error || !error.includes('JSON.parse error:')">
+        {{ error }}
+      </span>
+    </p>
   </div>
 
   <!-- Quiz Stats -->
@@ -318,18 +326,22 @@
               
               <!-- Multiple answers for multiple choice -->
               <div *ngIf="card.card_type === 'multiple_choice'" class="multiple-choice-answers">
-                <div class="correct-answers" *ngIf="card.correct_answers && card.correct_answers.length > 0">
-                  <div class="answer-item correct" *ngFor="let answer of card.correct_answers">
-                    <mat-icon>check</mat-icon>
-                    <span>{{ answer }}</span>
+                <ng-container *ngIf="(getParsedAnswers(card)?.correct || []).length > 0">
+                  <div class="correct-answers">
+                    <div class="answer-item correct" *ngFor="let answer of getParsedAnswers(card)?.correct || []">
+                      <mat-icon>check</mat-icon>
+                      <span>{{ answer }}</span>
+                    </div>
                   </div>
-                </div>
-                <div class="incorrect-answers" *ngIf="card.incorrect_answers && card.incorrect_answers.length > 0">
-                  <div class="answer-item incorrect" *ngFor="let answer of card.incorrect_answers">
-                    <mat-icon>close</mat-icon>
-                    <span>{{ answer }}</span>
+                </ng-container>
+                <ng-container *ngIf="(getParsedAnswers(card)?.incorrect || []).length > 0">
+                  <div class="incorrect-answers">
+                    <div class="answer-item incorrect" *ngFor="let answer of getParsedAnswers(card)?.incorrect || []">
+                      <mat-icon>close</mat-icon>
+                      <span>{{ answer }}</span>
+                    </div>
                   </div>
-                </div>
+                </ng-container>
               </div>
             </div>
             

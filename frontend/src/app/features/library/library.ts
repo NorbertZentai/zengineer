@@ -70,7 +70,19 @@ export class LibraryPage implements OnInit {
     private translate: TranslateService,
     private router: Router
   ) {
-    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
+    // Use singleton SupabaseService
+    this.supabase = (window as any).SupabaseService?.getClient?.() ?? undefined;
+    if (!this.supabase) {
+      // Fallback for direct import if not available on window
+      try {
+        // @ts-ignore
+        const SupabaseService = require('../../core/services/supabase.service').SupabaseService;
+        this.supabase = SupabaseService.getClient();
+      } catch (e) {
+        // If still not available, throw error
+        throw new Error('SupabaseService singleton not found.');
+      }
+    }
   }
 
   async ngOnInit() {
@@ -162,16 +174,52 @@ export class LibraryPage implements OnInit {
         const cards = await this.quizService.getQuizCards(quiz.id);
         // Lemásoljuk az összes kártyát az új kvízhez
         for (const card of cards) {
+          // answer: flashcard -> string, multiple_choice -> JSON string
+          let answerValue = card.answer;
+          // Ha az eredeti answer mező nem üres, pontosan másoljuk
+          if (typeof answerValue === 'string' && answerValue !== '') {
+            // do nothing, keep as is
+          } else if (card.card_type === 'multiple_choice') {
+            // Ha üres, generálunk JSON-t
+            answerValue = JSON.stringify({
+              type: 'multiple_choice',
+              correct: (() => {
+                try {
+                  if (typeof card.answer === 'string') {
+                    const parsed = JSON.parse(card.answer);
+                    return parsed.correct || [];
+                  }
+                  return [];
+                } catch {
+                  return [];
+                }
+              })(),
+              incorrect: (() => {
+                try {
+                  if (typeof card.answer === 'string') {
+                    const parsed = JSON.parse(card.answer);
+                    return parsed.incorrect || [];
+                  }
+                  return [];
+                } catch {
+                  return [];
+                }
+              })(),
+              hint: card.hint
+            });
+          } else {
+            // Flashcard: üres string
+            answerValue = '';
+          }
+          // tags must be JSON string
+          let tagsValue = Array.isArray(card.tags) ? JSON.stringify(card.tags) : (card.tags ?? '[]');
           await this.quizService.createCard({
             quiz_id: copiedQuiz.id,
-            front: card.question || card.front || '',
-            back: card.answer || card.back || '',
-            hint: card.hint || '',
-            card_type: card.card_type,
-            correct_answers: card.correct_answers,
-            incorrect_answers: card.incorrect_answers,
+            question: card.question,
+            answer: answerValue,
             tags: card.tags,
-            difficulty: card.difficulty
+            difficulty: card.difficulty,
+            card_type: card.card_type || (typeof answerValue === 'string' && answerValue.startsWith('{') ? 'multiple_choice' : 'flashcard')
           });
         }
         // Frissítjük a quiz listát, hogy azonnal látszódjon az új kvíz

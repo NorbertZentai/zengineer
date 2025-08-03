@@ -8,6 +8,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { TranslateModule } from '@ngx-translate/core';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { QuizService, Quiz, QuizCard } from '../../../core/services/quiz.service';
+
+// Locally extended QuizCard type for robust answer parsing
+type CardWithParsed = QuizCard & { parsedAnswer?: any; parseError?: string | null };
 import { AuthService } from '../../../core/services/auth.service';
 import { TestService, TestConfiguration, CardPerformance } from '../../../core/services/test.service';
 import { TestConfigModalComponent } from '../test-config-modal/test-config-modal.component';
@@ -40,6 +43,20 @@ import { environment } from '../../../../environments/environment';
   ]
 })
 export class QuizDetailsComponent implements OnInit {
+  // Helper to parse correct/incorrect answers from card.answer JSON
+  getParsedAnswers(card: QuizCard): { correct?: string[]; incorrect?: string[] } {
+    if (card.card_type !== 'multiple_choice' || !card.answer) return {};
+    try {
+      const parsed = JSON.parse(card.answer);
+      return {
+        correct: parsed.correct || [],
+        incorrect: parsed.incorrect || []
+      };
+    } catch {
+      return {};
+    }
+  }
+  // Locally extended QuizCard type for parsedAnswer
   // --- Add missing methods required by template ---
   goBack(): void {
     this.router.navigate(['/library']);
@@ -141,8 +158,12 @@ export class QuizDetailsComponent implements OnInit {
       if (isFlashcard) {
         cardData.answer = correctAnswers[0];
       } else {
-        cardData.correct_answers = correctAnswers;
-        cardData.incorrect_answers = incorrectAnswers;
+        cardData.answer = JSON.stringify({
+          type: 'multiple_choice',
+          correct: correctAnswers,
+          incorrect: incorrectAnswers,
+          hint: this.newCard.hint?.trim() || undefined
+        });
       }
       const card = await this.quizService.addCard(this.quiz.id, cardData);
       const cardWithFlip = { ...card, isFlipped: false };
@@ -172,7 +193,7 @@ export class QuizDetailsComponent implements OnInit {
   @ViewChild('imageInput') imageInput!: ElementRef;
 
   quiz: Quiz | null = null;
-  cards: QuizCard[] = [];
+  cards: (QuizCard & { parsedAnswer?: any; parseError?: string | null })[] = [];
   isLoading = false;
   error: string | null = null;
   showCreateCard = false;
@@ -247,7 +268,40 @@ export class QuizDetailsComponent implements OnInit {
     try {
       await this.authService.waitForInit();
       this.quiz = await this.quizService.getQuizById(quizId);
-      this.cards = await this.quizService.getQuizCards(quizId);
+      const rawCards = await this.quizService.getQuizCards(quizId);
+      // Csak másolt kvíznél írunk ki debug logokat
+      const isCopy = this.quiz?.name?.includes('(Copy)');
+      if (isCopy) {
+        console.log('[QUIZ DETAILS] quiz:', this.quiz);
+        console.log('[QUIZ DETAILS] rawCards:', rawCards);
+      }
+      this.cards = rawCards.map((card, idx) => {
+        let parsedAnswer: any = null;
+        let cardType = 'flashcard';
+        let parseError: string | null = null;
+        if (typeof card.answer === 'string' && card.answer.trim() !== '') {
+          try {
+            const parsed = JSON.parse(card.answer);
+            if (parsed.type === 'multiple_choice') {
+              cardType = 'multiple_choice';
+              parsedAnswer = parsed;
+            }
+          } catch (e: any) {
+            cardType = 'flashcard';
+            parsedAnswer = null;
+            parseError = `JSON.parse error: ${e.message}. Invalid answer string: ${card.answer}`;
+          }
+        }
+        return { ...card, card_type: cardType, parsedAnswer, parseError } as CardWithParsed;
+      });
+      // If any card has a parseError, show it in the UI
+      const firstParseErrorCard = this.cards.find(card => (card as CardWithParsed).parseError);
+      if (firstParseErrorCard) {
+        this.error = (firstParseErrorCard as CardWithParsed).parseError ?? null;
+      }
+      if (isCopy) {
+        console.log('[QUIZ DETAILS] mapped cards:', this.cards);
+      }
       this.cardPerformance = await this.testService.getCardPerformance(quizId);
       if (this.quiz) {
         this.editForm = {
@@ -264,7 +318,14 @@ export class QuizDetailsComponent implements OnInit {
         this.isOwner = !!(this.quiz.user_id && currentUser && this.quiz.user_id === currentUser.id);
       }
     } catch (err: any) {
-      this.error = err?.message || 'Hiba történt a kvíz betöltésekor';
+      let details = '';
+      if (err) {
+        details += err?.message ? `Hiba: ${err.message}\n` : '';
+        details += err?.stack ? `Stack trace: ${err.stack}\n` : '';
+        details += err?.response ? `Backend válasz: ${JSON.stringify(err.response)}\n` : '';
+        details += err?.error_description ? `Leírás: ${err.error_description}\n` : '';
+      }
+      this.error = details || 'Hiba történt a kvíz betöltésekor';
     } finally {
       this.isLoading = false;
     }

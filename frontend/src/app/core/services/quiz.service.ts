@@ -57,8 +57,7 @@ export interface QuizCard {
   answer?: string; // Egyszerű válasz flashcard esetén
   
   // Multiple choice típushoz
-  correct_answers?: string[]; // Helyes válaszok tömbje
-  incorrect_answers?: string[]; // Helytelen válaszok tömbje
+  // correct_answers és incorrect_answers eltávolítva, minden válasz az answer mezőben (JSON)
   
   // Metadata
   tags?: string[];
@@ -562,46 +561,76 @@ export class QuizService {
       return cardData.answer || '';
     } else {
       // Multiple choice: JSON formátumban tároljuk a válaszokat
+      let correct: string[] = [];
+      let incorrect: string[] = [];
+      let hint: string | undefined = cardData.hint;
+      // Ha az answer mező már tartalmazza a helyes/hibás válaszokat, próbáljuk meg kinyerni
+      if (cardData.answer) {
+        try {
+          const parsed = JSON.parse(cardData.answer);
+          if (parsed.type === 'multiple_choice') {
+            correct = parsed.correct || [];
+            incorrect = parsed.incorrect || [];
+            hint = parsed.hint;
+          }
+        } catch {}
+      }
       const mcData = {
         type: 'multiple_choice',
-        correct: cardData.correct_answers || [],
-        incorrect: cardData.incorrect_answers || [],
-        hint: cardData.hint
+        correct,
+        incorrect,
+        hint
       };
       return JSON.stringify(mcData);
     }
   }
 
   private convertFromLegacy(legacyData: any, originalCardData: Partial<QuizCard>): QuizCard {
+    let tagsArr: string[] = [];
+    if (typeof legacyData.tags === 'string' && legacyData.tags.trim().startsWith('[') && legacyData.tags.trim().endsWith(']')) {
+      try {
+        tagsArr = JSON.parse(legacyData.tags);
+      } catch {
+        tagsArr = [];
+      }
+    } else if (Array.isArray(legacyData.tags)) {
+      tagsArr = legacyData.tags;
+    } else {
+      tagsArr = [];
+    }
     let convertedCard: QuizCard = {
       ...legacyData,
-      tags: legacyData.tags ? JSON.parse(legacyData.tags) : []
+      tags: tagsArr
     };
 
-    // Próbáljuk meg kitalálni, hogy ez multiple choice vagy flashcard
-    try {
-      const parsedAnswer = JSON.parse(legacyData.answer);
-      if (parsedAnswer.type === 'multiple_choice') {
-        // Ez egy multiple choice kártya volt
-        convertedCard.card_type = 'multiple_choice';
-        convertedCard.correct_answers = parsedAnswer.correct || [];
-        convertedCard.incorrect_answers = parsedAnswer.incorrect || [];
-        convertedCard.hint = parsedAnswer.hint;
-        convertedCard.answer = undefined;
-      } else {
-        throw new Error('Not MC format');
+    // Ha az answer mező nem üres és JSON-nek tűnik, csak akkor próbáljuk meg parse-olni
+    const answerStr = legacyData.answer;
+    const looksLikeJson = typeof answerStr === 'string' && answerStr.trim().startsWith('{') && answerStr.trim().endsWith('}');
+    if (looksLikeJson) {
+      try {
+        const parsedAnswer = JSON.parse(answerStr);
+        if (parsedAnswer.type === 'multiple_choice') {
+          convertedCard.card_type = 'multiple_choice';
+          convertedCard.answer = answerStr;
+          convertedCard.hint = parsedAnswer.hint;
+        } else {
+          // Nem MC, flashcardként kezeljük
+          convertedCard.card_type = 'flashcard';
+          convertedCard.answer = answerStr;
+        }
+      } catch {
+        // Parse error, flashcardként kezeljük
+        convertedCard.card_type = 'flashcard';
+        convertedCard.answer = answerStr;
       }
-    } catch {
-      // Ez egy egyszerű flashcard
+    } else {
+      // Nem JSON, flashcardként kezeljük
       convertedCard.card_type = 'flashcard';
-      convertedCard.answer = legacyData.answer;
-      convertedCard.correct_answers = [];
-      convertedCard.incorrect_answers = [];
-      if (originalCardData.hint) {
-        convertedCard.hint = originalCardData.hint;
-      }
+      convertedCard.answer = answerStr;
     }
-
+    if (originalCardData.hint) {
+      convertedCard.hint = originalCardData.hint;
+    }
     return convertedCard;
   }
 
@@ -610,8 +639,6 @@ export class QuizService {
 
     if (updates.question !== undefined) updateData.question = updates.question;
     if (updates.answer !== undefined) updateData.answer = updates.answer;
-    if (updates.correct_answers !== undefined) updateData.correct_answers = JSON.stringify(updates.correct_answers);
-    if (updates.incorrect_answers !== undefined) updateData.incorrect_answers = JSON.stringify(updates.incorrect_answers);
     if (updates.card_type !== undefined) updateData.card_type = updates.card_type;
     if (updates.hint !== undefined) updateData.hint = updates.hint;
     if (updates.tags !== undefined) updateData.tags = JSON.stringify(updates.tags);
@@ -633,8 +660,6 @@ export class QuizService {
     // Parse JSON fields back for UI
     return {
       ...data,
-      correct_answers: data.correct_answers ? JSON.parse(data.correct_answers) : [],
-      incorrect_answers: data.incorrect_answers ? JSON.parse(data.incorrect_answers) : [],
       tags: data.tags ? JSON.parse(data.tags) : []
     };
   }
@@ -742,30 +767,19 @@ export class QuizService {
     return (data || []).map(card => this.convertFromLegacy(card, {}));
   }
 
-  async createCard(cardData: {
-    quiz_id: string;
-    front: string;
-    back: string;
-    hint?: string;
-    card_type?: 'flashcard' | 'multiple_choice';
-    correct_answers?: string[];
-    incorrect_answers?: string[];
-    tags?: string[];
-    difficulty?: number;
-  }): Promise<QuizCard> {
-    // Minden releváns mezőt elmentünk
+  // törölve: duplikált createCard deklaráció
+  async createCard(cardData: Partial<QuizCard>): Promise<QuizCard> {
+    // Csak a quiz_cards tábla mezőit mentjük, minden mezőt pontosan másolunk
+    let answerValue = cardData.answer;
+    // Mindig pontosan másoljuk az answer mezőt, csak akkor legyen üres string, ha null vagy undefined
+    if (answerValue == null) answerValue = '';
     const cardPayload: any = {
       quiz_id: cardData.quiz_id,
-      front: cardData.front,
-      back: cardData.back,
-      user_id: this.user()?.id
+      question: cardData.question,
+      answer: answerValue,
+      tags: cardData.tags,
+      difficulty: cardData.difficulty
     };
-    if (cardData.hint) cardPayload.hint = cardData.hint;
-    if (cardData.card_type) cardPayload.card_type = cardData.card_type;
-    if (cardData.correct_answers) cardPayload.correct_answers = cardData.correct_answers;
-    if (cardData.incorrect_answers) cardPayload.incorrect_answers = cardData.incorrect_answers;
-    if (cardData.tags) cardPayload.tags = cardData.tags;
-    if (cardData.difficulty) cardPayload.difficulty = cardData.difficulty;
 
     const { data, error } = await this.supabase
       .from('quiz_cards')
@@ -773,7 +787,10 @@ export class QuizService {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error || !data) {
+      // Ha nincs adat vagy hiba van, dobjunk értelmes hibát
+      throw new Error(error?.message || 'Card creation failed, no data returned');
+    }
     // A visszaadott adatot kiegészítjük a hiányzó mezőkkel
     return {
       ...data,

@@ -105,4 +105,12 @@ export class TestHistoryComponent implements OnInit {
     // Implementation depends on your routing setup
     // ...existing code...
   }
+
+  getScoreString(test: TestHistory): string {
+    return `${test.score}/${test.total_questions}`;
+  }
+
+  getTotalQuestionsString(test: TestHistory): string {
+    return `/${test.total_questions}`;
+  }
 }

@@ -40,7 +40,6 @@ export interface TestSession {
   answers: TestAnswer[];
   score?: number;
   total_questions: number;
-  correct_answers: number;
   created_at?: string;
   updated_at?: string;
 }
@@ -55,7 +54,7 @@ export interface TestQuestion {
   order?: number;
   options?: string[];
   correct_answer?: string;
-  correct_answers?: string[];
+  answer?: string; // answer mező hozzáadva, hogy a helyes/hibás válaszokat tartalmazza JSON-ként
 }
 
 export interface TestAnswer {
@@ -78,7 +77,6 @@ export interface TestResult {
   score: number;
   percentage: number;
   total_questions: number;
-  correct_answers: number;
   wrong_answers: number;
   time_spent: number; // in seconds
   test_configuration: TestConfiguration;
@@ -95,7 +93,6 @@ export interface TestHistory {
   score: number;
   percentage: number;
   total_questions: number;
-  correct_answers: number;
   time_spent: number;
   test_type: string;
   completed_at: string;
@@ -194,10 +191,13 @@ export class TestService {
     for (let index = 0; index < selectedCards.length; index++) {
       const card = selectedCards[index];
       let answerObj: any = {};
+      let isJson = false;
       try {
         answerObj = JSON.parse(card.answer ?? '');
+        isJson = true;
       } catch {
         answerObj = {};
+        isJson = false;
       }
       let detectedType = answerObj.type;
       const enabledTypesForType = config.testTypes.filter(t => t.enabled);
@@ -222,7 +222,8 @@ export class TestService {
         question: card.question,
         type: detectedType,
         hint: config.showHints ? card.hint : undefined,
-        order: index
+        order: index,
+        answer: card.answer // answer mező hozzáadva
       };
       // Always set options for multiple_choice and multi_select
       if (Array.isArray(answerObj.correct) && Array.isArray(answerObj.incorrect)) {
@@ -239,11 +240,16 @@ export class TestService {
           if (answerObj.correct.length < 2 || answerObj.incorrect.length < 3) continue;
           const allOptions = [...answerObj.correct, ...answerObj.incorrect];
           question.options = this.shuffleArray(allOptions);
-          question.correct_answers = answerObj.correct;
+        // correct_answers helyett csak az answerObj.correct tömböt használjuk, de nem mentjük külön
         }
       }
       if (question.type === 'written' || question.type === 'flashcard') {
-        question.correct_answer = Array.isArray(answerObj.correct) ? answerObj.correct[0] : answerObj.correct;
+        if (isJson && (Array.isArray(answerObj.correct) || typeof answerObj.correct === 'string')) {
+          question.correct_answer = Array.isArray(answerObj.correct) ? answerObj.correct[0] : answerObj.correct;
+        } else {
+          // Ha nem JSON, akkor a kártya answer mezője a helyes válasz
+          question.correct_answer = card.answer;
+        }
       }
       questions.push(question);
     }
@@ -341,7 +347,6 @@ export class TestService {
         status: 'active',
         answers: [],
         total_questions: questions.length,
-        correct_answers: 0
       };
 
       // Save session to database
@@ -461,8 +466,13 @@ export class TestService {
         userAnswer = answer[0] ?? '';
       }
       let corrects: string[] = [];
-      if (question.correct_answers && Array.isArray(question.correct_answers)) {
-        corrects = question.correct_answers.map(a => a.trim().toLowerCase());
+      if (question.answer) {
+        try {
+          const parsed = JSON.parse(question.answer);
+          if (Array.isArray(parsed.correct)) {
+            corrects = parsed.correct.map((a: string) => a.trim().toLowerCase());
+          }
+        } catch {}
       } else if (question.correct_answer) {
         corrects = [question.correct_answer.trim().toLowerCase()];
       }
@@ -491,12 +501,20 @@ export class TestService {
         isCorrect = userAnswer.trim().toLowerCase() === question.correct_answer.trim().toLowerCase();
       }
     } else if (question.type === 'multi_select') {
-      if (Array.isArray(answer) && Array.isArray(question.correct_answers)) {
-        const userAnswers = answer.map(a => a.trim().toLowerCase());
-        const correctAnswers = question.correct_answers.map(a => a.trim().toLowerCase());
+      if (Array.isArray(answer)) {
+        let correctAnswers: string[] = [];
+        if (question.answer) {
+          try {
+            const parsed = JSON.parse(question.answer);
+            if (Array.isArray(parsed.correct)) {
+              correctAnswers = parsed.correct.map((a: string) => a.trim().toLowerCase());
+            }
+          } catch {}
+        }
+        const userAnswers = answer.map((a: string) => a.trim().toLowerCase());
         const totalCorrect = correctAnswers.length;
-        const userCorrect = userAnswers.filter(a => correctAnswers.includes(a)).length;
-        const userIncorrect = userAnswers.filter(a => !correctAnswers.includes(a)).length;
+        const userCorrect = userAnswers.filter((a: string) => correctAnswers.includes(a)).length;
+        const userIncorrect = userAnswers.filter((a: string) => !correctAnswers.includes(a)).length;
         // Részpont: csak a helyesekért jár pont, hibásért nem
         partialScore = userCorrect / totalCorrect;
         isCorrect = userCorrect === totalCorrect && userIncorrect === 0;
@@ -529,7 +547,6 @@ export class TestService {
     const updatedSession = {
       ...session,
       answers: updatedAnswers,
-      correct_answers: correctAnswers,
       current_question_index: nextIndex,
       status
     };
@@ -559,7 +576,6 @@ export class TestService {
         score: correctCount,
         percentage,
         total_questions: session.total_questions,
-        correct_answers: correctCount,
         wrong_answers: wrongCount,
         time_spent: timeSpent,
         test_configuration: session.configuration,
@@ -626,7 +642,6 @@ export class TestService {
         score: result.score,
         percentage: (typeof result.percentage === 'number' && !isNaN(result.percentage)) ? result.percentage : 0,
         total_questions: result.total_questions,
-        correct_answers: result.correct_answers,
         time_spent: result.time_spent,
         test_type: result.test_configuration.testTypes.map(t => t.name).join(', '),
         completed_at: result.completed_at
@@ -698,7 +713,6 @@ export class TestService {
         score: correctCount,
         percentage,
         total_questions: session.total_questions ?? 0,
-        correct_answers: correctCount,
         wrong_answers: wrongCount,
         time_spent: timeSpent,
         test_configuration: session.configuration,
@@ -713,7 +727,6 @@ export class TestService {
         quiz_id: session.quiz_id || '',
         user_id: session.user_id || '',
         total_questions: session.total_questions ?? 0,
-        correct_answers: correctCount,
       };
 
       await this.updateSession(completedSession);

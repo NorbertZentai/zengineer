@@ -73,7 +73,7 @@
 
     <!-- Quiz Grid -->
     <div *ngIf="filteredQuizzes.length > 0" class="quiz-grid">
-      <div *ngFor="let quiz of filteredQuizzes" class="quiz-card">
+      <div *ngFor="let quiz of filteredQuizzes" class="quiz-card" (click)="openQuiz(quiz)" style="cursor:pointer;">
         <div class="quiz-card-header">
           <div class="quiz-color" [style.background-color]="quiz.color"></div>
           <div class="quiz-info">
@@ -82,7 +82,7 @@
           </div>
           <div class="quiz-actions">
             <button 
-              (click)="copyQuizToMyLibrary(quiz)" 
+              (click)="$event.stopPropagation(); copyQuizToMyLibrary(quiz)" 
               class="copy-btn"
               [title]="'LIBRARY.COPY_TO_MY_LIBRARY' | translate">
               📋

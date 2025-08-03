@@ -128,7 +128,7 @@
             <mat-icon>check_circle</mat-icon>
             <div class="solution-text">
               <h4>{{ 'TEST.EXECUTION.CORRECT_ANSWER' | translate }}:</h4>
-              <p class="solution-answer">{{ formatAnswerForDisplay(currentQuestion.correct_answers) }}</p>
+              <p class="solution-answer">{{ formatAnswerForDisplay(getParsedCorrectAnswers(currentQuestion)) }}</p>
               <small class="solution-warning">{{ 'TEST.EXECUTION.SOLUTION_WARNING' | translate }}</small>
             </div>
           </div>
@@ -357,7 +357,7 @@
       </div>
       
       <div class="stat-card">
-        <div class="stat-value">{{ testResult.correct_answers }}</div>
+        <div class="stat-value">{{ testResult.score }}</div>
         <div class="stat-label">Helyes válaszok</div>
       </div>
       
@@ -389,45 +389,54 @@
     <!-- Részletes kérdés-válasz kimutatás -->
     <div class="results-details">
       <h3>Kérdésenkénti eredmények</h3>
-      <div *ngFor="let answer of testResult.answers; let i = index" class="result-question-card">
-        <ng-container *ngIf="session && session.questions && session.questions.length > i">
-          <div class="result-question-header">
-            <span class="result-question-index">{{ i + 1 }}.</span>
-            <span class="result-question-text">{{ session.questions[i].question }}</span>
-          </div>
-          <!-- Multi Select, Multiple Choice -->
-          <div class="result-options" *ngIf="session.questions[i].options && (session.questions[i].options?.length || 0) > 0">
-            <div *ngFor="let opt of session.questions[i].options"
-                 class="result-option"
-                 [ngClass]="{
-                   'correct-selected': isOptionSelected(opt, answer) && isOptionCorrect(opt, session.questions[i]),
-                   'incorrect-selected': isOptionSelected(opt, answer) && !isOptionCorrect(opt, session.questions[i]),
-                   'correct-unselected': !isOptionSelected(opt, answer) && isOptionCorrect(opt, session.questions[i])
-                 }">
-              <mat-icon *ngIf="isOptionSelected(opt, answer) && isOptionCorrect(opt, session.questions[i])" class="correct-icon">check_circle</mat-icon>
-              <mat-icon *ngIf="isOptionSelected(opt, answer) && !isOptionCorrect(opt, session.questions[i])" class="incorrect-icon">cancel</mat-icon>
-              <mat-icon *ngIf="!isOptionSelected(opt, answer) && isOptionCorrect(opt, session.questions[i])" class="correct-icon">check_circle</mat-icon>
-              <span>{{ opt }}</span>
-            </div>
-          </div>
-          <!-- Written, Flashcard -->
-          <div *ngIf="!session.questions[i].options || (!!session.questions[i].options && session.questions[i].options?.length === 0)">
-            <div class="result-user-answer">
-              <strong>Jelölted:</strong>
-              <span [ngClass]="answer.is_correct ? 'text-green' : 'text-red'">{{ formatAnswerForDisplay(answer.answer) }}</span>
-              <span class="answer-status" [ngClass]="answer.is_correct ? 'text-green' : 'text-red'">
-                ({{ answer.is_correct ? 'Helyes' : 'Hibás' }})
+      <div *ngFor="let answer of testResult.answers; let i = index" class="result-question-card" style="border: 1px solid #fff; margin-bottom: 1rem; padding: 1rem; color: #fff; background: #222;">
+        <ng-container *ngIf="session && session.questions">
+          <ng-container *ngIf="getQuestionById(answer.question_id) as question">
+            <div class="result-question-header">
+              <span class="result-question-index">{{ i + 1 }}.</span>
+              <span class="result-question-text">
+                {{ question.question && question.question.trim() ? question.question : 'Nincs kérdés szöveg!' }}
               </span>
             </div>
-            <div class="result-correct-answer">
-              <strong>Helyes válasz:</strong>
-              <span class="text-green">{{ formatAnswerForDisplay(session.questions[i].correct_answer ? session.questions[i].correct_answer : session.questions[i].correct_answers) }}</span>
+            <div *ngIf="question.options && question.options.length > 0">
+              <div *ngFor="let opt of question.options"
+                   class="result-option"
+                   [ngClass]="{
+                     'correct-selected': isOptionSelected(opt, answer) && isOptionCorrect(opt, question),
+                     'incorrect-selected': isOptionSelected(opt, answer) && !isOptionCorrect(opt, question),
+                     'correct-unselected': !isOptionSelected(opt, answer) && isOptionCorrect(opt, question)
+                   }">
+                <mat-icon *ngIf="isOptionSelected(opt, answer) && isOptionCorrect(opt, question)" class="correct-icon">check_circle</mat-icon>
+                <mat-icon *ngIf="isOptionSelected(opt, answer) && !isOptionCorrect(opt, question)" class="incorrect-icon">cancel</mat-icon>
+                <mat-icon *ngIf="!isOptionSelected(opt, answer) && isOptionCorrect(opt, question)" class="correct-icon">check_circle</mat-icon>
+                <span>{{ opt }}</span>
+              </div>
             </div>
-          </div>
-          <div class="result-status" [class.correct]="answer.is_correct" [class.incorrect]="!answer.is_correct">
-            <mat-icon>{{ answer.is_correct ? 'check_circle' : 'cancel' }}</mat-icon>
-            <span>{{ answer.is_correct ? 'Helyes' : 'Hibás' }}</span>
-          </div>
+            <div *ngIf="!question.options || question.options.length === 0">
+              <div class="result-user-answer">
+                <strong>Jelölted:</strong>
+                <span [ngClass]="answer.is_correct ? 'text-green' : 'text-red'" style="color: inherit;">
+                  {{ formatAnswerForDisplay(answer.answer) }}
+                </span>
+                <span class="answer-status" [ngClass]="answer.is_correct ? 'text-green' : 'text-red'" style="color: inherit;">
+                  ({{ answer.is_correct ? 'Helyes' : 'Hibás' }})
+                </span>
+              </div>
+              <div class="result-correct-answer">
+                <strong>Helyes válasz:</strong>
+                <span class="text-green" style="color: #0f0;">
+                  {{ formatAnswerForDisplay(question.correct_answer ? question.correct_answer : getParsedCorrectAnswers(question)) }}
+                </span>
+              </div>
+            </div>
+            <div class="result-status" [class.correct]="answer.is_correct" [class.incorrect]="!answer.is_correct">
+              <mat-icon>{{ answer.is_correct ? 'check_circle' : 'cancel' }}</mat-icon>
+              <span>{{ answer.is_correct ? 'Helyes' : 'Hibás' }}</span>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="!getQuestionById(answer.question_id)">
+            <div style="color: #f00;">Nem található kérdés ehhez a válaszhoz (ID: {{ answer.question_id }})</div>
+          </ng-container>
         </ng-container>
       </div>
     </div>
