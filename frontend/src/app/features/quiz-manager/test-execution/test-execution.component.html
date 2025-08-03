@@ -272,18 +272,10 @@
             *ngFor="let option of currentQuestion.options"
             class="option-btn"
             [class.selected]="isAnswerSelected(option)"
-            [class]="getAnswerClass(option)"
             (click)="isAnswerSubmitted ? null : handleImmediateMultipleChoice(option)"
             [disabled]="isAnswerSubmitted">
             <div class="option-indicator">
-              <mat-icon *ngIf="!isAnswerSubmitted">
-                {{ isAnswerSelected(option) ? 'radio_button_checked' : 'radio_button_unchecked' }}
-              </mat-icon>
-              <mat-icon *ngIf="isAnswerSubmitted && session?.configuration?.immediateResultsForMC" class="result-icon">
-                {{ getAnswerClass(option).includes('correct') ? 'check_circle' : 
-                   getAnswerClass(option).includes('incorrect') ? 'cancel' : 'radio_button_unchecked' }}
-              </mat-icon>
-              <mat-icon *ngIf="isAnswerSubmitted && !session?.configuration?.immediateResultsForMC">
+              <mat-icon>
                 {{ isAnswerSelected(option) ? 'radio_button_checked' : 'radio_button_unchecked' }}
               </mat-icon>
             </div>
@@ -436,6 +428,7 @@
           </ng-container>
           <ng-container *ngIf="!getQuestionById(answer.question_id)">
             <div style="color: #f00;">Nem található kérdés ehhez a válaszhoz (ID: {{ answer.question_id }})</div>
+            <div style="color: #ff0; font-size: 0.9em;">Session kérdés ID-k: {{ getQuestionIdsString() }}</div>
           </ng-container>
         </ng-container>
       </div>

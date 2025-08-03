@@ -231,21 +231,55 @@ export class TestService {
       };
       // Always set options for multiple_choice and multi_select
       if (Array.isArray(answerObj.correct) && Array.isArray(answerObj.incorrect)) {
+      // Determine test difficulty (easy/medium/hard) from config
+      const difficulty = config.testTypes.find(t => t.enabled)?.id;
+      // For medium/hard: only allow multiple_choice or multi_select
+      if (difficulty === 'multiple_choice' || difficulty === 'multi_select') {
+        if (question.type === 'multi_select') {
+          // If not enough options for multi_select, fallback to multiple_choice
+          if (answerObj.correct.length < 2 || answerObj.incorrect.length < 1) {
+            question.type = 'multiple_choice';
+          } else {
+            const allOptions = [...answerObj.correct, ...answerObj.incorrect];
+            question.options = this.shuffleArray(allOptions);
+          }
+        }
         if (question.type === 'multiple_choice') {
           const correctAnswer = String(this.shuffleArray(answerObj.correct)[0] ?? '');
           const incorrectOptions = this.shuffleArray(
             answerObj.incorrect.filter((opt: any) => typeof opt === 'string' && opt.trim().toLowerCase() !== correctAnswer.trim().toLowerCase())
-          ).slice(0, 3);
-          if (incorrectOptions.length < 3) continue;
+          );
+          // If not enough incorrect options, skip this card
+          if (incorrectOptions.length < 1) continue;
           const allOptions = [correctAnswer, ...incorrectOptions];
           question.options = this.shuffleArray(allOptions);
           question.correct_answer = correctAnswer;
-        } else if (question.type === 'multi_select') {
-          if (answerObj.correct.length < 2 || answerObj.incorrect.length < 3) continue;
-          const allOptions = [...answerObj.correct, ...answerObj.incorrect];
-          question.options = this.shuffleArray(allOptions);
-        // correct_answers helyett csak az answerObj.correct tömböt használjuk, de nem mentjük külön
         }
+      } else {
+        // Easy test: allow flashcard fallback
+        if (question.type === 'multiple_choice') {
+          const correctAnswer = String(this.shuffleArray(answerObj.correct)[0] ?? '');
+          const incorrectOptions = this.shuffleArray(
+            answerObj.incorrect.filter((opt: any) => typeof opt === 'string' && opt.trim().toLowerCase() !== correctAnswer.trim().toLowerCase())
+          );
+          if (incorrectOptions.length < 1) {
+            question.type = 'flashcard';
+            question.correct_answer = correctAnswer;
+          } else {
+            const allOptions = [correctAnswer, ...incorrectOptions];
+            question.options = this.shuffleArray(allOptions);
+            question.correct_answer = correctAnswer;
+          }
+        } else if (question.type === 'multi_select') {
+          if (answerObj.correct.length < 2 || answerObj.incorrect.length < 1) {
+            question.type = 'flashcard';
+            question.correct_answer = Array.isArray(answerObj.correct) ? answerObj.correct.join(', ') : answerObj.correct;
+          } else {
+            const allOptions = [...answerObj.correct, ...answerObj.incorrect];
+            question.options = this.shuffleArray(allOptions);
+          }
+        }
+      }
       }
       if (question.type === 'written' || question.type === 'flashcard') {
         if (isJson && (Array.isArray(answerObj.correct) || typeof answerObj.correct === 'string')) {

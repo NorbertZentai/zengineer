@@ -16,6 +16,11 @@ import { QuizService } from '../../../core/services/quiz.service';
   styleUrls: ['./test-execution.component.scss']
 })
 export class TestExecutionComponent implements OnInit, OnDestroy {
+  // Debug helper: return all question IDs as string
+  getQuestionIdsString(): string {
+    if (!this.session || !this.session.questions) return 'nincs kérdés';
+    return this.session.questions.map(q => q.id).join(', ');
+  }
   // Helper to determine if a question/card is suitable for the current test type
   getQuestionById(id: string): TestQuestion | undefined {
     return this.session?.questions?.find(q => q.id === id);
@@ -170,6 +175,8 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
     // Filter out unsuitable cards/questions before starting the test
     if (this.session.questions && this.session.questions.length > 0) {
       this.session.questions = this.session.questions.filter(q => this.isQuestionSuitable(q));
+      // DEBUG: Log the IDs of questions after filtering
+      console.debug('[TEST EXECUTION] session.questions IDs after filter:', this.session.questions.map(q => q.id));
     }
     // If no suitable questions remain, immediately show result
     if (!this.session.questions || this.session.questions.length === 0) {
@@ -363,31 +370,14 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
         this.showHint || this.showSolution
       );
       this.isAnswerSubmitted = true;
-      if (this.session?.configuration.immediateResultsForMC && this.currentQuestion.type === 'multiple_choice') {
-        setTimeout(async () => {
-          if (this.testService.isTestCompleted()) {
-            await this.completeTest();
-          } else {
-            this.nextQuestion();
-          }
-        }, 1500);
-      } else if (this.currentQuestion.type === 'flashcard') {
-        setTimeout(async () => {
-          if (this.testService.isTestCompleted()) {
-            await this.completeTest();
-          } else {
-            this.nextQuestion();
-          }
-        }, 1500);
-      } else if (this.currentQuestion.type === 'multi_select' || this.currentQuestion.type === 'written') {
-        setTimeout(async () => {
-          if (this.testService.isTestCompleted()) {
-            await this.completeTest();
-          } else {
-            this.nextQuestion();
-          }
-        }, 800);
-      }
+      this.showSolution = false; // Ne mutassuk a megoldást válaszadás után
+      setTimeout(async () => {
+        if (this.testService.isTestCompleted()) {
+          await this.completeTest();
+        } else {
+          this.nextQuestion();
+        }
+      }, 400);
     } catch (error: any) {
       this.error = error.message || 'Hiba történt a válasz mentésekor';
     } finally {

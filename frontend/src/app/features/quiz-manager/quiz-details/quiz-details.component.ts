@@ -78,18 +78,28 @@ export class QuizDetailsComponent implements OnInit {
 
   startEasyMode() {
     // Könnyű: 5-15 kérdés, flashcard és multiple_choice (answer-ben 1 helyes, legalább 2 rossz), multi_select csak ha legalább 2 helyes és 3 rossz
-    const cardCount = Math.floor(Math.random() * 11) + 5;
-    let easyCards = this.shuffleArray(this.cards).filter(card => {
-      if (!card.answer) return true;
-      try {
-        const ans = JSON.parse(card.answer);
-        if (Array.isArray(ans.correct) && ans.correct.length === 1 && Array.isArray(ans.incorrect) && ans.incorrect.length >= 2) return true;
-        if (Array.isArray(ans.correct) && ans.correct.length >= 2 && Array.isArray(ans.incorrect) && ans.incorrect.length >= 3) return true;
-        return false;
-      } catch {
-        return true;
-      }
-    }).slice(0, cardCount);
+        let minCount = 5, maxCount = 15;
+        // Filter cards using the same logic as isQuestionSuitable
+        const isCardSuitable = (card: QuizCard): boolean => {
+          if (!card || !card.card_type || !card.question || card.question.trim() === '') return false;
+          if (card.card_type === 'flashcard' && (!card.answer || card.answer.trim() === '')) return false;
+          if ((card.card_type === 'multiple_choice') && (!card.answer || card.answer.trim() === '')) return false;
+          // Optionally, check for options array if available
+          return true;
+        };
+        let suitableCards = this.shuffleArray(this.cards).filter(isCardSuitable);
+        let cardCount = 0;
+        if (suitableCards.length < minCount) {
+          cardCount = suitableCards.length;
+        } else {
+          cardCount = Math.floor(Math.random() * (maxCount - minCount + 1)) + minCount;
+          if (cardCount > suitableCards.length) cardCount = suitableCards.length;
+        }
+        let easyCards = suitableCards.slice(0, cardCount);
+    // DEBUG: Log selected card IDs
+    console.log('Easy test: selected card IDs:', easyCards.map(card => card.id));
+    // DEBUG: Log selected card IDs
+    console.log('Easy test: selected card IDs:', easyCards.map(card => card.id));
     const config: TestConfiguration = {
       testTypes: [
         { id: 'multiple_choice', enabled: true, name: 'Egyszerű választás', description: 'Egyszerű választás' },
@@ -108,18 +118,35 @@ export class QuizDetailsComponent implements OnInit {
 
   startMediumMode() {
     // Közepes: 10-20 kérdés, csak multiple_choice (1 helyes, legalább 2 rossz) és multi_select (legalább 2 helyes, 3 rossz)
-    const cardCount = Math.floor(Math.random() * 11) + 10;
-    let mediumCards = this.shuffleArray(this.cards).filter(card => {
-      if (!card.answer) return false;
+    let minCount = 10, maxCount = 20;
+    let allCards = this.shuffleArray(this.cards);
+    let cardCount = Math.floor(Math.random() * (maxCount - minCount + 1)) + minCount;
+    cardCount = Math.max(minCount, Math.min(cardCount, allCards.length, maxCount));
+    let multiSelectCards: QuizCard[] = [];
+    let singleChoiceCards: QuizCard[] = [];
+    for (const card of allCards) {
+      if (!card.answer) {
+        singleChoiceCards.push(card);
+        continue;
+      }
       try {
         const ans = JSON.parse(card.answer);
-        if (Array.isArray(ans.correct) && ans.correct.length === 1 && Array.isArray(ans.incorrect) && ans.incorrect.length >= 2) return true;
-        if (Array.isArray(ans.correct) && ans.correct.length >= 2 && Array.isArray(ans.incorrect) && ans.incorrect.length >= 3) return true;
-        return false;
+        if (Array.isArray(ans.correct) && ans.correct.length >= 2 && Array.isArray(ans.incorrect) && ans.incorrect.length >= 3) {
+          multiSelectCards.push(card);
+        } else {
+          singleChoiceCards.push(card);
+        }
       } catch {
-        return false;
+        singleChoiceCards.push(card);
       }
-    }).slice(0, cardCount);
+    }
+    let mediumCards: QuizCard[] = [];
+    for (const card of multiSelectCards) {
+      if (mediumCards.length < cardCount) mediumCards.push(card);
+    }
+    for (const card of singleChoiceCards) {
+      if (mediumCards.length < cardCount) mediumCards.push(card);
+    }
     const config: TestConfiguration = {
       testTypes: [
         { id: 'multiple_choice', enabled: true, name: 'Egyszerű választás', description: 'Egyszerű választás' },
@@ -137,18 +164,35 @@ export class QuizDetailsComponent implements OnInit {
 
   startHardMode() {
     // Nehéz: 10-30 kérdés, főleg multi_select (legalább 2 helyes, 3 rossz), kevesebb multiple_choice (1 helyes, 2 rossz), írásos kérdés nem szűrhető answer alapján
-    const cardCount = Math.floor(Math.random() * 21) + 10;
-    let hardCards = this.shuffleArray(this.cards).filter(card => {
-      if (!card.answer) return true;
+    let minCount = 10, maxCount = 30;
+    let allCards = this.shuffleArray(this.cards);
+    let cardCount = Math.floor(Math.random() * (maxCount - minCount + 1)) + minCount;
+    cardCount = Math.max(minCount, Math.min(cardCount, allCards.length, maxCount));
+    let multiSelectCards: QuizCard[] = [];
+    let singleChoiceCards: QuizCard[] = [];
+    for (const card of allCards) {
+      if (!card.answer) {
+        singleChoiceCards.push(card);
+        continue;
+      }
       try {
         const ans = JSON.parse(card.answer);
-        if (Array.isArray(ans.correct) && ans.correct.length >= 2 && Array.isArray(ans.incorrect) && ans.incorrect.length >= 3) return true;
-        if (Array.isArray(ans.correct) && ans.correct.length === 1 && Array.isArray(ans.incorrect) && ans.incorrect.length >= 2) return true;
-        return false;
+        if (Array.isArray(ans.correct) && ans.correct.length >= 2 && Array.isArray(ans.incorrect) && ans.incorrect.length >= 3) {
+          multiSelectCards.push(card);
+        } else {
+          singleChoiceCards.push(card);
+        }
       } catch {
-        return true;
+        singleChoiceCards.push(card);
       }
-    }).slice(0, cardCount);
+    }
+    let hardCards: QuizCard[] = [];
+    for (const card of multiSelectCards) {
+      if (hardCards.length < cardCount) hardCards.push(card);
+    }
+    for (const card of singleChoiceCards) {
+      if (hardCards.length < cardCount) hardCards.push(card);
+    }
     // Több multi_select, kevesebb multiple_choice
     hardCards = hardCards.sort((a, b) => {
       if (!a.answer) return 1;
