@@ -16,6 +16,7 @@ import { QuizService } from '../../../core/services/quiz.service';
   styleUrls: ['./test-execution.component.scss']
 })
 export class TestExecutionComponent implements OnInit, OnDestroy {
+  // Helper to determine if a question/card is suitable for the current test type
   getQuestionById(id: string): TestQuestion | undefined {
     return this.session?.questions?.find(q => q.id === id);
   }
@@ -166,6 +167,15 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
       this.router.navigate(['/quiz-manager']);
       return;
     }
+    // Filter out unsuitable cards/questions before starting the test
+    if (this.session.questions && this.session.questions.length > 0) {
+      this.session.questions = this.session.questions.filter(q => this.isQuestionSuitable(q));
+    }
+    // If no suitable questions remain, immediately show result
+    if (!this.session.questions || this.session.questions.length === 0) {
+      await this.completeTest();
+      return;
+    }
     this.loadCurrentQuestion();
     this.startTimer();
     // Scroll event for scroll-to-top button
@@ -173,6 +183,17 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
       this.showScrollTop = window.scrollY > 400;
     };
     window.addEventListener('scroll', this.scrollListener);
+  }
+
+  // Helper to determine if a question/card is suitable for the current test type
+  isQuestionSuitable(q: TestQuestion): boolean {
+    // Example logic: must have a valid type and non-empty question text
+    if (!q || !q.type || !q.question || q.question.trim() === '') return false;
+    // You can add more rules here, e.g. for flashcard: must have correct_answer, etc.
+    if (q.type === 'flashcard' && (!q.correct_answer || q.correct_answer.trim() === '')) return false;
+    if ((q.type === 'multiple_choice' || q.type === 'multi_select') && (!q.options || q.options.length === 0)) return false;
+    // Add further rules as needed
+    return true;
   }
 
 
@@ -306,8 +327,10 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
     if (this.isAnswerSubmitted) return;
     this.selectedAnswers = [answer];
     this.submitAnswer();
-    setTimeout(() => {
-      if (!this.testService.isTestCompleted()) {
+    setTimeout(async () => {
+      if (this.testService.isTestCompleted()) {
+        await this.completeTest();
+      } else {
         this.nextQuestion();
       }
     }, 400);
@@ -341,17 +364,29 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
       );
       this.isAnswerSubmitted = true;
       if (this.session?.configuration.immediateResultsForMC && this.currentQuestion.type === 'multiple_choice') {
-        setTimeout(() => {
-          if (!this.testService.isTestCompleted()) {
+        setTimeout(async () => {
+          if (this.testService.isTestCompleted()) {
+            await this.completeTest();
+          } else {
             this.nextQuestion();
           }
         }, 1500);
       } else if (this.currentQuestion.type === 'flashcard') {
-        setTimeout(() => {
-          if (!this.testService.isTestCompleted()) {
+        setTimeout(async () => {
+          if (this.testService.isTestCompleted()) {
+            await this.completeTest();
+          } else {
             this.nextQuestion();
           }
         }, 1500);
+      } else if (this.currentQuestion.type === 'multi_select' || this.currentQuestion.type === 'written') {
+        setTimeout(async () => {
+          if (this.testService.isTestCompleted()) {
+            await this.completeTest();
+          } else {
+            this.nextQuestion();
+          }
+        }, 800);
       }
     } catch (error: any) {
       this.error = error.message || 'Hiba történt a válasz mentésekor';

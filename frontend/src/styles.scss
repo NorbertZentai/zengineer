@@ -1,11 +1,29 @@
-// =============================================================================
-// ZENGINEER QUIZ MANAGER - MAIN STYLES
-// =============================================================================
-
-// Import all our SCSS modules using modern @use syntax (MUST BE FIRST!)
 @use 'scss/variables' as *;
 @use 'scss/mixins' as *;
 @use 'scss/utilities' as *;
+
+// Add global CSS custom properties for theme colors
+:root {
+  --primary: #667eea;
+  --secondary: #764ba2;
+  --primary-dark: #5a6fd8;
+  --secondary-dark: #5a3679;
+  --primary-light: #8fa7f3;
+  --text-on-primary: #fff;
+  --text-primary: #111827;
+  --bg-card-dark: #1c2128;
+  --border-primary-dark: #30363d;
+  --text-on-primary-dark: #fff;
+  --text-primary-dark: #f0f6fc;
+  // Default light theme variables for dropdown and elements
+  --bg-card: #{$light-bg-card};
+  --border-primary: #{$light-border-primary};
+  --shadow-lg: #{$shadow-lg};
+}
+
+// =============================================================================
+// ZENGINEER QUIZ MANAGER - MAIN STYLES
+// =============================================================================
 
 // === GLOBAL MOBILE ANTI-SCROLL SETTINGS ===
 // Disable horizontal scrolling and ensure responsive behavior across all pages
@@ -538,8 +556,33 @@ body {
 
 // Override Material Menu
 .mat-mdc-menu-panel {
-  background: var(--dialog-bg) !important;
-  color: var(--text-primary) !important;
+  overflow: hidden !important;
+  overflow: visible !important;
+  background: var(--bg-card) !important;
+  border-radius: 18px !important;
+  border: 1.5px solid rgba(120,130,150,0.12) !important;
+  box-shadow: 0 8px 32px 0 rgba(40,60,120,0.18), 0 1.5px 8px 0 rgba(40,60,120,0.10) !important;
+  backdrop-filter: blur(8px) !important;
+  padding: 0.75rem 0 !important;
+  min-width: 260px !important;
+  transition: box-shadow 0.25s cubic-bezier(.4,0,.2,1), border 0.25s cubic-bezier(.4,0,.2,1);
+}
+
+.mat-mdc-menu-item {
+  border-radius: 12px !important;
+  padding: 0.5rem 1.25rem !important;
+  font-size: 1.08rem !important;
+  font-weight: 500 !important;
+  transition: background 0.18s cubic-bezier(.4,0,.2,1), color 0.18s cubic-bezier(.4,0,.2,1);
+}
+.mat-mdc-menu-item:hover:not([disabled]) {
+  background: var(--primary) !important;
+  color: var(--text-on-primary) !important;
+  box-shadow: 0 2px 8px rgba(102,126,234,0.10) !important;
+}
+.mat-mdc-menu-item[disabled] {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
 }
 
 .mat-mdc-menu-item {

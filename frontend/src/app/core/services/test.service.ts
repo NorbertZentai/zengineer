@@ -188,6 +188,7 @@ export class TestService {
    */
   generateTestQuestions(selectedCards: any[], config: TestConfiguration): TestQuestion[] {
     const questions: TestQuestion[] = [];
+    const enabledTypes = config.testTypes.filter(t => t.enabled).map(t => t.id);
     for (let index = 0; index < selectedCards.length; index++) {
       const card = selectedCards[index];
       let answerObj: any = {};
@@ -200,10 +201,13 @@ export class TestService {
         isJson = false;
       }
       let detectedType = answerObj.type;
-      const enabledTypesForType = config.testTypes.filter(t => t.enabled);
-      if (enabledTypesForType.length === 1) {
-        detectedType = enabledTypesForType[0].id;
+      // If multiple test types are enabled, randomly pick one for this question
+      if (enabledTypes.length > 1) {
+        detectedType = enabledTypes[Math.floor(Math.random() * enabledTypes.length)];
+      } else if (enabledTypes.length === 1) {
+        detectedType = enabledTypes[0];
       } else {
+        // fallback to auto-detect
         if (
           Array.isArray(answerObj.correct) && answerObj.correct.length >= 2 &&
           Array.isArray(answerObj.incorrect) && answerObj.incorrect.length >= 3

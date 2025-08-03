@@ -17,13 +17,36 @@
           <div class="quiz-title-row">
             <h1 class="quiz-title">{{ quiz.name }}</h1>
             <div class="quiz-header-actions">
-              <button class="test-btn" 
-                      (click)="openTestConfig()" 
-                      [disabled]="cards.length === 0"
-                      [title]="'TEST.START_TEST' | translate">
+              <button class="test-btn" [matMenuTriggerFor]="testStartMenu" [disabled]="cards.length === 0" [title]="'TEST.START_TEST' | translate">
                 <mat-icon>play_arrow</mat-icon>
                 <span>{{ 'TEST.START_TEST' | translate }}</span>
               </button>
+              <mat-menu #testStartMenu="matMenu" panelClass="test-start-menu">
+                <button mat-menu-item (click)="startLearningMode()">
+                  <mat-icon>school</mat-icon>
+                  <span>Tanulás</span>
+                </button>
+                <button mat-menu-item (click)="startEasyMode()">
+                  <mat-icon>sentiment_satisfied</mat-icon>
+                  <span>Könnyű</span>
+                </button>
+                <button mat-menu-item (click)="startMediumMode()">
+                  <mat-icon>sentiment_neutral</mat-icon>
+                  <span>Közepes</span>
+                </button>
+                <button mat-menu-item (click)="startHardMode()">
+                  <mat-icon>sentiment_very_dissatisfied</mat-icon>
+                  <span>Nehéz</span>
+                </button>
+                <button mat-menu-item disabled>
+                  <mat-icon>smart_toy</mat-icon>
+                  <span>AI teszt (hamarosan)</span>
+                </button>
+                <button mat-menu-item (click)="openTestConfig()">
+                  <mat-icon>settings</mat-icon>
+                  <span>Egyéni</span>
+                </button>
+              </mat-menu>
               
               <button *ngIf="isOwner" class="expand-btn" 
                       (click)="toggleSettings()" 

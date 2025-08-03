@@ -1,3 +1,4 @@
+import { MatMenuModule } from '@angular/material/menu';
 // ...existing imports and decorators...
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -27,7 +28,8 @@ import { environment } from '../../../../environments/environment';
     MatIconModule, 
     MatButtonModule,
     TranslateModule,
-    TestConfigModalComponent
+    TestConfigModalComponent,
+    MatMenuModule
   ],
   animations: [
     trigger('slideDown', [
@@ -43,6 +45,116 @@ import { environment } from '../../../../environments/environment';
   ]
 })
 export class QuizDetailsComponent implements OnInit {
+  // --- Test start menu logic ---
+  startLearningMode() {
+    // Tanulás: 5-20 random kártya, csak flashcard, nincs határidő
+    const cardCount = Math.floor(Math.random() * 16) + 5;
+    const selectedCards = this.shuffleArray(this.cards).filter(card => card.card_type === 'flashcard').slice(0, cardCount);
+    const config: TestConfiguration = {
+      testTypes: [{ id: 'flashcard', enabled: true, name: 'Flashcard', description: 'Flashcard teszt' }],
+      questionCount: cardCount,
+      shuffleQuestions: true,
+      showHints: true,
+      timeLimit: undefined,
+      allowRetry: true,
+      immediateResultsForMC: false
+    };
+    this.startTestWithConfig(selectedCards, config);
+  }
+
+  startEasyMode() {
+    // Könnyű: 5-15 kártya, egyszeri választásos, határidővel, lehet flashcard (csak 0%-osak)
+    const cardCount = Math.floor(Math.random() * 11) + 5;
+    let easyCards = this.cards.filter(card => {
+      if (!card.id) return false;
+      // Flashcard csak ha 0%-os tudás
+      const successRate = this.getCardSuccessRate(card.id);
+      return card.card_type === 'multiple_choice' || (card.card_type === 'flashcard' && successRate === 0);
+    });
+    easyCards = this.shuffleArray(easyCards).slice(0, cardCount);
+    const config: TestConfiguration = {
+      testTypes: [
+        { id: 'multiple_choice', enabled: true, name: 'Egyszeri választás', description: 'Egyszeri választásos teszt' },
+        { id: 'flashcard', enabled: true, name: 'Flashcard', description: 'Flashcard teszt' }
+      ],
+      questionCount: cardCount,
+      shuffleQuestions: true,
+      showHints: true,
+      timeLimit: cardCount * 45,
+      allowRetry: true,
+      immediateResultsForMC: false
+    };
+    this.startTestWithConfig(easyCards, config);
+  }
+
+  startMediumMode() {
+    // Közepes: 5-20 kártya, egyszeri/többszöri választás, határidővel, arányos idő
+    const cardCount = Math.floor(Math.random() * 16) + 5;
+    let mediumCards = this.cards.filter(card => String(card.card_type) === 'multiple_choice' || String(card.card_type) === 'multi_select');
+    mediumCards = this.shuffleArray(mediumCards).slice(0, cardCount);
+    const config: TestConfiguration = {
+      testTypes: [
+        { id: 'multiple_choice', enabled: true, name: 'Egyszeri választás', description: 'Egyszeri választásos teszt' },
+        { id: 'multi_select', enabled: true, name: 'Többszöri választás', description: 'Többszöri választásos teszt' }
+      ],
+      questionCount: cardCount,
+      shuffleQuestions: true,
+      showHints: false,
+      timeLimit: cardCount * 40,
+      allowRetry: true,
+      immediateResultsForMC: true
+    };
+    this.startTestWithConfig(mediumCards, config);
+  }
+
+  startHardMode() {
+    // Nehéz: 10-30 kártya, több multi_select, kevesebb multiple_choice/írásos, arányos idő
+    const cardCount = Math.floor(Math.random() * 21) + 10;
+    let hardCards = this.cards.filter(card => String(card.card_type) === 'multiple_choice' || String(card.card_type) === 'multi_select' || String(card.card_type) === 'written');
+    hardCards = this.shuffleArray(hardCards).slice(0, cardCount);
+    // Arányos idő: written: 60s, multi_select: 45s, multiple_choice: 35s
+    let timeLimit = 0;
+    hardCards.forEach(card => {
+      if (String(card.card_type) === 'written') timeLimit += 60;
+      else if (String(card.card_type) === 'multi_select') timeLimit += 45;
+      else if (String(card.card_type) === 'multiple_choice') timeLimit += 35;
+    });
+    const config: TestConfiguration = {
+      testTypes: [
+        { id: 'multiple_choice', enabled: true, name: 'Egyszeri választás', description: 'Egyszeri választásos teszt' },
+        { id: 'multi_select', enabled: true, name: 'Többszöri választás', description: 'Többszöri választásos teszt' },
+        { id: 'written', enabled: true, name: 'Írásos', description: 'Írásos teszt' }
+      ],
+      questionCount: cardCount,
+      shuffleQuestions: true,
+      showHints: false,
+      timeLimit,
+      allowRetry: false,
+      immediateResultsForMC: true
+    };
+    this.startTestWithConfig(hardCards, config);
+  }
+
+  // Helper: get card performance (0-100)
+
+  // Helper: shuffle array
+  shuffleArray<T>(array: T[]): T[] {
+    return array
+      .map(value => ({ value, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(({ value }) => value);
+  }
+
+  // Helper: start test with config
+  startTestWithConfig(selectedCards: QuizCard[], config: TestConfiguration) {
+    // Use testService to create session and navigate
+    // Feltételezve, hogy a tesztService.createTestSession(quizId, config) signature-t használ
+    // Ha a selectedCards tömb kell, akkor a metódust módosítani kell, de most quizId-t adunk át
+    if (selectedCards.length > 0 && selectedCards[0].quiz_id) {
+      this.testService.createTestSession(selectedCards[0].quiz_id, config);
+      this.router.navigate(['/quiz-manager/test-execution']);
+    }
+  }
   // Helper to parse correct/incorrect answers from card.answer JSON
   getParsedAnswers(card: QuizCard): { correct?: string[]; incorrect?: string[] } {
     if (card.card_type !== 'multiple_choice' || !card.answer) return {};
@@ -507,6 +619,7 @@ export class QuizDetailsComponent implements OnInit {
   }
 
   // Card performance methods
+
   getCardPerformance(cardId: string): CardPerformance | null {
     return this.cardPerformance.find(p => p.card_id === cardId) || null;
   }

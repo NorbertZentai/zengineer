@@ -1,5 +1,137 @@
-// Mobil reszponzív stílusok importálása
-@use './quiz-details.component.mobile.scss';
+// Modern test start button and menu styles (HTML unchanged, only styling)
+.test-btn {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: var(--text-on-primary);
+  border: none;
+  border-radius: 12px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+    color: var(--text-on-primary);
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  mat-icon {
+    font-size: 1.2rem;
+    margin-right: 0.5rem;
+  }
+
+
+// Ensure menu background and border are always visible
+// Force solid background and border for dropdown menu
+// Use theme variables for menu background and border
+.test-start-menu {
+  position: relative;
+  background: var(--bg-card);
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+  border: 2px solid var(--border-primary);
+  padding: 0.5rem 0;
+  min-width: 260px;
+  z-index: 200;
+  // Pseudo-element for solid background separation
+  // Force solid, non-transparent background for dropdown menu
+  background: var(--bg-card), #fff;
+  // Remove pseudo-element, use direct background
+}
+  .mat-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+    mat-icon {
+      font-size: 1.3rem;
+      color: var(--primary);
+    }
+    span {
+      color: var(--text-primary);
+    }
+    &:hover:not(:disabled) {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      mat-icon { color: var(--primary-dark); }
+      span { color: var(--primary-dark); }
+    }
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
+
+
+@media (prefers-color-scheme: dark) {
+  .test-start-menu {
+    background: var(--bg-card-dark);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.32);
+    border: 2px solid var(--border-primary-dark);
+    .mat-menu-item {
+      background: transparent;
+      color: var(--text-primary-dark);
+      mat-icon { color: var(--primary-dark); }
+      span { color: var(--text-primary-dark); }
+      &:hover:not(:disabled) {
+        background: var(--primary-dark);
+        color: var(--text-on-primary);
+        mat-icon { color: var(--text-on-primary); }
+        span { color: var(--text-on-primary); }
+      }
+    }
+  }
+  .test-btn {
+    background: linear-gradient(135deg, var(--primary-dark), var(--secondary-dark));
+    color: var(--text-on-primary-dark);
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, var(--primary), var(--secondary-dark));
+      color: var(--text-on-primary-dark);
+    }
+  }
+}
+
+
+
+// Scroll to top button (copied from test-execution.component.scss for consistency)
+.scroll-to-top-btn {
+  position: fixed;
+  right: 2rem;
+  bottom: 2rem;
+  z-index: 100;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  &:hover {
+    background: var(--primary-dark);
+    box-shadow: var(--shadow-xl);
+  }
+  mat-icon {
+    font-size: 28px;
+  }
+}
 
 .quiz-details-container {
   max-width: 1200px;
