@@ -9,6 +9,7 @@ import { QuizPreviewComponent } from './quiz-preview/quiz-preview.component';
 import { QuizListComponent } from './quiz-list/quiz-list.component';
 import { ViewChild } from '@angular/core';
 import { QuizCreateModalComponent } from './quiz-create-modal/quiz-create-modal.component';
+import { QuizImportModalComponent } from './quiz-import-modal/quiz-import-modal.component';
 import { Quiz } from '../../core/services/quiz.service';
 import { QuizService } from '../../core/services/quiz.service';
 
@@ -26,10 +27,30 @@ import { QuizService } from '../../core/services/quiz.service';
     QuizStatsComponent,
     QuizPreviewComponent,
     QuizListComponent,
-    QuizCreateModalComponent
+    QuizCreateModalComponent,
+    QuizImportModalComponent
   ]
 })
 export class QuizManagerComponent {
+  showImportModal = false;
+
+  onImport() {
+    this.showImportModal = true;
+  }
+
+  handleImportModalClose() {
+    this.showImportModal = false;
+  }
+
+  async handleQuizImported(event: any) {
+    // Close modal and refresh the list so the new quiz/cards appear
+    this.showImportModal = false;
+    if (this.quizListComponent) {
+      await this.quizListComponent.ngOnInitData();
+    } else {
+      await this.quizService.loadQuizzes();
+    }
+  }
   @ViewChild(QuizListComponent) quizListComponent?: QuizListComponent;
   selectedQuiz: any = null;
   viewMode: 'list' | 'edit' | 'stats' | 'preview' = 'list';

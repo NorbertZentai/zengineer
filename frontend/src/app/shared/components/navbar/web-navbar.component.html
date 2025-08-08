@@ -8,7 +8,20 @@
     <a routerLink="/analytics" routerLinkActive="active" role="link" tabindex="0">{{ 'NAV.ANALYTICS' | translate }}</a>
   </div>
   <div class="navbar-actions">
-    <!-- Language Selector -->
+    <!-- Plus (+) Dropdown -->
+    <div class="navbar-action navbar-plus" (click)="showPlusDropdown = !showPlusDropdown" tabindex="0" aria-label="Create or import">
+      <span class="navbar-icon">+</span>
+      <div class="navbar-dropdown" *ngIf="showPlusDropdown">
+        <button (click)="$event.stopPropagation(); navigateToNewQuiz()">
+          <mat-icon>add</mat-icon>
+          Új kvíz
+        </button>
+        <button (click)="$event.stopPropagation(); navigateToImport()">
+          <mat-icon>file_upload</mat-icon>
+          Import
+        </button>
+      </div>
+    </div>
     <div class="navbar-action navbar-lang" (click)="toggleLanguage()" tabindex="0" aria-label="Select language">
       <span class="navbar-icon">🌐</span>
       <div class="navbar-dropdown" *ngIf="showLanguageDropdown">

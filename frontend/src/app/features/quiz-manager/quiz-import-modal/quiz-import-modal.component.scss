@@ -1,0 +1,566 @@
+.public-toggle-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--bg-secondary, #23243a);
+  border-radius: 24px;
+  box-shadow: 0 2px 8px rgba(102,126,234,0.08);
+  padding: 0.18rem 0.18rem;
+  margin: 0.7rem 0 0.2rem 0;
+  width: 180px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.toggle-btn {
+  flex: 1 1 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text-secondary, #bbb);
+  font-size: 1.08rem;
+  font-weight: 600;
+  padding: 0.6rem 0.2rem;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.22s cubic-bezier(.4,0,.2,1), color 0.22s;
+  margin: 0 0.08rem;
+}
+.toggle-btn.active {
+  background: linear-gradient(90deg, #7f7fff 0%, #a084ee 100%);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(102,126,234,0.12);
+}
+// Switch nagyobb méret, feliratok a csúszkán belül
+.input-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.7rem;
+}
+.input-icon mat-icon {
+  font-size: 1.3rem;
+  color: var(--primary);
+}
+.quiz-input-label input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: 1.08rem;
+  padding: 0.3rem 0.2rem;
+  min-width: 0;
+}
+// Új kvíz blokk
+.new-quiz-block {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  margin-top: 0.5rem;
+}
+.input-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.7rem;
+}
+.input-row.horizontal {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+.quizname-label, .category-label {
+  max-width: 48%;
+  min-width: 180px;
+  box-sizing: border-box;
+}
+.quizname-label, .category-label {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+}
+.quizname-label mat-icon, .category-label mat-icon {
+  font-size: 1.3rem;
+  color: var(--primary);
+}
+.quizname-label input, .category-label input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: 1.08rem;
+  padding: 0.3rem 0.2rem;
+}
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.08rem;
+  font-weight: 500;
+  cursor: pointer;
+  margin-left: 0.2rem;
+}
+.custom-checkbox {
+  display: flex;
+  align-items: center;
+  font-size: 1.3rem;
+  margin-right: 0.2rem;
+}
+.checkbox-label input[type="checkbox"] {
+  display: none;
+}
+.checkbox-text {
+  color: var(--primary);
+  font-weight: 500;
+}
+.public-quiz-option {
+  margin-top: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+.custom-checkbox {
+  display: flex;
+  align-items: center;
+  font-size: 1.3rem;
+  margin-right: 0.2rem;
+}
+.checkbox-label input[type="checkbox"] {
+  display: none;
+}
+.checkbox-text {
+  color: var(--primary);
+  font-weight: 500;
+}
+// A textarea ne lógjon ki a modal paddingből
+.code-mode {
+  padding-left: 0.1rem;
+  padding-right: 0.1rem;
+}
+// Removed invalid top-level padding declaration
+ .info-popup-overlay {
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100vw;
+   height: 100vh;
+   background: rgba(0,0,0,0.18);
+   z-index: 3000;
+ }
+ .info-popup {
+   position: fixed;
+   top: 12vh;
+   left: 50%;
+   transform: translateX(-50%);
+   background: #fffbe6;
+   color: #7c5c00;
+   border-radius: 10px;
+   padding: 0.7rem 1.2rem;
+   font-size: 0.98rem;
+   box-shadow: 0 4px 16px rgba(255, 193, 7, 0.12);
+   border: 1.5px solid #ffe082;
+   font-weight: 500;
+   z-index: 3010;
+   display: flex;
+   flex-direction: row;
+   align-items: center;
+   gap: 0.7rem;
+   min-width: 180px;
+   max-width: 320px;
+ }
+ .info-close-btn {
+   background: transparent;
+   border: none;
+   color: #7c5c00;
+   font-size: 1.5rem;
+   cursor: pointer;
+   position: absolute;
+   top: 1rem;
+   right: 1rem;
+   transition: color 0.2s;
+   &:hover {
+     color: #ff9800;
+   }
+ }
+ .info-btn {
+   background: var(--bg-secondary);
+   border: none;
+   color: var(--primary);
+   font-size: 1.3rem;
+   cursor: pointer;
+   border-radius: 50%;
+   width: 36px;
+   height: 36px;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   margin-left: 0.5rem;
+   margin-right: 0.2rem;
+   transition: background 0.2s, color 0.2s;
+   box-shadow: 0 2px 8px rgba(102,126,234,0.08);
+   &:hover {
+     background: var(--primary);
+     color: #fff;
+   }
+ }
+
+ .info-tooltip {
+   display: flex;
+   align-items: center;
+   gap: 0.7rem;
+   background: #fffbe6;
+   color: #7c5c00;
+   border-radius: 10px;
+   padding: 1rem 1.5rem;
+   font-size: 1.05rem;
+   margin-bottom: 1.2rem;
+   box-shadow: 0 2px 12px rgba(255, 193, 7, 0.12);
+   border: 1.5px solid #ffe082;
+   font-weight: 500;
+ }
+ .import-target-selector {
+   display: flex;
+   gap: 1rem;
+   margin-bottom: 1.2rem;
+   justify-content: center;
+ }
+.import-target-selector button {
+  flex: 1;
+  padding: 0.7rem 0;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background 0.2s, color 0.2s;
+}
+.import-target-selector button.active {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(102,126,234,0.12);
+}
+.quizname-label, .quizselect-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  margin-bottom: 0.7rem;
+}
+.quizname-label input, .quizselect-label select {
+  flex: 1;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1.5px solid var(--border-primary);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+}
+.quiz-import-modal {
+  /* Responsive modal */
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-radius: 18px;
+  box-shadow: 0 8px 40px rgba(102,126,234,0.18), 0 2px 8px rgba(0,0,0,0.12);
+  max-width: 440px;
+  margin: 6vh auto;
+  padding: 2.2rem 2rem 1.7rem 2rem;
+  position: relative;
+  animation: modalFadeIn 0.25s cubic-bezier(.4,0,.2,1);
+  border: 1.5px solid var(--primary);
+  transition: box-shadow 0.2s, border 0.2s;
+  /* Prevent modal from growing beyond viewport when content (like textarea) is large */
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+@media (max-width: 600px) {
+  .quiz-import-modal {
+    max-width: 98vw;
+    padding: 1.2rem 0.5rem 1rem 0.5rem;
+  margin: 4vh auto;
+  max-height: 90vh;
+  }
+}
+/* Scrollable content area; header stays, footer sticks */
+.modal-body {
+  overflow: auto;
+  padding-bottom: 0.5rem; /* space above sticky footer */
+}
+.modal-header {
+  /* Move plain declarations before nested rules to avoid mixed-decls warning */
+  box-shadow: 0 1px 4px rgba(102,126,234,0.08);
+  border: 1.5px solid transparent;
+  /* Nincs hover border, csak aktív szín */
+  transition: border 0.2s, box-shadow 0.2s;
+  appearance: none;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%23999" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+  background-size: 1.2em;
+  margin-top: 0.7rem;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-primary);
+
+  &:focus {
+    border: 1.5px solid var(--primary);
+    box-shadow: 0 2px 8px rgba(102,126,234,0.12);
+    outline: none;
+  }
+
+  h2 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--primary);
+    margin-bottom: 0;
+  }
+
+  input[type="checkbox"] {
+    accent-color: var(--primary);
+    width: 18px;
+    height: 18px;
+    margin-right: 0.5rem;
+  }
+}
+.modal-icon {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border-radius: 50%;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(102,126,234,0.12);
+}
+.desc-text {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+.close-btn {
+  background: var(--bg-secondary);
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.7rem;
+  cursor: pointer;
+  margin-left: auto;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s;
+  box-shadow: 0 2px 8px rgba(102,126,234,0.08);
+  &:hover {
+    background: var(--primary);
+    color: #fff;
+  }
+}
+.modal-desc {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  color: var(--text-secondary, #bbb);
+}
+.import-mode-selector {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+  justify-content: center;
+}
+.import-mode-selector button {
+  flex: 1;
+  padding: 0.7rem 0;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background 0.2s, color 0.2s;
+}
+.import-mode-selector button.active {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(102,126,234,0.12);
+}
+.import-content {
+  margin-bottom: 1rem;
+}
+.file-upload-label {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #fff;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 8px rgba(102,126,234,0.12);
+}
+.file-upload-label input[type="file"] {
+  display: none;
+}
+.file-info {
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.98rem;
+  color: var(--primary);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1.5px solid var(--border-primary);
+  border-radius: 8px;
+  padding: 0.85rem;
+  font-size: 1rem;
+  resize: vertical;
+  width: 100%;
+  box-sizing: border-box;
+  margin-left: 0;
+  margin-right: 0;
+}
+textarea {
+  width: 100%;
+  background: var(--background-alt, #333);
+  color: inherit;
+  border: 1px solid var(--border, #444);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  resize: vertical;
+  box-sizing: border-box;
+  margin: 0;
+}
+/* Limit textarea growth in code mode so modal doesn't fill the page */
+.code-mode textarea {
+  min-height: 160px;
+  max-height: 40vh;
+  overflow: auto;
+}
+.import-settings {
+  margin-bottom: 1.2rem;
+  font-size: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+}
+.import-settings label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.modal-actions {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  background: var(--bg-card);
+  padding-top: 0.7rem;
+  margin-top: 0.3rem;
+  border-top: 1px solid var(--border-primary);
+}
+.import-btn {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.7rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 1rem;
+  box-shadow: 0 2px 8px rgba(102,126,234,0.12);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background 0.2s;
+  &:hover {
+    filter: brightness(1.08);
+    box-shadow: 0 4px 16px rgba(102,126,234,0.18);
+  }
+}
+.cancel-btn {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.7rem;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background 0.2s;
+  &:hover {
+    background: var(--bg-card);
+    color: var(--primary);
+  }
+}
+.error-msg {
+  color: var(--error);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  background: rgba(255,82,82,0.08);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+}
+
+@keyframes modalFadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.96) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}

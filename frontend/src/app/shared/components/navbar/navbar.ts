@@ -4,15 +4,31 @@ import { RouterModule, Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { ThemeService } from '../../../core/services/theme.service';
+import { QuizImportModalComponent } from '../../../features/quiz-manager/quiz-import-modal/quiz-import-modal.component';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterModule, TranslateModule],
+  imports: [CommonModule, RouterModule, TranslateModule, QuizImportModalComponent],
   templateUrl: './navbar.html',
   styleUrls: ['./navbar.scss']
 })
 export class NavbarComponent implements OnInit, OnDestroy {
+  showImportModal = false;
+
+  onImport() {
+    this.closeDropdowns();
+    this.showImportModal = true;
+  }
+
+  handleImportModalClose() {
+    this.showImportModal = false;
+  }
+
+  handleQuizImported(event: any) {
+    // TODO: handle imported quiz (event contains file/code)
+    this.showImportModal = false;
+  }
   authInitialized = false;
   showUserDropdown = false;
   showLanguageDropdown = false;

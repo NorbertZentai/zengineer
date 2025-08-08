@@ -54,10 +54,20 @@
 
           <div class="form-group">
             <label for="visibility">Láthatóság</label>
-            <select id="visibility" [(ngModel)]="newQuiz.visibility" name="visibility">
-              <option value="private">Privát</option>
-              <option value="public">Nyilvános</option>
-            </select>
+            <div class="public-toggle-group">
+              <button type="button"
+                      class="toggle-btn"
+                      [class.active]="newQuiz.visibility === 'private'"
+                      (click)="newQuiz.visibility = 'private'">
+                Private
+              </button>
+              <button type="button"
+                      class="toggle-btn"
+                      [class.active]="newQuiz.visibility === 'public'"
+                      (click)="newQuiz.visibility = 'public'">
+                Public
+              </button>
+            </div>
           </div>
         </div>
 

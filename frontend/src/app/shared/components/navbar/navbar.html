@@ -14,7 +14,9 @@
           <line x1="12" y1="5" x2="12" y2="19"></line>
           <line x1="5" y1="12" x2="19" y2="12"></line>
         </svg>
-        <div class="navbar-dropdown" *ngIf="showCreateDropdown">
+        <div class="navbar-dropdown"
+             *ngIf="showCreateDropdown && !showImportModal"
+             [ngClass]="{'dropdown-fade-in': showCreateDropdown, 'dropdown-fade-out': !showCreateDropdown}">
           <a routerLink="/quiz-manager" [queryParams]="{action: 'create-quiz'}" (click)="closeDropdowns()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
               <path d="m9 12 2 2 4-4"></path>
@@ -22,6 +24,14 @@
               <path d="M21 16c.552 0 1 .448 1 1v3a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-3c0-.552.448-1 1-1"></path>
             </svg>
             {{ 'NAV.CREATE.NEW_QUIZ' | translate }}
+          </a>
+          <a (click)="onImport(); closeDropdowns()" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+              <path d="M12 19V6"></path>
+              <polyline points="8 15 12 19 16 15"></polyline>
+              <rect x="4" y="4" width="16" height="4" rx="2"></rect>
+            </svg>
+            Import
           </a>
         </div>
       </div>
@@ -80,6 +90,13 @@
       </div>
     </div>
   </nav>
+<!-- Import Modal rendered globally, not inside dropdown -->
+<app-quiz-import-modal
+  *ngIf="showImportModal"
+  (close)="handleImportModalClose()"
+  (imported)="handleQuizImported($event)"
+  style="position: fixed; z-index: 2000; left: 0; top: 0; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3);">
+</app-quiz-import-modal>
 </div>
 
 <!-- Mobile Navbar (<768px) -->

@@ -12,6 +12,10 @@
           <mat-icon>add</mat-icon>
           {{ 'QUIZ_MANAGER.NEW_QUIZ' | translate }}
         </button>
+        <button class="create-quiz-btn" (click)="onImport()" style="margin-left: 0.5rem;">
+          <mat-icon>file_upload</mat-icon>
+          Import
+        </button>
       </div>
     </header>
     
@@ -44,4 +48,11 @@
     (close)="onModalClose()"
     (created)="onQuizCreated($event)">
   </app-quiz-create-modal>
+
+  <app-quiz-import-modal
+    *ngIf="showImportModal"
+    (close)="handleImportModalClose()"
+    (imported)="handleQuizImported($event)"
+    style="position: fixed; z-index: 2000; left: 0; top: 0; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3);">
+  </app-quiz-import-modal>
 </div>
