@@ -3,7 +3,7 @@ services:
   - type: web
     name: zengineer-frontend
     env: static
-    buildCommand: cd frontend && npm ci && npm run build
+    buildCommand: cd frontend && npm ci && npm run build -- --configuration=production
     staticPublishPath: frontend/dist/zengineer/browser
     routes:
       - type: rewrite
