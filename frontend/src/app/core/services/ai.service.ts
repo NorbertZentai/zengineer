@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { AuthService } from './auth.service';
 import { Subject } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface AiCardDTO {
   question: string;
@@ -11,7 +12,7 @@ export interface AiCardDTO {
 
 @Injectable({ providedIn: 'root' })
 export class AiService {
-  private baseUrl = 'http://localhost:8787/api/ai';
+  private baseUrl = environment.aiServerUrl;
   constructor(private auth: AuthService, private translate: TranslateService) {}
   // Emits when an AI request likely consumed quota
   public usageUpdated$ = new Subject<void>();
