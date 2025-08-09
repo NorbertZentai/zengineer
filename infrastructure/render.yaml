@@ -4,7 +4,7 @@ services:
     name: zengineer-frontend
     env: static
     buildCommand: cd frontend && npm ci && npm run build
-    staticPublishPath: frontend/dist/zengineer
+    staticPublishPath: frontend/dist/zengineer/browser
     routes:
       - type: rewrite
         source: /*
