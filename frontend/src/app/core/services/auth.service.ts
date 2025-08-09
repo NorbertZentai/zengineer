@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
-import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
-import { environment } from '../../../environments/environment';
+import { SupabaseClient, User } from '@supabase/supabase-js';
+import { SupabaseService } from './supabase.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,8 +15,9 @@ export class AuthService {
   isLoading = signal(false);
 
   constructor() {
-    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
-    
+    // Reuse a single Supabase client across the app to avoid Navigator Lock errors
+    this.supabase = SupabaseService.getClient();
+
     // Initialize auth state
     this.initPromise = this.initializeAuth();
   }

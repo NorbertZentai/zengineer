@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, OnInit }
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 export interface QuizQuestion {
   id?: string;
@@ -21,7 +22,7 @@ export interface QuizAnswer {
 @Component({
   selector: 'app-question-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [CommonModule, FormsModule, MatIconModule, TranslateModule],
   templateUrl: './question-editor.component.html',
   styleUrls: ['./question-editor.component.scss']
 })
@@ -46,6 +47,8 @@ export class QuestionEditorComponent implements OnInit {
   };
 
   pointOptions = [1, 2, 3, 5, 10];
+
+  constructor(private translate: TranslateService) {}
 
   ngOnInit() {
     if (this.isEditMode && this.questionData) {
@@ -105,9 +108,9 @@ export class QuestionEditorComponent implements OnInit {
   }
 
   insertLink() {
-    const url = prompt('Add meg a link URL-jét:');
+    const url = prompt(this.translate.instant('QUIZ_MANAGER.LINK_PROMPT.URL'));
     if (url) {
-      const text = prompt('Add meg a link szövegét:') || url;
+      const text = prompt(this.translate.instant('QUIZ_MANAGER.LINK_PROMPT.TEXT')) || url;
       const link = `<a href="${url}" target="_blank">${text}</a>`;
       this.insertHtmlAtCursor(link);
     }

@@ -4,7 +4,14 @@
     "LOGIN": "Bejelentkezés",
     "REGISTER": "Regisztráció",
     "LOGOUT": "Kijelentkezés",
-    "CLOSE": "Bezárás"
+  "CLOSE": "Bezárás",
+  "CANCEL": "Mégse",
+  "SAVE": "Mentés",
+  "LOADING": "Betöltés...",
+  "PUBLIC": "Nyilvános",
+  "PRIVATE": "Privát",
+  "ERROR": "Hiba",
+  "SUCCESS": "Siker"
   },
   "NAV": {
     "DASHBOARD": "Irányítópult",
@@ -36,7 +43,8 @@
     "INVALID_NAME": "Hibás névformátum.",
     "SERVER_ERROR": "Szerverhiba. Kérjük, próbálja később.",
     "LOGIN_FAILED": "A bejelentkezés sikertelen. Ellenőrizze az adatokat és próbálja újra.",
-    "NETWORK_ERROR": "Hálózati hiba. Ellenőrizze a kapcsolatot és próbálja újra."
+    "NETWORK_ERROR": "Hálózati hiba. Ellenőrizze a kapcsolatot és próbálja újra.",
+    "NOT_LOGGED_IN": "Nincs bejelentkezett felhasználó. Jelentkezz be!"
   },
   "LOGIN": {
     "TITLE": "Bejelentkezés",
@@ -129,6 +137,38 @@
   },
   "LOGOUT": "Kijelentkezés",
   "QUIZ_MANAGER": {
+    "QUESTION_EDITOR": {
+      "TITLE_EDIT": "Kérdés szerkesztése",
+      "TITLE_NEW": "Új kérdés hozzáadása",
+      "LABELS": {
+        "QUESTION_TEXT": "Kérdés szövege",
+        "QUESTION_TYPE": "Kérdés típusa",
+        "ANSWER_OPTIONS": "Válaszlehetőségek",
+        "CORRECT_ANSWER": "Helyes válasz",
+        "POINTS": "Pontszám",
+        "EXPLANATION_OPTIONAL": "Magyarázat (opcionális)"
+      },
+      "OPTIONS": {
+        "MULTIPLE_CHOICE": "Feleletválasztós",
+        "TRUE_FALSE": "Igaz/Hamis",
+        "TEXT_INPUT": "Szöveges válasz",
+        "TRUE": "Igaz",
+        "FALSE": "Hamis"
+      },
+      "PLACEHOLDERS": {
+        "ENTER_QUESTION": "Írd be a kérdést...",
+        "ANSWER_N": "Válasz {{index}}",
+        "ENTER_CORRECT_ANSWER": "Add meg a helyes választ",
+        "ENTER_EXPLANATION": "Add meg a magyarázatot..."
+      },
+      "BUTTONS": {
+        "ADD_ANSWER": "Újabb válasz hozzáadása",
+        "ADD": "Hozzáadás"
+      },
+      "HELP_TEXT": {
+        "TEXT_ANSWER_CASE_INSENSITIVE": "A válasz kis- és nagybetű érzéketlen lesz"
+      }
+    },
     "TITLE": "Kvízkezelő",
     "PAGE_TITLE": "Kvíz Menedzser",
     "NEW_PROJECT": "Új projekt neve",
@@ -166,7 +206,9 @@
       "STATISTICS": "Statisztikák",
       "EXPORT": "Exportálás",
       "DELETE": "Törlés",
-      "EDIT": "Szerkesztés"
+  "EDIT": "Szerkesztés",
+  "AI_CARDS": "AI kártyák",
+  "AI_TEST": "AI teszt"
     },
     "CREATE_DIALOG": {
       "NEW_FOLDER": "Új mappa",
@@ -189,31 +231,87 @@
       "NO_RESULTS": "Nincs találat",
       "NO_RESULTS_DESC": "Próbálj meg más keresési kifejezést!"
     },
+    "LABELS": {
+      "BACK_TO_QUIZZES": "Vissza a kvízekhez",
+      "QUIZ_NAME": "Kvíz neve",
+      "DIFFICULTY_LEVEL": "Nehézségi szint",
+      "DESCRIPTION": "Leírás",
+      "DESCRIPTION_PLACEHOLDER": "Írd le mire vonatkozik ez a kvíz...",
+      "VISIBILITY": "Láthatóság",
+      "THEME_COLOR": "Téma szín",
+  "TAGS": "Címkék (vesszővel elválasztva)",
+  "TAGS_PREFIX": "Címkék",
+      "TAGS_PLACEHOLDER": "pl: matematika, algebra, egyenletek",
+      "CREATED_AT": "Létrehozva",
+      "CARDS_HEADER": "Kártyák",
+      "ADD_NEW_CARD": "Új kártya hozzáadása",
+      "EDIT_CARD": "Kártya szerkesztése"
+    },
+    "PLACEHOLDERS": {
+      "QUESTION_OR_TERM": "Kérdés vagy fogalom...",
+      "ANSWER": "Válasz...",
+      "HINT": "Opcionális segítség ehhez a kártyához..."
+    },
+    "CARDS_EMPTY": {
+      "TITLE": "Még nincsenek kártyák",
+      "SUBTITLE": "Hozd létre az első kártyát a fenti űrlappal!"
+    },
     "MESSAGES": {
       "FOLDER_CREATED": "Mappa sikeresen létrehozva",
       "QUIZ_CREATED": "Kvíz sikeresen létrehozva",
+  "QUIZ_IMPORTED": "Kvíz importálva.",
       "CREATE_ERROR": "Hiba történt a létrehozás során",
       "FOLDER_UPDATED": "Mappa frissítve",
       "QUIZ_UPDATED": "Kvíz frissítve",
       "UPDATE_ERROR": "Hiba történt a frissítés során",
       "FOLDER_DELETED": "Mappa törölve",
-      "QUIZ_DELETED": "Kvíz törölve",
-      "DELETE_ERROR": "Hiba történt a törlés során",
+  "QUIZ_DELETED": "Kvíz törölve",
+  "DELETE_ERROR": "Hiba történt a törlés során",
+  "DELETE_ERROR_WITH_DETAILS": "Hiba történt a törlés során: {{details}}",
+  "CARD_DELETED": "Kártya törölve.",
+  "CARD_SAVED": "Kártya elmentve.",
+  "CARD_UPDATED": "Kártya frissítve.",
+  "CARD_SAVE_ERROR": "Hiba a kártya mentése során",
       "NO_CARDS": "A kvízben nincsenek kártyák",
       "STUDY_COMPLETE": "Tanulás befejezve!",
       "CORRECT_ANSWERS": "helyes válasz",
       "QUIZ_EXPORTED": "Kvíz exportálva",
-      "EXPORT_ERROR": "Hiba történt az exportálás során",
-      "MOVE_NOT_IMPLEMENTED": "Az áthelyezés funkció még nem készült el"
+  "EXPORT_ERROR": "Hiba történt az exportálás során",
+  "MOVE_NOT_IMPLEMENTED": "Az áthelyezés funkció még nem készült el",
+  "AI_CARDS_ADDED": "AI {{inserted}} kártyát hozzáadott.",
+  "AI_CARDS_ADDED_WITH_SKIPS": "AI {{inserted}} kártyát hozzáadott, {{skipped}} duplikátum kihagyva.",
+  "AI_GENERATE_ERROR": "AI hiba kártya generálás közben"
     },
     "CONFIRM": {
       "DELETE_FOLDER": "Biztosan törölni szeretnéd a",
       "DELETE_FOLDER_WARNING": "mappát? Ez törli az összes benne lévő kvízt is.",
       "DELETE_QUIZ": "Biztosan törölni szeretnéd a",
       "DELETE_QUIZ_WARNING": "kvízt?"
+    },
+    "LINK_PROMPT": {
+      "URL": "Add meg a beillesztendő URL-t:",
+      "TEXT": "Add meg a hivatkozás szövegét (opcionális):"
+    },
+    "PERFORMANCE": {
+      "NOT_TESTED": "Még nem tesztelve"
     }
   },
+  "DIFFICULTY_LEVEL": {
+    "EASY": "Könnyű",
+    "MEDIUM": "Közepes",
+    "HARD": "Nehéz"
+  },
+  "DIFFICULTY_PRESET": {
+    "BEGINNER": "Kezdő",
+    "BASIC": "Alapfok",
+    "ADVANCED": "Haladó",
+    "EXPERT": "Expert"
+  },
   "TEST": {
+    "MENU": {
+      "LEARNING": "Tanulás",
+      "CUSTOM": "Egyéni"
+    },
     "START_TEST": "Teszt indítása",
     "TEST_CONFIG": "Teszt beállítások",
     "TEST_MODE": "Teszt mód",
@@ -288,6 +386,8 @@
       "YOUR_ANSWER": "Az Ön válasza",
       "LOADING": "Betöltés...",
       "ERROR_OCCURRED": "Hiba történt",
+  "NO_ACTIVE_SESSION": "Nincs aktív teszt session",
+  "QUESTION_NOT_FOUND": "Kérdés nem található",
       "RETRY": "Újrapróbálkozás",
       "QUESTION_TYPE_FLASHCARD": "Kártya teszt",
       "QUESTION_TYPE_MULTIPLE_CHOICE": "Feleletválasztós",
@@ -299,10 +399,14 @@
       "ENTER_YOUR_ANSWER": "Írj be a válaszod:",
       "TYPE_ANSWER_HERE": "Írd be a válaszod ide...",
       "SUBMIT_ANSWER": "Válasz beküldése",
-      "NEXT_QUESTION": "Következő kérdés"
+  "NEXT_QUESTION": "Következő kérdés",
+  "NO_OPTIONS": "Ehhez a kérdéshez nincs elérhető válaszlehetőség.",
+  "PAUSED_HINT": "Kattints a Folytatás gombra a teszt folytatásához",
+  "NONE_OF_THE_ABOVE": "A fenti egyik sem"
     },
     "RESULTS": {
-      "TEST_COMPLETED": "Teszt befejezve",
+  "TEST_COMPLETED": "Teszt befejezve",
+  "ERROR_COMPLETING": "Hiba történt a teszt befejezésekor:\n\n",
       "SCORE": "Eredmény",
       "PERCENTAGE": "Százalék",
       "CORRECT_ANSWERS": "Helyes válaszok",
@@ -318,7 +422,24 @@
       "ACCURACY": "Pontosság",
       "CORRECT": "Helyes válaszok",
       "INCORRECT": "Hibás válaszok",
-      "TIME": "Idő"
+  "TIME": "Idő",
+  "SAVE_AS_NEW_QUIZ": "Mentés új kvízként",
+  "SELECT_QUIZ_PLACEHOLDER": "Válassz kvízt...",
+  "APPEND_TO_EXISTING": "Hozzáadás meglévőhöz",
+  "DETAILS_TITLE": "Kérdésenkénti eredmények",
+  "NO_QUESTION_TEXT": "Nincs kérdés szöveg!",
+  "YOU_MARKED": "Jelölted:",
+  "QUESTION_NOT_FOUND_WITH_ID": "Nem található kérdés ehhez a válaszhoz (ID: {{id}})",
+  "SESSION_QUESTION_IDS": "Session kérdés ID-k:",
+  "ANSWER": "Válasz",
+  "OTHER": "Egyéb",
+  "DONT_KNOW": "Nem tudom",
+  "NO_ANSWER": "Nincs válasz",
+  "SAVED_AS_NEW": "Mentve új kvízként.",
+  "NEW_QUIZ_CREATED": "Új kvíz létrehozva: {{inserted}} kártya hozzáadva{{skipped ? (', ' + skipped + ' kihagyva') : ''}}.",
+  "SAVE_ERROR": "Mentési hiba.",
+  "ADDED_TO_SELECTED": "Hozzáadva a kiválasztott kvízhez.",
+  "APPENDED_TO_EXISTING": "Hozzáadva: {{inserted}} kártya{{skipped ? (', ' + skipped + ' kihagyva') : ''}}."
     },
     "PERFORMANCE": {
       "EXCELLENT": "Kiváló",
@@ -332,6 +453,7 @@
     },
     "HISTORY": {
       "TITLE": "Teszt előzmények",
+  "SUBTITLE": "Itt követheted nyomon a korábbi tesztjeid eredményeit",
       "NO_TESTS": "Még nincsenek befejezett tesztek",
       "COMPLETED_ON": "Befejezve",
       "VIEW_DETAILS": "Részletek",
@@ -354,6 +476,25 @@
       "TIME": "Idő",
       "DATE": "Dátum",
       "ACTIONS": "Műveletek"
+    }
+    ,
+    "MESSAGES": {
+      "AI_TEST_STARTED": "AI teszt elindult ({{count}} kérdés).",
+      "AI_TEST_START_ERROR": "AI teszt indítási hiba"
+    },
+    "ERRORS": {
+      "MISSING_QUIZ_ID": "Kvíz azonosító hiányzik!",
+      "NO_SELECTED_CARDS": "Nincsenek kiválasztott kártyák a teszthez.",
+      "START_FAILED": "Nem sikerült elindítani a tesztet",
+      "NO_CARDS_TO_START": "Nem lehet tesztet indítani kártyák nélkül!",
+      "QUIZ_HAS_NO_CARDS": "A kvízhez nincsenek kártyák. Adj hozzá kártyákat a teszt indításához."
+    }
+  },
+  "AI": {
+    "DEFAULT_TOPIC": "Általános",
+    "ERRORS": {
+      "SERVER_UNAVAILABLE": "Az AI szerver nem érhető el (http://localhost:8787). Indítsd el: npm run ai:dev a projekt gyökerében.",
+      "SERVER_NOT_RUNNING": "Az AI szerver nem fut. Indítsd: npm run ai:dev (mock módban is működik, ha nincs GEMINI_API_KEY)."
     }
   },
   "DASHBOARD": {
@@ -397,7 +538,11 @@
     "COMPLETED_ON": "Teljesítve",
     "NO_TESTS_YET": "Még nincsenek teljesített tesztek",
     "START_TESTING_MESSAGE": "Kezdj tesztelni, hogy itt lásd a statisztikáidat",
-    "START_TESTING": "Kezdj tesztelni"
+    "START_TESTING": "Kezdj tesztelni",
+    "MESSAGES": {
+      "STATS_LOADED": "Profil statisztikák betöltve.",
+      "STATS_LOAD_ERROR": "Profil statisztikák betöltése sikertelen."
+    }
   },
   "LIBRARY": {
     "TITLE": "Nyilvános könyvtár",
@@ -421,7 +566,14 @@
     "NO_RESULTS": "Nem találhatók kvízek",
     "TRY_DIFFERENT_FILTERS": "Próbálj más keresési szűrőket",
     "NO_PUBLIC_QUIZZES": "Nincsenek elérhető nyilvános kvízek",
-    "NO_PUBLIC_QUIZZES_MESSAGE": "Légy az első, aki megoszt egy kvízt a közösséggel!"
+    "NO_PUBLIC_QUIZZES_MESSAGE": "Légy az első, aki megoszt egy kvízt a közösséggel!",
+    "MESSAGES": {
+      "PUBLIC_QUIZZES_LOADED": "Nyilvános kvízek betöltve.",
+      "ERROR_LOADING_PUBLIC": "Nem sikerült betölteni a nyilvános kvízeket.",
+      "ERROR_LOADING_CARDS": "Nem sikerült betölteni a kártyákat.",
+      "COPIED": "Kvíz lemásolva a könyvtáradba.",
+      "COPY_FAILED": "Nem sikerült lemásolni a kvízt."
+    }
   },
   "TEST_TYPES": {
     "FLASHCARD": "Kártya teszt",

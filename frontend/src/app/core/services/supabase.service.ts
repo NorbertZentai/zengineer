@@ -8,7 +8,20 @@ export class SupabaseService {
     if (!SupabaseService.client) {
       SupabaseService.client = createClient(
         environment.supabaseUrl,
-        environment.supabaseKey
+        environment.supabaseKey,
+        {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: false, // Disable URL session detection to reduce lock conflicts
+            flowType: 'pkce'
+          },
+          global: {
+            headers: {
+              'x-client-info': 'zengineer-app'
+            }
+          }
+        }
       );
     }
     return SupabaseService.client;

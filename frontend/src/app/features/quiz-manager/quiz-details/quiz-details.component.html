@@ -7,7 +7,7 @@
   <div class="quiz-header">
     <button class="back-btn" (click)="goBack()">
       <mat-icon>arrow_back</mat-icon>
-      <span>Vissza a kvízekhez</span>
+      <span>{{ 'QUIZ_MANAGER.LABELS.BACK_TO_QUIZZES' | translate }}</span>
     </button>
     
     <div class="quiz-info" *ngIf="quiz">
@@ -24,27 +24,27 @@
               <mat-menu #testStartMenu="matMenu" panelClass="test-start-menu">
                 <button mat-menu-item (click)="startLearningMode()">
                   <mat-icon>school</mat-icon>
-                  <span>Tanulás</span>
+                  <span>{{ 'TEST.MENU.LEARNING' | translate }}</span>
                 </button>
                 <button mat-menu-item (click)="startEasyMode()">
                   <mat-icon>sentiment_satisfied</mat-icon>
-                  <span>Könnyű</span>
+                  <span>{{ 'DIFFICULTY_LEVEL.EASY' | translate }}</span>
                 </button>
                 <button mat-menu-item (click)="startMediumMode()">
                   <mat-icon>sentiment_neutral</mat-icon>
-                  <span>Közepes</span>
+                  <span>{{ 'DIFFICULTY_LEVEL.MEDIUM' | translate }}</span>
                 </button>
                 <button mat-menu-item (click)="startHardMode()">
                   <mat-icon>sentiment_very_dissatisfied</mat-icon>
-                  <span>Nehéz</span>
+                  <span>{{ 'DIFFICULTY_LEVEL.HARD' | translate }}</span>
                 </button>
-                <button mat-menu-item disabled>
+                <button mat-menu-item (click)="startAiTestFromDetails()">
                   <mat-icon>smart_toy</mat-icon>
-                  <span>AI teszt (hamarosan)</span>
+                  <span>{{ 'QUIZ_MANAGER.ACTIONS.AI_TEST' | translate }}</span>
                 </button>
                 <button mat-menu-item (click)="openTestConfig()">
                   <mat-icon>settings</mat-icon>
-                  <span>Egyéni</span>
+                  <span>{{ 'TEST.MENU.CUSTOM' | translate }}</span>
                 </button>
               </mat-menu>
               
@@ -69,36 +69,36 @@
           <form class="settings-form" (ngSubmit)="saveSettings()">
             <div class="form-row">
               <div class="form-group">
-                <label for="quizName">Kvíz neve</label>
-                <input type="text" id="quizName" [(ngModel)]="editForm.name" name="quizName" placeholder="Add meg a kvíz nevét" required>
+                <label for="quizName">{{ 'QUIZ_MANAGER.LABELS.QUIZ_NAME' | translate }}</label>
+                <input type="text" id="quizName" [(ngModel)]="editForm.name" name="quizName" [placeholder]="'QUIZ_MANAGER.LABELS.QUIZ_NAME' | translate" required>
               </div>
               <div class="form-group">
-                <label for="difficulty">Nehézségi szint</label>
+                <label for="difficulty">{{ 'QUIZ_MANAGER.LABELS.DIFFICULTY_LEVEL' | translate }}</label>
                 <select id="difficulty" [(ngModel)]="editForm.difficulty_level" name="difficulty">
-                  <option value="1">🟢 Kezdő</option>
-                  <option value="2">🔵 Alapfok</option>
-                  <option value="3">🟡 Közepes</option>
-                  <option value="4">🟠 Haladó</option>
-                  <option value="5">🔴 Expert</option>
+                  <option value="1">🟢 {{ 'DIFFICULTY_PRESET.BEGINNER' | translate }}</option>
+                  <option value="2">🔵 {{ 'DIFFICULTY_PRESET.BASIC' | translate }}</option>
+                  <option value="3">🟡 {{ 'DIFFICULTY_LEVEL.MEDIUM' | translate }}</option>
+                  <option value="4">🟠 {{ 'DIFFICULTY_PRESET.ADVANCED' | translate }}</option>
+                  <option value="5">🔴 {{ 'DIFFICULTY_PRESET.EXPERT' | translate }}</option>
                 </select>
               </div>
             </div>
             
             <div class="form-group full-width">
-              <label for="quizDescription">Leírás</label>
-              <textarea id="quizDescription" [(ngModel)]="editForm.description" name="quizDescription" placeholder="Írd le mire vonatkozik ez a kvíz..."></textarea>
+              <label for="quizDescription">{{ 'QUIZ_MANAGER.LABELS.DESCRIPTION' | translate }}</label>
+              <textarea id="quizDescription" [(ngModel)]="editForm.description" name="quizDescription" [placeholder]="'QUIZ_MANAGER.LABELS.DESCRIPTION_PLACEHOLDER' | translate"></textarea>
             </div>
             
             <div class="form-row">
               <div class="form-group">
-                <label for="visibility">Láthatóság</label>
+                <label for="visibility">{{ 'QUIZ_MANAGER.LABELS.VISIBILITY' | translate }}</label>
                 <select id="visibility" [(ngModel)]="editForm.visibility" name="visibility">
-                  <option value="private">🔒 Privát</option>
-                  <option value="public">🌍 Nyilvános</option>
+                  <option value="private">🔒 {{ 'COMMON.PRIVATE' | translate }}</option>
+                  <option value="public">🌍 {{ 'COMMON.PUBLIC' | translate }}</option>
                 </select>
               </div>
               <div class="form-group">
-                <label for="language">Nyelv</label>
+                <label for="language">{{ 'NAV.LANGUAGE' | translate }}</label>
                 <select id="language" [(ngModel)]="editForm.language" name="language">
                   <option value="hu">🇭🇺 Magyar</option>
                   <option value="en">🇬🇧 English</option>
@@ -109,7 +109,7 @@
             </div>
 
             <div class="form-group color-selection">
-              <label>Téma szín</label>
+              <label>{{ 'QUIZ_MANAGER.LABELS.THEME_COLOR' | translate }}</label>
               <div class="color-palette">
                 <div class="color-option" 
                      *ngFor="let color of colorPalette" 
@@ -122,18 +122,18 @@
             </div>
             
             <div class="form-group full-width">
-              <label for="tags">Címkék (vesszővel elválasztva)</label>
-              <input type="text" id="tags" [(ngModel)]="tagsString" name="tags" placeholder="pl: matematika, algebra, egyenletek">
+              <label for="tags">{{ 'QUIZ_MANAGER.LABELS.TAGS' | translate }}</label>
+              <input type="text" id="tags" [(ngModel)]="tagsString" name="tags" [placeholder]="'QUIZ_MANAGER.LABELS.TAGS_PLACEHOLDER' | translate">
             </div>
             
             <div class="form-actions">
               <button type="button" class="btn btn-cancel" (click)="cancelEdit()">
                 <mat-icon>close</mat-icon>
-                <span>Mégse</span>
+                <span>{{ 'COMMON.CANCEL' | translate }}</span>
               </button>
               <button type="submit" class="btn btn-save" [disabled]="!editForm.name.trim()">
                 <mat-icon>save</mat-icon>
-                <span>Mentés</span>
+                <span>{{ 'COMMON.SAVE' | translate }}</span>
               </button>
             </div>
           </form>
@@ -145,7 +145,7 @@
   <!-- Loading -->
   <div *ngIf="isLoading" class="loading-container">
     <div class="spinner"></div>
-    <p>Betöltés...</p>
+    <p>{{ 'COMMON.LOADING' | translate }}</p>
   </div>
 
   <!-- Error -->
@@ -167,25 +167,46 @@
     <div class="stat-item">
       <mat-icon>quiz</mat-icon>
       <span class="stat-number">{{ cards.length }}</span>
-      <span class="stat-label">kártya</span>
+  <span class="stat-label">{{ 'QUIZ_MANAGER.STATS.CARDS' | translate }}</span>
     </div>
     <div class="stat-item">
       <mat-icon>schedule</mat-icon>
-      <span class="stat-label">Létrehozva: {{ formatDate(quiz.created_at!) }}</span>
+  <span class="stat-label">{{ 'QUIZ_MANAGER.LABELS.CREATED_AT' | translate }}: {{ formatDate(quiz.created_at!) }}</span>
+    </div>
+    <!-- AI controls: single button opens difficulty menu -->
+    <div class="ai-controls" *ngIf="isOwner">
+      <button class="test-btn ai-btn" [matMenuTriggerFor]="aiDifficultyMenu" [title]="'QUIZ_MANAGER.ACTIONS.AI_CARDS' | translate">
+        <mat-icon>bolt</mat-icon>
+        <span>{{ 'QUIZ_MANAGER.ACTIONS.AI_CARDS' | translate }}</span>
+      </button>
+      <mat-menu #aiDifficultyMenu="matMenu">
+        <button mat-menu-item (click)="generateAiCardsForThisQuiz('easy')">
+          <mat-icon>sentiment_satisfied</mat-icon>
+          <span>{{ 'DIFFICULTY_LEVEL.EASY' | translate }}</span>
+        </button>
+        <button mat-menu-item (click)="generateAiCardsForThisQuiz('medium')">
+          <mat-icon>sentiment_neutral</mat-icon>
+          <span>{{ 'DIFFICULTY_LEVEL.MEDIUM' | translate }}</span>
+        </button>
+        <button mat-menu-item (click)="generateAiCardsForThisQuiz('hard')">
+          <mat-icon>sentiment_very_dissatisfied</mat-icon>
+          <span>{{ 'DIFFICULTY_LEVEL.HARD' | translate }}</span>
+        </button>
+      </mat-menu>
     </div>
   </div>
 
   <!-- Cards Section -->
   <div class="cards-section" *ngIf="!isLoading">
     <div class="section-header">
-      <h2>Kártyák ({{ cards.length }})</h2>
+      <h2>{{ 'QUIZ_MANAGER.LABELS.CARDS_HEADER' | translate }} ({{ cards.length }})</h2>
     </div>
 
     <!-- Quick Card Creator - Always visible at top -->
     <div class="quick-card-creator" *ngIf="isOwner">
       <div class="creator-header">
-        <mat-icon>quiz</mat-icon>
-        <span>Új kártya hozzáadása</span>
+        <mat-icon>{{ isEditingCard ? 'edit' : 'quiz' }}</mat-icon>
+        <span>{{ isEditingCard ? ('QUIZ_MANAGER.LABELS.EDIT_CARD' | translate) : ('QUIZ_MANAGER.LABELS.ADD_NEW_CARD' | translate) }}</span>
       </div>
       
       <!-- Rich Text Editor for Question -->
@@ -246,12 +267,13 @@
           </div>
         </div>
         
-        <div class="question-editor" 
+  <div class="question-editor" 
              #questionEditor
              contenteditable="true"
              (input)="onQuestionChange($event)"
+             (focus)="onQuestionFocus()"
              (blur)="onQuestionBlur()"
-             [attr.data-placeholder]="'Kérdés vagy fogalom...'">
+       [attr.data-placeholder]="'QUIZ_MANAGER.PLACEHOLDERS.QUESTION_OR_TERM' | translate">
         </div>
         
         <!-- Hidden file input for images -->
@@ -273,9 +295,9 @@
                   title="{{ answer.isCorrect ? 'Helyes válasz' : 'Rossz válasz' }}">
             <mat-icon>{{ answer.isCorrect ? 'check' : 'close' }}</mat-icon>
           </button>
-          <input type="text" 
+     <input type="text" 
                  [(ngModel)]="answer.text" 
-                 placeholder="Válasz..."
+       [placeholder]="'QUIZ_MANAGER.PLACEHOLDERS.ANSWER' | translate"
                  class="answer-input"
                  (keydown.enter)="handleAnswerEnter(i, $event)">
           <button type="button" 
@@ -295,48 +317,72 @@
         </div>
       </div>
 
+      <!-- Hint field -->
+      <div class="hint-container">
+        <input type="text" 
+               [(ngModel)]="newCard.hint" 
+               placeholder="{{ 'QUIZ_MANAGER.PLACEHOLDERS.HINT' | translate }}"
+               class="hint-input">
+      </div>
+
       <!-- Save button -->
       <div class="creator-actions">
         <button class="save-card-btn" 
                 (click)="saveQuickCard()" 
                 [disabled]="!isQuickCardValid()"
-                title="Kártya mentése">
-          <mat-icon>save</mat-icon>
-          <span>Mentés</span>
+                [title]="isEditingCard ? 'Kártya frissítése' : 'Kártya mentése'">
+          <mat-icon>{{ isEditingCard ? 'update' : 'save' }}</mat-icon>
+          <span>{{ isEditingCard ? 'Frissítés' : 'Mentés' }}</span>
+        </button>
+        <button class="cancel-btn" 
+                *ngIf="isEditingCard"
+                (click)="cancelEdit()"
+                title="Szerkesztés megszakítása">
+          <mat-icon>close</mat-icon>
+          <span>Mégse</span>
         </button>
       </div>
     </div>
 
     <!-- Cards Grid -->
     <div class="cards-grid" *ngIf="cards.length > 0">
-      <div class="card-item" 
-           *ngFor="let card of cards; trackBy: trackByCardId" 
-           [class.flipped]="card.isFlipped"
-           (click)="flipCard(card)">
+      <div class="card-wrapper" 
+           #cardItem
+           *ngFor="let card of cards; trackBy: trackByCardId">
         
-        <!-- Card Front -->
-        <div class="card-face card-front">
-          <!-- Card performance indicator -->
-          <div class="card-performance" *ngIf="getCardPerformance(card.id!)">
-            <div class="performance-badge" [class]="getCardPerformanceClass(card.id!)">
-              <mat-icon>{{ getCardPerformanceIcon(card.id!) }}</mat-icon>
-              <span>{{ getCardSuccessRate(card.id!) }}%</span>
-            </div>
-            <div class="performance-stats">
-              <span class="attempts">{{ getCardPerformance(card.id!)?.total_attempts || 0 }} {{ 'TEST.PERFORMANCE.ATTEMPTS' | translate }}</span>
-            </div>
-          </div>
-          
-          <div class="card-content">
-            <div class="card-question">
-              {{ card.question }}
-            </div>
-            <div class="card-flip-hint">
-              <mat-icon>touch_app</mat-icon>
-              <span>Kattints a válaszokért</span>
-            </div>
-          </div>
+        <!-- Performance indicator - floating badge -->
+        <div class="performance-badge" [class]="'performance-' + getCardPerformanceClass(card.id!)">
+          <mat-icon>{{ getCardPerformanceIcon(card.id!) }}</mat-icon>
+          <span class="performance-text">{{ getCardPerformanceText(card.id!) }}</span>
         </div>
+        
+        <div class="card-item" 
+             [class.flipped]="card.isFlipped"
+             (click)="flipCard(card)">
+        
+          <!-- Card Front -->
+          <div class="card-face card-front">
+            
+            <div class="card-content">
+              <div class="card-question">
+                {{ card.question }}
+              </div>
+              <div class="card-flip-hint">
+                <mat-icon>touch_app</mat-icon>
+                <span>{{ 'TEST.EXECUTION.CLICK_FOR_ANSWER' | translate }}</span>
+              </div>
+            </div>
+            
+            <!-- Card actions jobb felső sarok -->
+            <div class="card-actions" (click)="$event.stopPropagation()" *ngIf="isOwner">
+              <button class="action-btn edit" (click)="editCard(card)" title="Szerkesztés">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button class="action-btn delete" (click)="deleteCard(card.id!)" title="Törlés">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
 
         <!-- Card Back -->
         <div class="card-face card-back">    
@@ -344,7 +390,7 @@
             <div class="card-answers">
               <!-- Single answer for flashcard -->
               <div *ngIf="card.card_type === 'flashcard'" class="flashcard-answer">
-                {{ card.answer }}
+                {{ getCardAnswer(card) }}
               </div>
               
               <!-- Multiple answers for multiple choice -->
@@ -368,9 +414,9 @@
               </div>
             </div>
             
-            <div class="card-hint" *ngIf="card.hint">
+            <div class="card-hint" *ngIf="getCardHint(card)">
               <mat-icon>lightbulb</mat-icon>
-              <span>{{ card.hint }}</span>
+              <span>{{ getCardHint(card) }}</span>
             </div>
           </div>
           <!-- Card actions jobb felső sarok -->
@@ -391,8 +437,8 @@
       <div class="empty-illustration">
         <mat-icon>quiz</mat-icon>
       </div>
-      <h3>Még nincsenek kártyák</h3>
-      <p>Hozd létre az első kártyát a fenti űrlappal!</p>
+      <h3>{{ 'QUIZ_MANAGER.CARDS_EMPTY.TITLE' | translate }}</h3>
+      <p>{{ 'QUIZ_MANAGER.CARDS_EMPTY.SUBTITLE' | translate }}</p>
     </div>
   </div>
 </div>

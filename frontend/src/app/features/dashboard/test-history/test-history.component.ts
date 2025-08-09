@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TestService, TestHistory } from '../../../core/services/test.service';
 
 @Component({
@@ -37,7 +37,7 @@ export class TestHistoryComponent implements OnInit {
   isLoading = false;
   error: string | null = null;
 
-  constructor(private testService: TestService) {}
+  constructor(private testService: TestService, private translate: TranslateService) {}
 
   // ...existing code...
 
@@ -48,7 +48,7 @@ export class TestHistoryComponent implements OnInit {
     try {
       this.testHistory = await this.testService.loadTestHistory();
     } catch (error: any) {
-      this.error = error.message || 'Hiba történt a teszt előzmények betöltésekor';
+      this.error = error.message || this.translate.instant('TEST.HISTORY.ERROR_LOADING');
     } finally {
       this.isLoading = false;
     }

@@ -8,6 +8,10 @@
       <a routerLink="/library" routerLinkActive="active">{{ 'NAV.LIBRARY' | translate }}</a>
     </div>
     <div class="navbar-actions">
+      <!-- AI usage counter with reset countdown -->
+      <div *ngIf="aiRemaining !== null && aiLimit !== null" class="navbar-action" [title]="aiResetTz ? ('Reset: ' + (aiResetTz)) : 'AI napi limit'">
+        🤖 {{ aiRemaining }}/{{ aiLimit }}<span *ngIf="aiCountdown"> · ⏳ {{ aiCountdown }}</span>
+      </div>
       <!-- Create dropdown (+ button) - csak bejelentkezve -->
       <div *ngIf="isLoggedIn()" class="navbar-action navbar-create" (click)="toggleCreateDropdown()" aria-label="Create new">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">

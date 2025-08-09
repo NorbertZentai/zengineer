@@ -2,6 +2,7 @@
 // ...existing code...
 // ...existing code...
 import { Injectable, signal } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { SupabaseService } from './supabase.service';
 import { environment } from '../../../environments/environment';
@@ -158,7 +159,7 @@ export class TestService {
 
   // ...existing code...
 
-  constructor(private authService: AuthService) {
+  constructor(private authService: AuthService, private translate: TranslateService) {
     this.supabase = SupabaseService.getClient();
   }
 
@@ -352,7 +353,7 @@ export class TestService {
   async createTestSession(quizId: string, config: TestConfiguration): Promise<TestSession> {
     const user = this.authService.currentUser;
     if (!user) {
-      throw new Error('Nincs bejelentkezett felhasználó');
+      throw new Error(this.translate.instant('ERRORS.NOT_LOGGED_IN'));
     }
 
     this.isLoading.set(true);
@@ -364,10 +365,10 @@ export class TestService {
         .eq('quiz_id', quizId);
 
       if (cardsError) {
-        throw new Error(`Kártyák lekérdezési hiba: ${cardsError.message}`);
+  throw new Error(cardsError.message);
       }
       if (!cards || cards.length === 0) {
-        throw new Error('A kvízhez nincsenek kártyák');
+  throw new Error(this.translate.instant('QUIZ_MANAGER.MESSAGES.NO_CARDS'));
       }
 
       // Convert cards to test questions
@@ -395,7 +396,7 @@ export class TestService {
         .single();
 
       if (error) {
-        throw new Error(`Adatbázis hiba: ${error.message}${error.details ? ` (${error.details})` : ''}${error.hint ? ` Tipp: ${error.hint}` : ''}`);
+  throw new Error(error.message);
       }
 
       const savedSession = { ...session, id: data.id };
@@ -464,10 +465,10 @@ export class TestService {
     // If we don't have enough other answers, generate some generic options
     if (otherAnswers.length < count) {
       const genericOptions = [
-        'Nem tudom',
-        'Egyéb válasz',
-        'Nincs helyes válasz',
-        'A fenti egyik sem'
+        this.translate.instant('TEST.RESULTS.DONT_KNOW') || 'I don\'t know',
+        this.translate.instant('TEST.RESULTS.OTHER') || 'Other',
+        this.translate.instant('TEST.RESULTS.NO_ANSWER') || 'No answer',
+        this.translate.instant('TEST.EXECUTION.NONE_OF_THE_ABOVE') || 'None of the above'
       ];
       
       // Add generic options that aren't already in the list
@@ -484,10 +485,10 @@ export class TestService {
   }
 
   async answerQuestion(questionId: string, answer: string | string[], timeSpent: number, hintUsed: boolean = false): Promise<void> {
-    const session = this.currentSession();
-    if (!session) throw new Error('Nincs aktív teszt session');
-    const question = session.questions.find(q => q.id === questionId);
-    if (!question) throw new Error('Kérdés nem található');
+  const session = this.currentSession();
+  if (!session) throw new Error(this.translate.instant('TEST.EXECUTION.NO_ACTIVE_SESSION'));
+  const question = session.questions.find(q => q.id === questionId);
+  if (!question) throw new Error(this.translate.instant('TEST.EXECUTION.QUESTION_NOT_FOUND'));
     let isCorrect = false;
     let partialScore = undefined;
     if (question.type === 'flashcard') {
@@ -596,7 +597,7 @@ export class TestService {
     try {
       const session = this.currentSession();
       if (!session) {
-        throw new Error('Nincs aktív teszt session');
+        throw new Error(this.translate.instant('TEST.EXECUTION.NO_ACTIVE_SESSION'));
       }
 
       const endTime = new Date().toISOString();
@@ -727,7 +728,7 @@ export class TestService {
     try {
       let session = this.currentSession();
       if (!session) {
-        throw new Error('Nincs aktív teszt session');
+        throw new Error(this.translate.instant('TEST.EXECUTION.NO_ACTIVE_SESSION'));
       }
       // Mindig frissítsük a session-t a backendről, hogy a legutolsó válasz is benne legyen
       if (session.id) {
@@ -736,7 +737,7 @@ export class TestService {
           session = backendSession;
         }
       }
-      if (!session) throw new Error('Nincs aktív teszt session');
+  if (!session) throw new Error(this.translate.instant('TEST.EXECUTION.NO_ACTIVE_SESSION'));
       const endTime = new Date().toISOString();
       const timeSpent = Math.floor((new Date(endTime).getTime() - new Date(session.start_time).getTime()) / 1000);
       // Helyes és hibás válaszok újraszámolása a válaszok alapján

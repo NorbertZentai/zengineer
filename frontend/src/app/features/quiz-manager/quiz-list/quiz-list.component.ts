@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-quiz-list',
@@ -57,7 +57,8 @@ export class QuizListComponent implements OnInit {
   constructor(
     private quizService: QuizService,
     private authService: AuthService,
-    private router: Router
+  private router: Router,
+  private translate: TranslateService
   ) {}
 
   async ngOnInitData() {
@@ -68,7 +69,7 @@ export class QuizListComponent implements OnInit {
       await this.authService.waitForInit();
       // Ellenőrizzük hogy be van-e jelentkezve a felhasználó
       if (!this.authService.isAuthenticated()) {
-        this.error = 'Nincs bejelentkezett felhasználó. Jelentkezz be!';
+        this.error = this.translate.instant('ERRORS.NOT_LOGGED_IN');
         this.isLoading = false;
         return;
       }
@@ -77,7 +78,7 @@ export class QuizListComponent implements OnInit {
       this.quizzes = this.quizService.quizzes();
       this.isLoading = false;
     } catch (err: any) {
-      this.error = err?.message || 'Hiba történt a kvízek betöltésekor.';
+      this.error = err?.message || this.translate.instant('ERRORS.SERVER_ERROR');
       this.isLoading = false;
     }
   }
@@ -145,16 +146,16 @@ export class QuizListComponent implements OnInit {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     if (diffDays === 0) {
-      return 'Ma';
+  return new Intl.RelativeTimeFormat(navigator.language, { numeric: 'auto' }).format(0, 'day');
     } else if (diffDays === 1) {
-      return 'Tegnap';
+  return new Intl.RelativeTimeFormat(navigator.language, { numeric: 'auto' }).format(-1, 'day');
     } else if (diffDays < 7) {
-      return `${diffDays} napja`;
+  return new Intl.RelativeTimeFormat(navigator.language, { numeric: 'auto' }).format(-diffDays, 'day');
     } else if (diffDays < 30) {
       const weeks = Math.floor(diffDays / 7);
-      return weeks === 1 ? '1 hete' : `${weeks} hete`;
+  return new Intl.RelativeTimeFormat(navigator.language, { numeric: 'auto' }).format(-weeks, 'week');
     } else {
-      return date.toLocaleDateString('hu-HU', {
+  return date.toLocaleDateString(navigator.language || 'en-US', {
         year: 'numeric',
         month: 'short',
         day: 'numeric'

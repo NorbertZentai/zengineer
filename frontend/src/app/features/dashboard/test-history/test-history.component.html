@@ -10,8 +10,8 @@
         <mat-icon>analytics</mat-icon>
       </div>
       <div class="header-text">
-        <h2>Teszt előzmények</h2>
-        <p>Itt követheted nyomon a korábbi tesztjeid eredményeit</p>
+  <h2>{{ 'TEST.HISTORY.TITLE' | translate }}</h2>
+  <p>{{ 'TEST.HISTORY.SUBTITLE' | translate }}</p>
       </div>
     </div>
   </div>
@@ -24,7 +24,7 @@
       </div>
       <div class="stat-content">
         <div class="stat-value">{{ getTotalTests() }}</div>
-        <div class="stat-label">Elvégzett teszt</div>
+        <div class="stat-label">{{ 'TEST.HISTORY.COMPLETED_TESTS' | translate }}</div>
       </div>
     </div>
 
@@ -34,7 +34,7 @@
       </div>
       <div class="stat-content">
         <div class="stat-value">{{ getAverageScore() }}%</div>
-        <div class="stat-label">Átlagos eredmény</div>
+        <div class="stat-label">{{ 'TEST.HISTORY.AVERAGE_SCORE' | translate }}</div>
       </div>
     </div>
 
@@ -44,7 +44,7 @@
       </div>
       <div class="stat-content">
         <div class="stat-value">{{ formatTime(getTotalTimeSpent()) }}</div>
-        <div class="stat-label">Összesen eltöltött idő</div>
+        <div class="stat-label">{{ 'TEST.HISTORY.TOTAL_TIME_SPENT' | translate }}</div>
       </div>
     </div>
   </div>
@@ -52,7 +52,7 @@
   <!-- Loading State -->
   <div class="loading-container" *ngIf="isLoading">
     <div class="spinner"></div>
-    <p>Teszt előzmények betöltése...</p>
+    <p>{{ 'TEST.HISTORY.LOADING_HISTORY' | translate }}</p>
   </div>
 
   <!-- Error State -->
@@ -61,7 +61,7 @@
     <p>{{ error }}</p>
     <button class="retry-btn" (click)="loadTestHistory()">
       <mat-icon>refresh</mat-icon>
-      Újrapróbálkozás
+      {{ 'TEST.HISTORY.RETRY' | translate }}
     </button>
   </div>
 
@@ -70,11 +70,11 @@
     <div class="empty-icon">
       <mat-icon>quiz</mat-icon>
     </div>
-    <h3>Még nincsenek teszt eredményeid</h3>
-    <p>Kezdj el tesztelni a kvízeid segítségével, hogy lásd az előrehaladásod!</p>
+    <h3>{{ 'TEST.HISTORY.NO_RESULTS_YET' | translate }}</h3>
+    <p>{{ 'TEST.HISTORY.START_TESTING_NOW' | translate }}</p>
     <a routerLink="/quiz-manager" class="start-testing-btn">
       <mat-icon>play_arrow</mat-icon>
-      Teszt indítása
+      {{ 'TEST.HISTORY.START_TESTING' | translate }}
     </a>
   </div>
 
@@ -85,7 +85,7 @@
       <div class="section-header">
         <h3>
           <mat-icon>history</mat-icon>
-          Legutóbbi tesztek
+          {{ 'TEST.HISTORY.RECENT_TESTS' | translate }}
         </h3>
       </div>
 
@@ -125,7 +125,7 @@
           <div class="test-actions">
             <button class="action-btn secondary" (click)="retryTest(test.quiz_id)">
               <mat-icon>refresh</mat-icon>
-              <span>Újra</span>
+        <span>{{ 'TEST.HISTORY.RETRY' | translate }}</span>
             </button>
           </div>
         </div>
@@ -137,18 +137,18 @@
       <div class="section-header">
         <h3>
           <mat-icon>list</mat-icon>
-          Összes teszt ({{ testHistory.length }})
+      {{ 'TEST.HISTORY.ALL_TESTS' | translate }} ({{ testHistory.length }})
         </h3>
       </div>
 
       <div class="all-tests-table">
         <div class="table-header">
-          <div class="col-quiz">Kvíz neve</div>
-          <div class="col-score">Eredmény</div>
-          <div class="col-questions">Kérdések</div>
-          <div class="col-time">Idő</div>
-          <div class="col-date">Dátum</div>
-          <div class="col-actions">Műveletek</div>
+      <div class="col-quiz">{{ 'TEST.HISTORY.QUIZ_NAME' | translate }}</div>
+      <div class="col-score">{{ 'TEST.HISTORY.RESULT' | translate }}</div>
+      <div class="col-questions">{{ 'TEST.HISTORY.QUESTIONS' | translate }}</div>
+      <div class="col-time">{{ 'TEST.HISTORY.TIME' | translate }}</div>
+      <div class="col-date">{{ 'TEST.HISTORY.DATE' | translate }}</div>
+      <div class="col-actions">{{ 'TEST.HISTORY.ACTIONS' | translate }}</div>
         </div>
 
         <div class="table-body">

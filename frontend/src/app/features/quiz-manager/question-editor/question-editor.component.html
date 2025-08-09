@@ -1,6 +1,6 @@
 <div class="question-editor-container">
   <div class="question-editor-header">
-    <h3>{{ isEditMode ? 'Kérdés szerkesztése' : 'Új kérdés hozzáadása' }}</h3>
+    <h3>{{ isEditMode ? ('QUIZ_MANAGER.QUESTION_EDITOR.TITLE_EDIT' | translate) : ('QUIZ_MANAGER.QUESTION_EDITOR.TITLE_NEW' | translate) }}</h3>
     <button type="button" class="close-btn" (click)="onCancel()">
       <mat-icon>close</mat-icon>
     </button>
@@ -9,7 +9,7 @@
   <form class="question-form" (ngSubmit)="onSave()">
     <!-- Kérdés szövege -->
     <div class="form-section">
-      <label class="form-label">Kérdés szövege *</label>
+      <label class="form-label">{{ 'QUIZ_MANAGER.QUESTION_EDITOR.LABELS.QUESTION_TEXT' | translate }} <span>*</span></label>
       
       <!-- Rich Text Editor toolbar -->
       <div class="editor-toolbar">
@@ -62,13 +62,13 @@
       </div>
 
       <!-- Rich Text Editor -->
-      <div class="rich-editor" 
+  <div class="rich-editor" 
            #questionEditor
            contenteditable="true"
            (input)="onQuestionChange($event)"
            (blur)="onQuestionBlur()"
            [innerHTML]="question.text"
-           placeholder="Írd be a kérdést...">
+       [attr.placeholder]="'QUIZ_MANAGER.QUESTION_EDITOR.PLACEHOLDERS.ENTER_QUESTION' | translate">
       </div>
       
       <!-- Image upload input -->
@@ -81,35 +81,35 @@
 
     <!-- Kérdés típusa -->
     <div class="form-section">
-      <label class="form-label">Kérdés típusa</label>
+      <label class="form-label">{{ 'QUIZ_MANAGER.QUESTION_EDITOR.LABELS.QUESTION_TYPE' | translate }}</label>
       <div class="question-type-selector">
         <label class="radio-option">
           <input type="radio" 
                  name="questionType" 
                  value="multiple-choice" 
                  [(ngModel)]="question.type">
-          <span class="radio-label">Feleletválasztós</span>
+          <span class="radio-label">{{ 'QUIZ_MANAGER.QUESTION_EDITOR.OPTIONS.MULTIPLE_CHOICE' | translate }}</span>
         </label>
         <label class="radio-option">
           <input type="radio" 
                  name="questionType" 
                  value="true-false" 
                  [(ngModel)]="question.type">
-          <span class="radio-label">Igaz/Hamis</span>
+          <span class="radio-label">{{ 'QUIZ_MANAGER.QUESTION_EDITOR.OPTIONS.TRUE_FALSE' | translate }}</span>
         </label>
         <label class="radio-option">
           <input type="radio" 
                  name="questionType" 
                  value="text-input" 
                  [(ngModel)]="question.type">
-          <span class="radio-label">Szöveges válasz</span>
+          <span class="radio-label">{{ 'QUIZ_MANAGER.QUESTION_EDITOR.OPTIONS.TEXT_INPUT' | translate }}</span>
         </label>
       </div>
     </div>
 
     <!-- Válaszok -->
     <div class="form-section answers-section">
-      <label class="form-label">Válaszlehetőségek</label>
+      <label class="form-label">{{ 'QUIZ_MANAGER.QUESTION_EDITOR.LABELS.ANSWER_OPTIONS' | translate }}</label>
       
       <!-- Multiple Choice Answers -->
       <div *ngIf="question.type === 'multiple-choice'" class="answers-list">
@@ -124,7 +124,7 @@
                      [checked]="answer.isCorrect"
                      (change)="setCorrectAnswer(i)">
               <span class="checkmark"></span>
-              <span class="label-text">Helyes válasz</span>
+              <span class="label-text">{{ 'QUIZ_MANAGER.QUESTION_EDITOR.LABELS.CORRECT_ANSWER' | translate }}</span>
             </label>
             
             <button type="button" 
@@ -154,11 +154,11 @@
             </button>
           </div>
           
-          <div class="rich-editor answer-editor" 
+    <div class="rich-editor answer-editor" 
                contenteditable="true"
                (input)="onAnswerChange($event, i)"
                [innerHTML]="answer.text"
-               [attr.data-placeholder]="'Válasz ' + (i + 1)">>
+      [attr.data-placeholder]="('QUIZ_MANAGER.QUESTION_EDITOR.PLACEHOLDERS.ANSWER_N' | translate:{index: (i + 1)})">
           </div>
         </div>
         
@@ -167,43 +167,43 @@
                 (click)="addAnswer()"
                 *ngIf="question.answers && question.answers.length < 6">
           <mat-icon>add</mat-icon>
-          Újabb válasz hozzáadása
+    {{ 'QUIZ_MANAGER.QUESTION_EDITOR.BUTTONS.ADD_ANSWER' | translate }}
         </button>
       </div>
 
       <!-- True/False Answers -->
-      <div *ngIf="question.type === 'true-false'" class="true-false-answers">
+    <div *ngIf="question.type === 'true-false'" class="true-false-answers">
         <label class="radio-option">
           <input type="radio" 
                  name="trueFalseAnswer" 
                  value="true" 
                  [(ngModel)]="question.correctAnswer">
-          <span class="radio-label">Igaz</span>
+      <span class="radio-label">{{ 'QUIZ_MANAGER.QUESTION_EDITOR.OPTIONS.TRUE' | translate }}</span>
         </label>
         <label class="radio-option">
           <input type="radio" 
                  name="trueFalseAnswer" 
                  value="false" 
                  [(ngModel)]="question.correctAnswer">
-          <span class="radio-label">Hamis</span>
+      <span class="radio-label">{{ 'QUIZ_MANAGER.QUESTION_EDITOR.OPTIONS.FALSE' | translate }}</span>
         </label>
       </div>
 
       <!-- Text Input Answer -->
       <div *ngIf="question.type === 'text-input'" class="text-answer">
-        <label class="form-label">Helyes válasz</label>
+   <label class="form-label">{{ 'QUIZ_MANAGER.QUESTION_EDITOR.LABELS.CORRECT_ANSWER' | translate }}</label>
         <input type="text" 
                [(ngModel)]="question.correctAnswer" 
                name="textAnswer"
-               placeholder="Add meg a helyes választ"
+     [attr.placeholder]="'QUIZ_MANAGER.QUESTION_EDITOR.PLACEHOLDERS.ENTER_CORRECT_ANSWER' | translate"
                class="text-input">
-        <small class="help-text">A válasz automatikusan kis- és nagybetű érzéketlen lesz</small>
+   <small class="help-text">{{ 'QUIZ_MANAGER.QUESTION_EDITOR.HELP_TEXT.TEXT_ANSWER_CASE_INSENSITIVE' | translate }}</small>
       </div>
     </div>
 
     <!-- Pontszám -->
     <div class="form-section">
-      <label class="form-label">Pontszám</label>
+      <label class="form-label">{{ 'QUIZ_MANAGER.QUESTION_EDITOR.LABELS.POINTS' | translate }}</label>
       <div class="points-selector">
         <button type="button" 
                 *ngFor="let point of pointOptions" 
@@ -217,7 +217,7 @@
 
     <!-- Magyarázat -->
     <div class="form-section">
-      <label class="form-label">Magyarázat (opcionális)</label>
+      <label class="form-label">{{ 'QUIZ_MANAGER.QUESTION_EDITOR.LABELS.EXPLANATION_OPTIONAL' | translate }}</label>
       
       <div class="explanation-toolbar">
         <button type="button" class="toolbar-btn-small" 
@@ -237,21 +237,21 @@
         </button>
       </div>
       
-      <div class="rich-editor explanation-editor" 
+  <div class="rich-editor explanation-editor" 
            contenteditable="true"
            (input)="onExplanationChange($event)"
            [innerHTML]="question.explanation"
-           placeholder="Add meg a magyarázatot...">
+       [attr.placeholder]="'QUIZ_MANAGER.QUESTION_EDITOR.PLACEHOLDERS.ENTER_EXPLANATION' | translate">
       </div>
     </div>
 
     <!-- Form Actions -->
     <div class="form-actions">
       <button type="button" class="cancel-btn" (click)="onCancel()">
-        Mégse
+        {{ 'COMMON.CANCEL' | translate }}
       </button>
       <button type="submit" class="save-btn" [disabled]="!isValid()">
-        {{ isEditMode ? 'Mentés' : 'Hozzáadás' }}
+        {{ isEditMode ? ('COMMON.SAVE' | translate) : ('QUIZ_MANAGER.QUESTION_EDITOR.BUTTONS.ADD' | translate) }}
       </button>
     </div>
   </form>

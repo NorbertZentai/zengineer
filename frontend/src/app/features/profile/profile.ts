@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { NotificationService } from '../../core/services/notification.service';
 import { AuthService } from '../../core/services/auth.service';
 import { TestService } from '../../core/services/test.service';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
@@ -47,7 +48,8 @@ export class ProfilePage implements OnInit {
   constructor(
     private authService: AuthService,
     private testService: TestService,
-    private translate: TranslateService
+  private translate: TranslateService,
+  private notificationService: NotificationService
   ) {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
   }
@@ -86,10 +88,12 @@ export class ProfilePage implements OnInit {
 
         // Get recent tests (last 5)
         this.userStats.recentTests = testHistory.slice(0, 5);
-      }
+  }
+  this.notificationService.success('PROFILE.MESSAGES.STATS_LOADED', 'PROFILE.TITLE');
     } catch (error) {
       console.error('Error loading user stats:', error);
       this.error = this.translate.instant('PROFILE.LOAD_ERROR');
+  this.notificationService.error('PROFILE.MESSAGES.STATS_LOAD_ERROR', 'PROFILE.TITLE');
     }
   }
 

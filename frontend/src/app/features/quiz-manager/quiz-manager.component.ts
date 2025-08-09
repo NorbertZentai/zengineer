@@ -12,6 +12,8 @@ import { QuizCreateModalComponent } from './quiz-create-modal/quiz-create-modal.
 import { QuizImportModalComponent } from './quiz-import-modal/quiz-import-modal.component';
 import { Quiz } from '../../core/services/quiz.service';
 import { QuizService } from '../../core/services/quiz.service';
+import { AiService } from '../../core/services/ai.service';
+import { NotificationService } from '../../core/services/notification.service';
 
 @Component({
   selector: 'app-quiz-manager',
@@ -50,13 +52,14 @@ export class QuizManagerComponent {
     } else {
       await this.quizService.loadQuizzes();
     }
+  this.notificationService.success('QUIZ_MANAGER.MESSAGES.QUIZ_IMPORTED', 'QUIZ_MANAGER.TITLE');
   }
   @ViewChild(QuizListComponent) quizListComponent?: QuizListComponent;
   selectedQuiz: any = null;
   viewMode: 'list' | 'edit' | 'stats' | 'preview' = 'list';
   showCreateModal = false;
 
-  constructor(public quizService: QuizService) {}
+  constructor(public quizService: QuizService, private ai: AiService, private notificationService: NotificationService) {}
 
   // Események kezelése
   onEdit(quiz: any) {
@@ -73,10 +76,13 @@ export class QuizManagerComponent {
         }
         this.selectedQuiz = null;
         this.viewMode = 'list';
+  this.notificationService.success('QUIZ_MANAGER.MESSAGES.QUIZ_DELETED', 'QUIZ_MANAGER.TITLE');
       })
       .catch((err: any) => {
         // Hibakezelés
-        alert('Hiba történt a törlés során: ' + (err?.message || err));
+  const msg = err?.message || '';
+  const key = msg ? 'QUIZ_MANAGER.MESSAGES.DELETE_ERROR_WITH_DETAILS' : 'QUIZ_MANAGER.MESSAGES.DELETE_ERROR';
+  this.notificationService.error(key, 'QUIZ_MANAGER.TITLE', msg ? { params: { details: msg } } : undefined);
       });
   }
   onStats(quiz: any) {
@@ -102,4 +108,6 @@ export class QuizManagerComponent {
     this.selectedQuiz = null;
     this.viewMode = 'list';
   }
+
+
 }

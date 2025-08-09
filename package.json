@@ -4,6 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+  "build": "npm run build:prod",
     "test": "bash test-suite.sh",
     "test:suite": "bash test-suite.sh",
     "test:frontend": "cd frontend && npm run test:ci",
@@ -14,7 +15,8 @@
     "docker:rebuild": "docker-compose down && docker-compose build --no-cache && docker-compose up -d",
     "docker:logs": "docker-compose logs -f",
     "build:prod": "cd frontend && npm run build:prod",
-    "build:lenient": "cd frontend && npm run build:lenient"
+  "build:lenient": "cd frontend && npm run build:lenient",
+  "ai:dev": "cd server && npm install && npm start"
   },
   "repository": {
     "type": "git",

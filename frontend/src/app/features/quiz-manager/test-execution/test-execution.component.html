@@ -44,7 +44,7 @@
     <div class="pause-content">
       <mat-icon>pause_circle</mat-icon>
       <h2>{{ 'TEST.EXECUTION.PAUSE' | translate }}</h2>
-      <p>Kattints a folytatás gombra a teszt folytatásához</p>
+  <p>{{ 'TEST.EXECUTION.PAUSED_HINT' | translate }}</p>
       <button class="resume-btn" (click)="resumeTest()">
         <mat-icon>play_arrow</mat-icon>
         {{ 'TEST.EXECUTION.RESUME' | translate }}
@@ -57,7 +57,7 @@
     <!-- Loading -->
     <div class="loading-container" *ngIf="isLoading">
       <div class="spinner"></div>
-      <p>Betöltés...</p>
+  <p>{{ 'TEST.EXECUTION.LOADING' | translate }}</p>
     </div>
 
     <!-- Error -->
@@ -69,7 +69,7 @@
         *ngIf="session?.configuration?.allowRetry && !hasMaxAttemptsReached"
         (click)="restartTest()">
         <mat-icon>refresh</mat-icon>
-        Újrapróbálkozás
+  {{ 'TEST.EXECUTION.RETRY' | translate }}
       </button>
     </div>
 
@@ -149,7 +149,7 @@
           <ng-template #noOptions>
             <div class="no-options-message">
               <mat-icon>info</mat-icon>
-              <span>Nincs elérhető válaszlehetőség ehhez a kérdéshez.</span>
+              <span>{{ 'TEST.EXECUTION.NO_OPTIONS' | translate }}</span>
             </div>
           </ng-template>
         </div>
@@ -335,7 +335,7 @@
         </mat-icon>
       </div>
       
-      <h2>Teszt befejezve!</h2>
+      <h2>{{ 'TEST.RESULTS.TEST_COMPLETED' | translate }}</h2>
       <p class="result-message">
         {{ testResult.percentage >= 80 ? ('TEST.RESULTS.EXCELLENT_RESULT' | translate) : 
            testResult.percentage >= 60 ? ('TEST.RESULTS.GOOD_RESULT' | translate) : ('TEST.RESULTS.PRACTICE_MORE' | translate) }}
@@ -345,49 +345,65 @@
     <div class="results-stats">
       <div class="stat-card">
         <div class="stat-value">{{ testResult.percentage }}%</div>
-        <div class="stat-label">Pontosság</div>
+        <div class="stat-label">{{ 'TEST.RESULTS.ACCURACY' | translate }}</div>
       </div>
       
       <div class="stat-card">
         <div class="stat-value">{{ testResult.score }}</div>
-        <div class="stat-label">Helyes válaszok</div>
+        <div class="stat-label">{{ 'TEST.RESULTS.CORRECT' | translate }}</div>
       </div>
       
       <div class="stat-card">
         <div class="stat-value">{{ testResult.wrong_answers }}</div>
-        <div class="stat-label">Hibás válaszok</div>
+        <div class="stat-label">{{ 'TEST.RESULTS.INCORRECT' | translate }}</div>
       </div>
       
       <div class="stat-card">
         <div class="stat-value">{{ formatTime(testResult.time_spent) }}</div>
-        <div class="stat-label">Idő</div>
+        <div class="stat-label">{{ 'TEST.RESULTS.TIME' | translate }}</div>
       </div>
     </div>
 
     <div class="results-actions">
       <button class="secondary-btn" (click)="exitTest()">
         <mat-icon>home</mat-icon>
-        Vissza a kvízekhez
+        {{ 'TEST.RESULTS.BACK_TO_QUIZZES' | translate }}
       </button>
       <button 
         class="primary-btn" 
         *ngIf="session?.configuration?.allowRetry"
         (click)="retryTest()">
         <mat-icon>refresh</mat-icon>
-        Újra próbálom
+        {{ 'TEST.RESULTS.TRY_AGAIN' | translate }}
       </button>
+      <!-- Save actions -->
+      <button class="primary-btn" (click)="saveAsNewQuiz()" [disabled]="saving">
+        <mat-icon>save</mat-icon>
+        {{ 'TEST.RESULTS.SAVE_AS_NEW_QUIZ' | translate }}
+      </button>
+      <div class="append-actions" style="display:flex; gap: 0.5rem; align-items:center;">
+        <select [(ngModel)]="selectedTargetQuizId" style="padding: 0.25rem 0.5rem;">
+          <option [ngValue]="null">{{ 'TEST.RESULTS.SELECT_QUIZ_PLACEHOLDER' | translate }}</option>
+          <option *ngFor="let q of quizService.quizzes()" [value]="q.id">{{ q.name }}</option>
+        </select>
+        <button class="primary-btn" (click)="appendToExistingQuiz()" [disabled]="saving || !selectedTargetQuizId">
+          <mat-icon>playlist_add</mat-icon>
+          {{ 'TEST.RESULTS.APPEND_TO_EXISTING' | translate }}
+        </button>
+      </div>
+      <span *ngIf="saveMessage" style="margin-left: 0.5rem; color:#9ef;">{{ saveMessage }}</span>
     </div>
 
     <!-- Részletes kérdés-válasz kimutatás -->
     <div class="results-details">
-      <h3>Kérdésenkénti eredmények</h3>
+      <h3>{{ 'TEST.RESULTS.DETAILS_TITLE' | translate }}</h3>
       <div *ngFor="let answer of testResult.answers; let i = index" class="result-question-card" style="border: 1px solid #fff; margin-bottom: 1rem; padding: 1rem; color: #fff; background: #222;">
         <ng-container *ngIf="session && session.questions">
           <ng-container *ngIf="getQuestionById(answer.question_id) as question">
             <div class="result-question-header">
               <span class="result-question-index">{{ i + 1 }}.</span>
               <span class="result-question-text">
-                {{ question.question && question.question.trim() ? question.question : 'Nincs kérdés szöveg!' }}
+                {{ question.question && question.question.trim() ? question.question : ('TEST.RESULTS.NO_QUESTION_TEXT' | translate) }}
               </span>
             </div>
             <div *ngIf="question.options && question.options.length > 0">
@@ -406,16 +422,16 @@
             </div>
             <div *ngIf="!question.options || question.options.length === 0">
               <div class="result-user-answer">
-                <strong>Jelölted:</strong>
+                <strong>{{ 'TEST.RESULTS.YOU_MARKED' | translate }}</strong>
                 <span [ngClass]="answer.is_correct ? 'text-green' : 'text-red'" style="color: inherit;">
                   {{ formatAnswerForDisplay(answer.answer) }}
                 </span>
                 <span class="answer-status" [ngClass]="answer.is_correct ? 'text-green' : 'text-red'" style="color: inherit;">
-                  ({{ answer.is_correct ? 'Helyes' : 'Hibás' }})
+                  ({{ (answer.is_correct ? 'TEST.RESULTS.CORRECT' : 'TEST.RESULTS.INCORRECT') | translate }})
                 </span>
               </div>
               <div class="result-correct-answer">
-                <strong>Helyes válasz:</strong>
+                <strong>{{ 'TEST.EXECUTION.CORRECT_ANSWER' | translate }}:</strong>
                 <span class="text-green" style="color: #0f0;">
                   {{ formatAnswerForDisplay(question.correct_answer ? question.correct_answer : getParsedCorrectAnswers(question)) }}
                 </span>
@@ -423,12 +439,12 @@
             </div>
             <div class="result-status" [class.correct]="answer.is_correct" [class.incorrect]="!answer.is_correct">
               <mat-icon>{{ answer.is_correct ? 'check_circle' : 'cancel' }}</mat-icon>
-              <span>{{ answer.is_correct ? 'Helyes' : 'Hibás' }}</span>
+              <span>{{ (answer.is_correct ? 'TEST.RESULTS.CORRECT' : 'TEST.RESULTS.INCORRECT') | translate }}</span>
             </div>
           </ng-container>
           <ng-container *ngIf="!getQuestionById(answer.question_id)">
-            <div style="color: #f00;">Nem található kérdés ehhez a válaszhoz (ID: {{ answer.question_id }})</div>
-            <div style="color: #ff0; font-size: 0.9em;">Session kérdés ID-k: {{ getQuestionIdsString() }}</div>
+            <div style="color: #f00;">{{ 'TEST.RESULTS.QUESTION_NOT_FOUND_WITH_ID' | translate: { id: answer.question_id } }}</div>
+            <div style="color: #ff0; font-size: 0.9em;">{{ 'TEST.RESULTS.SESSION_QUESTION_IDS' | translate }} {{ getQuestionIdsString() }}</div>
           </ng-container>
         </ng-container>
       </div>

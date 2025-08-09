@@ -3,6 +3,7 @@ import { Injectable, signal, computed } from '@angular/core';
 import { SupabaseClient, User } from '@supabase/supabase-js';
 import { SupabaseService } from './supabase.service';
 import { environment } from '../../../environments/environment';
+import { AiCardDTO } from './ai.service';
 
 export interface Project {
   id?: string;
@@ -428,9 +429,12 @@ export class QuizService {
   }
 
   async updateQuizCard(id: string, updates: Partial<QuizCard>) {
+    // Remove card_type field as it doesn't exist in database
+    const { card_type, ...dbUpdates } = updates;
+    
     const { data, error } = await this.supabase
       .from('quiz_cards')
-      .update(updates)
+      .update(dbUpdates)
       .eq('id', id)
       .select()
       .single();
@@ -799,5 +803,53 @@ export class QuizService {
       reviewCount: data.reviewCount || 0,
       successRate: data.successRate || 0
     };
+  }
+
+  async addCardsToQuiz(quizId: string, aiCards: AiCardDTO[], difficulty: number = 1): Promise<{ inserted: number; skipped: number }> {
+    let inserted = 0;
+    let skipped = 0;
+
+    for (const aiCard of aiCards) {
+      try {
+        // Convert AI card format to QuizCard format
+        const correctAnswers = aiCard.answers?.filter((a: any) => a.isCorrect).map((a: any) => a.text.trim()) || [];
+        const incorrectAnswers = aiCard.answers?.filter((a: any) => !a.isCorrect).map((a: any) => a.text.trim()) || [];
+        const isFlashcard = correctAnswers.length === 1 && incorrectAnswers.length === 0;
+        const hint = aiCard.explanation?.trim() || undefined;
+
+        const cardData: Partial<QuizCard> = {
+          question: aiCard.question.trim(),
+          difficulty: difficulty
+        };
+
+        if (isFlashcard) {
+          // For flashcards, if there's a hint, store it as JSON structure
+          if (hint) {
+            cardData.answer = JSON.stringify({
+              type: 'flashcard',
+              answer: correctAnswers[0],
+              hint: hint
+            });
+          } else {
+            cardData.answer = correctAnswers[0];
+          }
+        } else {
+          cardData.answer = JSON.stringify({
+            type: 'multiple_choice',
+            correct: correctAnswers,
+            incorrect: incorrectAnswers,
+            hint: hint
+          });
+        }
+
+        await this.addCard(quizId, cardData);
+        inserted++;
+      } catch (error) {
+        console.error('Error adding card:', error);
+        skipped++;
+      }
+    }
+
+    return { inserted, skipped };
   }
 }

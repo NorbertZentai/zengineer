@@ -7,6 +7,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { QuizService, Quiz, QuizCard } from '../../core/services/quiz.service';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../../../environments/environment';
+import { NotificationService } from '../../core/services/notification.service';
 
 interface QuizWithProfile extends Quiz {
   profiles?: {
@@ -27,7 +28,6 @@ export class LibraryPage implements OnInit {
   hasCards(quiz: QuizWithProfile): boolean {
     return !!(quiz.id && this.quizCards[quiz.id] && this.quizCards[quiz.id].length > 0);
   }
-  // ...existing code...
   quizCards: { [quizId: string]: QuizCard[] } = {};
   expandedQuizId: string | null = null;
   // Only keep the first constructor above, remove this duplicate
@@ -50,6 +50,10 @@ export class LibraryPage implements OnInit {
         this.quizCards[quiz.id] = cards;
       } catch (error) {
         console.error('Error loading quiz cards:', error);
+        this.notificationService.error(
+          this.translate.instant('LIBRARY.MESSAGES.ERROR_LOADING_CARDS'),
+          this.translate.instant('COMMON.ERROR') || 'Error'
+        );
       }
     }
   }
@@ -68,7 +72,8 @@ export class LibraryPage implements OnInit {
   constructor(
     private quizService: QuizService,
     private translate: TranslateService,
-    private router: Router
+    private router: Router,
+    private notificationService: NotificationService
   ) {
     // Use singleton SupabaseService
     this.supabase = (window as any).SupabaseService?.getClient?.() ?? undefined;
@@ -103,9 +108,17 @@ export class LibraryPage implements OnInit {
       if (error) throw error;
 
       this.publicQuizzes = quizzes || [];
+      this.notificationService.info(
+        this.translate.instant('LIBRARY.MESSAGES.PUBLIC_QUIZZES_LOADED'),
+        this.translate.instant('NAV.LIBRARY')
+      );
     } catch (error) {
       console.error('Error loading public quizzes:', error);
       this.error = this.translate.instant('LIBRARY.LOAD_ERROR');
+      this.notificationService.error(
+        this.error || this.translate.instant('LIBRARY.MESSAGES.ERROR_LOADING_PUBLIC'),
+        this.translate.instant('COMMON.ERROR') || 'Error'
+      );
     }
   }
 
@@ -226,9 +239,17 @@ export class LibraryPage implements OnInit {
         await this.quizService.loadQuizzes();
         // Navigálunk az új kvíz szerkesztő oldalára
         this.router.navigate(['/quiz-manager', copiedQuiz.id]);
+        this.notificationService.success(
+          this.translate.instant('LIBRARY.MESSAGES.COPIED'),
+          this.translate.instant('COMMON.SUCCESS') || 'Success'
+        );
       }
     } catch (error) {
       console.error('Error copying quiz:', error);
+      this.notificationService.error(
+        this.translate.instant('LIBRARY.MESSAGES.COPY_FAILED'),
+        this.translate.instant('COMMON.ERROR') || 'Error'
+      );
     }
   }
 

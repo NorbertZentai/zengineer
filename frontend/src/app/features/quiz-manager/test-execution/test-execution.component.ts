@@ -4,9 +4,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { Router, ActivatedRoute } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TestService, TestSession, TestQuestion, TestAnswer, TestResult } from '../../../core/services/test.service';
-import { QuizService } from '../../../core/services/quiz.service';
+import { QuizService, QuizCard } from '../../../core/services/quiz.service';
+import { NotificationService } from '../../../core/services/notification.service';
+import { AiCardDTO } from '../../../core/services/ai.service';
 
 @Component({
   selector: 'app-test-execution',
@@ -18,7 +20,7 @@ import { QuizService } from '../../../core/services/quiz.service';
 export class TestExecutionComponent implements OnInit, OnDestroy {
   // Debug helper: return all question IDs as string
   getQuestionIdsString(): string {
-    if (!this.session || !this.session.questions) return 'nincs kérdés';
+  if (!this.session || !this.session.questions) return this.t('TEST.HISTORY.NO_TESTS');
     return this.session.questions.map(q => q.id).join(', ');
   }
   // Helper to determine if a question/card is suitable for the current test type
@@ -93,7 +95,7 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
   session: TestSession | null = null;
   formatAnswerForDisplay(answer: any): string {
     if (answer === undefined || answer === null || (typeof answer === 'string' && answer.trim() === '')) {
-      return 'Nincs válasz';
+      return this.t('TEST.RESULTS.SKIPPED');
     }
     if (typeof answer === 'string') {
       try {
@@ -131,9 +133,9 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
       }
     }
     if (Array.isArray(answer)) {
-      return answer.length > 0 ? answer.join(', ') : 'Nincs válasz';
+      return answer.length > 0 ? answer.join(', ') : this.t('TEST.RESULTS.SKIPPED');
     }
-    return String(answer || 'Nincs válasz');
+    return String(answer || this.t('TEST.RESULTS.SKIPPED'));
   }
   currentQuestion: TestQuestion | null = null;
   userAnswer: string = '';
@@ -151,6 +153,10 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
   showResult = false;
   testResult: TestResult | null = null;
   isExiting = false;
+  // Save options state
+  saving = false;
+  saveMessage: string | null = null;
+  selectedTargetQuizId: string | null = null;
 
   get hasMaxAttemptsReached(): boolean {
     // For now, just return false - can be enhanced later with proper attempt tracking
@@ -159,10 +165,16 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
 
   constructor(
     private testService: TestService,
-    private quizService: QuizService,
+  public quizService: QuizService,
     private router: Router,
-    private route: ActivatedRoute
+  private route: ActivatedRoute,
+  private notificationService: NotificationService,
+  private translate: TranslateService
   ) {}
+
+  private t(key: string, params?: Record<string, any>): string {
+    return this.translate.instant(key, params);
+  }
 
   async ngOnInit() {
     // Get the current session
@@ -216,13 +228,13 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
     const session = this.session;
     if (session) {
       const selectedTypes = session.configuration.testTypes.filter(t => t.enabled).map(t => t.id);
-      console.debug('[DEBUG] Teszt indítva:', selectedTypes.length === 1 ? selectedTypes[0] : selectedTypes);
+      console.debug('[DEBUG] Test started:', selectedTypes.length === 1 ? selectedTypes[0] : selectedTypes);
     }
     if (this.currentQuestion) {
-      console.debug('[DEBUG] Folyamatban lévő teszt:', this.currentQuestion.type);
-      console.debug('[DEBUG] Kérdés:', this.currentQuestion.question);
+      console.debug('[DEBUG] Running test:', this.currentQuestion.type);
+      console.debug('[DEBUG] Question:', this.currentQuestion.question);
       if (this.currentQuestion.options) {
-        console.debug('[DEBUG] Válaszlehetőségek:', this.currentQuestion.options);
+        console.debug('[DEBUG] Options:', this.currentQuestion.options);
       }
     }
     this.resetQuestionState();
@@ -278,9 +290,9 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
 
   toggleSolution(): void {
     this.showSolution = !this.showSolution;
-    // Ha megmutatjuk a megoldást, az számít segítség használatnak
+    // Showing the solution counts as using help
     if (this.showSolution) {
-      // A segítség használatát már a submitAnswer-ben fogjuk követni
+      // Help usage is tracked in submitAnswer
     }
   }
 
@@ -369,8 +381,8 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
         questionTime,
         this.showHint || this.showSolution
       );
-      this.isAnswerSubmitted = true;
-      this.showSolution = false; // Ne mutassuk a megoldást válaszadás után
+  this.isAnswerSubmitted = true;
+  this.showSolution = false; // Don't show solution after answering
       setTimeout(async () => {
         if (this.testService.isTestCompleted()) {
           await this.completeTest();
@@ -379,7 +391,7 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
         }
       }, 400);
     } catch (error: any) {
-      this.error = error.message || 'Hiba történt a válasz mentésekor';
+      this.error = error.message || this.t('TEST.EXECUTION.ERROR_OCCURRED');
     } finally {
       this.isLoading = false;
     }
@@ -423,7 +435,7 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
       }, 1000);
 
     } catch (error: any) {
-      this.error = error.message || 'Hiba történt a válasz mentésekor';
+      this.error = error.message || this.t('TEST.EXECUTION.ERROR_OCCURRED');
     } finally {
       this.isLoading = false;
     }
@@ -442,7 +454,7 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
       
       // Get quiz name for the result
       const quizId = this.session?.quiz_id;
-      let quizName = 'Ismeretlen kvíz';
+  let quizName = this.t('QUIZ_MANAGER.LABELS.QUIZ_NAME');
       
       if (quizId) {
         const quiz = this.quizService.quizzes().find(q => q.id === quizId);
@@ -454,7 +466,7 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
       const result = await this.testService.completeTest();
       result.quiz_name = quizName;
       // Log only the final result JSON to the console
-      console.log('Végső eredmény JSON:', JSON.stringify(result, null, 2));
+  console.log('Final result JSON:', JSON.stringify(result, null, 2));
       // Debug: Print session.questions and testResult.answers for ID comparison
       console.log('session.questions:', this.session?.questions);
       console.log('testResult.answers:', result.answers);
@@ -466,43 +478,43 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
       console.error('❌ Test completion failed:', error);
       
       // Create detailed error message
-      let detailedError = 'Hiba történt a teszt befejezésekor:\n\n';
+      let detailedError = this.t('TEST.RESULTS.ERROR_COMPLETING');
       
       if (error.message) {
-        detailedError += `Üzenet: ${error.message}\n`;
+        detailedError += ` Message: ${error.message}\n`;
       }
       
       if (error.code) {
-        detailedError += `Hibakód: ${error.code}\n`;
+        detailedError += ` Code: ${error.code}\n`;
       }
       
       if (error.details) {
-        detailedError += `Részletek: ${error.details}\n`;
+        detailedError += ` Details: ${error.details}\n`;
       }
       
       if (error.hint) {
-        detailedError += `Javaslat: ${error.hint}\n`;
+        detailedError += ` Hint: ${error.hint}\n`;
       }
       
       // Database specific errors
       if (error.message?.includes('column')) {
-        detailedError += '\n🔧 Ez egy adatbázis oszlop hiba. Futtasd le a database fix scriptet a Supabase-ben.';
+        detailedError += '\n🔧 This is a database column error. Run the database fix script in Supabase.';
       }
       
       if (error.message?.includes('test_results')) {
-        detailedError += '\n📋 A test_results táblával van probléma.';
+        detailedError += '\n📋 There is an issue with the test_results table.';
       }
       
       if (error.message?.includes('test_configuration')) {
-        detailedError += '\n⚙️ A test_configuration oszlop hiányzik vagy rossz nevű.';
+        detailedError += '\n⚙️ The test_configuration column is missing or misnamed.';
       }
       
       if (error.message?.includes('wrong_answers')) {
-        detailedError += '\n🎯 A wrong_answers oszlop hiányzik vagy rossz nevű.';
+        detailedError += '\n🎯 The wrong_answers column is missing or misnamed.';
       }
       
       // Add full error object for debugging
-      detailedError += `\n\n🔍 Teljes hiba objektum:\n${JSON.stringify(error, null, 2)}`;
+      detailedError += `\n\n🔍 Full error object:\n${JSON.stringify(error, null, 2)}`;
       
       this.error = detailedError;
     } finally {
@@ -525,6 +537,91 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
     this.isExiting = true;
     this.stopTimer();
     this.router.navigate(['/quiz-manager', this.session?.quiz_id || '']);
+  }
+
+  private buildCardsFromSession(): AiCardDTO[] {
+    const session = this.session;
+    if (!session || !session.questions) return [];
+  const cards: AiCardDTO[] = [];
+    for (const q of session.questions) {
+      if (!q || !q.question) continue;
+      let answerPayload = '';
+  if (q.type === 'multiple_choice' || q.type === 'multi_select') {
+        // options + correct_answer present or embedded in q.answer JSON
+        let correct: string[] = [];
+        let incorrect: string[] = [];
+        try {
+          if (q.answer) {
+            const parsed = JSON.parse(q.answer);
+            if (Array.isArray(parsed.correct)) correct = parsed.correct;
+            if (Array.isArray(parsed.incorrect)) incorrect = parsed.incorrect;
+          }
+        } catch {}
+        // If not in answer JSON, derive from options and correct_answer
+        if (correct.length === 0 && typeof q.correct_answer === 'string') correct = [q.correct_answer];
+        if (incorrect.length === 0 && Array.isArray(q.options)) {
+          incorrect = q.options.filter(opt => !correct.includes(opt));
+        }
+        // Map to AI DTO fields
+        const answers = [
+          ...correct.map(text => ({ text, isCorrect: true })),
+          ...incorrect.map(text => ({ text, isCorrect: false }))
+        ];
+        cards.push({ question: q.question, answers, explanation: q.hint });
+      } else if (q.type === 'flashcard' || q.type === 'written') {
+        // Represent flashcard/written as a 1-correct + 3-generic answers set
+        const correctAns = typeof q.correct_answer === 'string' ? q.correct_answer : this.t('TEST.RESULTS.ANSWER');
+        const filler = [
+          this.t('TEST.RESULTS.OTHER'),
+          this.t('TEST.RESULTS.DONT_KNOW'),
+          this.t('TEST.RESULTS.NO_ANSWER')
+        ];
+        const answers = [
+          { text: correctAns, isCorrect: true },
+          ...filler.map(text => ({ text, isCorrect: false }))
+        ];
+        cards.push({ question: q.question, answers, explanation: q.hint });
+      }
+    }
+    return cards;
+  }
+
+  async saveAsNewQuiz(): Promise<void> {
+    if (!this.session) return;
+    this.saving = true;
+    this.saveMessage = null;
+    try {
+      const cards = this.buildCardsFromSession();
+      const name = `AI Quiz - ${new Date().toLocaleDateString()}`;
+      const newQuiz = await this.quizService.createQuiz({ name, description: '', color: '#667eea', difficulty_level: 2, estimated_time: 0, study_modes: [], language: 'hu' } as any);
+      if (newQuiz?.id && cards.length) {
+        const { inserted, skipped } = await this.quizService.addCardsToQuiz(newQuiz.id, cards as any);
+        this.saveMessage = this.t('TEST.RESULTS.SAVED_AS_NEW');
+        this.notificationService.success('TEST.RESULTS.NEW_QUIZ_CREATED', undefined, { params: { inserted, skipped } });
+      }
+    } catch (e: any) {
+      this.saveMessage = e?.message || this.t('TEST.RESULTS.SAVE_ERROR');
+    } finally {
+      this.saving = false;
+    }
+  }
+
+  async appendToExistingQuiz(): Promise<void> {
+    if (!this.session || !this.selectedTargetQuizId) return;
+    this.saving = true;
+    this.saveMessage = null;
+    try {
+      const cards = this.buildCardsFromSession();
+      if (cards.length) {
+        const { inserted, skipped } = await this.quizService.addCardsToQuiz(this.selectedTargetQuizId, cards as any);
+        this.saveMessage = this.t('TEST.RESULTS.ADDED_TO_SELECTED');
+        this.notificationService.success('TEST.RESULTS.APPENDED_TO_EXISTING', undefined, { params: { inserted, skipped } });
+      }
+    } catch (e: any) {
+      this.saveMessage = e?.message || this.t('TEST.RESULTS.SAVE_ERROR');
+    } finally {
+      this.saving = false;
+    }
   }
 
   getAnswerClass(answer: string): string {

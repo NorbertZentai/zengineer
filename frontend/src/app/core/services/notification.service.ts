@@ -6,6 +6,8 @@ export interface ToastMessage {
   type: 'success' | 'error' | 'warning' | 'info';
   title?: string;
   message: string;
+  // Optional translate params for title/message
+  params?: Record<string, any>;
   duration?: number;
   persistent?: boolean;
 }
@@ -26,7 +28,7 @@ export class NotificationService {
     const id = this.generateId();
     const newToast: ToastMessage = {
       id,
-      duration: 5000,
+      duration: 20000, // Drastically increased to 20 seconds for testing
       ...toast
     };
     
@@ -48,6 +50,7 @@ export class NotificationService {
       type: 'success',
       title,
       message,
+      duration: 20000, // Test with 20 seconds
       ...options
     });
   }
@@ -57,7 +60,7 @@ export class NotificationService {
       type: 'error',
       title,
       message,
-      duration: 8000, // Longer duration for errors
+      duration: 25000, // Test with 25 seconds for errors
       ...options
     });
   }
@@ -67,6 +70,7 @@ export class NotificationService {
       type: 'warning',
       title,
       message,
+      duration: 22000, // Test with 22 seconds for warnings
       ...options
     });
   }
@@ -76,13 +80,15 @@ export class NotificationService {
       type: 'info',
       title,
       message,
+      duration: 20000, // Test with 20 seconds for info
       ...options
     });
   }
   
   remove(id: string): void {
     const currentToasts = this.toasts$.value;
-    this.toasts$.next(currentToasts.filter(toast => toast.id !== id));
+    const remainingToasts = currentToasts.filter(toast => toast.id !== id);
+    this.toasts$.next(remainingToasts);
   }
   
   clear(): void {

@@ -27,6 +27,10 @@ backend/pb_data/*.db-wal
 # Logs
 *.log
 
+# Supabase temporary files
+supabase/.temp/
+supabase_remote_schema.sql
+
 .fake.github/workflows/ci-cd-backup.yml
 
 .fake
