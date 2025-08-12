@@ -192,6 +192,10 @@
           <mat-icon>sentiment_very_dissatisfied</mat-icon>
           <span>{{ 'DIFFICULTY_LEVEL.HARD' | translate }}</span>
         </button>
+        <button mat-menu-item (click)="openAiCardConfig()">
+          <mat-icon>settings</mat-icon>
+          <span>{{ 'TEST.MENU.CUSTOM' | translate }}</span>
+        </button>
       </mat-menu>
     </div>
   </div>
@@ -452,3 +456,12 @@
   (close)="closeTestConfig()"
   (startTest)="startTest($event)">
 </app-test-config-modal>
+
+<!-- AI Card Configuration Modal -->
+<app-ai-card-config-modal 
+  *ngIf="showAiCardConfig"
+  [quizId]="quiz?.id || ''"
+  [quizName]="quiz?.name || ''"
+  (close)="closeAiCardConfig()"
+  (generateCards)="generateCustomAiCards($event)">
+</app-ai-card-config-modal>

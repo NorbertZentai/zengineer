@@ -495,6 +495,36 @@
     "ERRORS": {
       "SERVER_UNAVAILABLE": "The AI server is unavailable (http://localhost:8787). Start it with: npm run ai:dev at the project root.",
       "SERVER_NOT_RUNNING": "The AI server is not running. Start it: npm run ai:dev (works in mock mode without GEMINI_API_KEY)."
+    },
+    "CUSTOM_GENERATION": {
+      "TITLE": "Custom AI Card Generation",
+      "CARD_COUNT": "Number of Cards",
+      "CARD_COUNT_DESC": "Set how many cards you want to generate (maximum 15)",
+      "CARDS": "cards",
+      "TOPIC": "Topic",
+      "TOPIC_DESC": "Briefly describe what kind of cards you want",
+      "TOPIC_PLACEHOLDER": "e.g: World History, Mathematics, Biology...",
+      "DIFFICULTY": "Difficulty Level",
+      "DIFFICULTY_DESC": "Choose the difficulty level for the questions",
+      "ANSWER_CONFIG": "Answer Configuration",
+      "ANSWER_CONFIG_DESC": "Set how many correct and incorrect answers per question",
+      "CORRECT_ANSWERS": "Correct Answers",
+      "WRONG_ANSWERS": "Wrong Answers",
+      "TOTAL_ANSWERS": "Total Answers",
+      "QUESTION_TYPE": "Question Type",
+      "QUESTION_TYPE_DESC": "Choose what type of questions you want",
+      "ADVANCED_OPTIONS": "Advanced Options",
+      "LANGUAGE": "Language",
+      "INCLUDE_EXPLANATIONS": "Include Explanations",
+      "INCLUDE_EXPLANATIONS_DESC": "AI will also generate explanations for answers",
+      "SUMMARY": "Summary",
+      "ANSWERS_PER_CARD": "answers/card",
+      "GENERATE_CARDS": "Generate Cards"
+    },
+    "QUESTION_TYPES": {
+      "MULTIPLE_CHOICE": "Multiple Choice",
+      "TRUE_FALSE": "True/False",
+      "FILL_IN_BLANK": "Fill in the Blank"
     }
   },
   "DASHBOARD": {

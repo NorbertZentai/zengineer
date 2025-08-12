@@ -17,6 +17,7 @@ type CardWithParsed = QuizCard & { parsedAnswer?: any; parseError?: string | nul
 import { AuthService } from '../../../core/services/auth.service';
 import { TestService, TestConfiguration, CardPerformance } from '../../../core/services/test.service';
 import { TestConfigModalComponent } from '../test-config-modal/test-config-modal.component';
+import { AiCardConfigModalComponent, AiCardConfiguration } from '../ai-card-config-modal/ai-card-config-modal.component';
 import { environment } from '../../../../environments/environment';
 
 type QuizCardView = QuizCard & { parsedAnswer?: any; parseError?: string | null; isFlipped?: boolean };
@@ -33,6 +34,7 @@ type QuizCardView = QuizCard & { parsedAnswer?: any; parseError?: string | null;
     MatButtonModule,
     TranslateModule,
     TestConfigModalComponent,
+    AiCardConfigModalComponent,
     MatMenuModule
   ],
   animations: [
@@ -590,6 +592,7 @@ export class QuizDetailsComponent implements OnInit {
   
   // Test-related properties
   showTestConfig = false;
+  showAiCardConfig = false;
   cardPerformance: CardPerformance[] = [];
   
   // Színpaletta
@@ -1024,6 +1027,67 @@ export class QuizDetailsComponent implements OnInit {
 
   closeTestConfig(): void {
     this.showTestConfig = false;
+  }
+
+  // AI Card Configuration methods
+  openAiCardConfig(): void {
+    this.showAiCardConfig = true;
+  }
+
+  closeAiCardConfig(): void {
+    this.showAiCardConfig = false;
+  }
+
+  async generateCustomAiCards(config: AiCardConfiguration): Promise<void> {
+    if (!this.quiz?.id) return;
+    
+    try {
+      this.isLoading = true;
+      this.error = null;
+      
+      // Build the AI generation request
+      const aiRequest = {
+        topic: config.topic,
+        language: config.language,
+        numQuestions: config.cardCount,
+        difficulty: config.difficulty,
+        correctAnswers: config.correctAnswers,
+        wrongAnswers: config.wrongAnswers,
+        questionType: config.questionType,
+        includeExplanations: config.includeExplanations
+      };
+      
+      const cards = await this.ai.generateQuizCards(aiRequest);
+      
+      // Convert string difficulty to number
+      const difficultyNumber = config.difficulty === 'easy' ? 1 : config.difficulty === 'medium' ? 2 : 3;
+      const { inserted, skipped } = await this.quizService.addCardsToQuiz(this.quiz.id, cards as any, difficultyNumber);
+      
+      // Reload cards
+      const rawCards = await this.quizService.getQuizCards(this.quiz.id);
+      this.cards = rawCards as any;
+      
+      // Show success message
+      const msgKey = skipped && skipped > 0
+        ? 'QUIZ_MANAGER.MESSAGES.AI_CARDS_ADDED_WITH_SKIPS'
+        : 'QUIZ_MANAGER.MESSAGES.AI_CARDS_ADDED';
+      const params = skipped && skipped > 0 ? { inserted, skipped } : { inserted };
+      this.notificationService.success(
+        msgKey,
+        'AI.CUSTOM_GENERATION.TITLE',
+        { params }
+      );
+      
+    } catch (e: any) {
+      this.error = e?.message || this.t('QUIZ_MANAGER.MESSAGES.AI_GENERATE_ERROR');
+      this.notificationService.error(
+        'QUIZ_MANAGER.MESSAGES.AI_GENERATE_ERROR',
+        'ERRORS.SERVER_ERROR'
+      );
+    } finally {
+      this.isLoading = false;
+      this.showAiCardConfig = false;
+    }
   }
 
   async startTest(config: TestConfiguration): Promise<void> {

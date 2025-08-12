@@ -1,0 +1,242 @@
+<div class="modal-overlay" (click)="onClose()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="header-content">
+        <div class="quiz-info">
+          <mat-icon class="quiz-icon">bolt</mat-icon>
+          <div>
+            <h2>{{ 'AI.CUSTOM_GENERATION.TITLE' | translate }}</h2>
+            <p class="quiz-name">{{ quizName }}</p>
+          </div>
+        </div>
+        <button class="close-btn" (click)="onClose()" type="button">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="modal-content">
+      <!-- Card Count Section -->
+      <div class="config-section">
+        <h3>
+          <mat-icon>pin</mat-icon>
+          {{ 'AI.CUSTOM_GENERATION.CARD_COUNT' | translate }}
+        </h3>
+        <p class="section-description">{{ 'AI.CUSTOM_GENERATION.CARD_COUNT_DESC' | translate }}</p>
+        
+        <div class="counter-control">
+          <button type="button" class="counter-btn" (click)="decrementCardCount()" [disabled]="configuration.cardCount <= 1">
+            <mat-icon>remove</mat-icon>
+          </button>
+          <div class="counter-display">
+            <span class="counter-value">{{ configuration.cardCount }}</span>
+            <span class="counter-label">{{ 'AI.CUSTOM_GENERATION.CARDS' | translate }}</span>
+          </div>
+          <button type="button" class="counter-btn" (click)="incrementCardCount()" [disabled]="configuration.cardCount >= 15">
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Topic Section -->
+      <div class="config-section">
+        <h3>
+          <mat-icon>topic</mat-icon>
+          {{ 'AI.CUSTOM_GENERATION.TOPIC' | translate }}
+        </h3>
+        <p class="section-description">{{ 'AI.CUSTOM_GENERATION.TOPIC_DESC' | translate }}</p>
+        
+        <div class="topic-input-group">
+          <input 
+            type="text" 
+            [(ngModel)]="configuration.topic"
+            [placeholder]="'AI.CUSTOM_GENERATION.TOPIC_PLACEHOLDER' | translate"
+            class="topic-input"
+            maxlength="100">
+          <div class="character-count">{{ configuration.topic.length }}/100</div>
+        </div>
+      </div>
+
+      <!-- Difficulty Section -->
+      <div class="config-section">
+        <h3>
+          <mat-icon>tune</mat-icon>
+          {{ 'AI.CUSTOM_GENERATION.DIFFICULTY' | translate }}
+        </h3>
+        <p class="section-description">{{ 'AI.CUSTOM_GENERATION.DIFFICULTY_DESC' | translate }}</p>
+        
+        <div class="difficulty-grid">
+          <div 
+            *ngFor="let option of difficultyOptions" 
+            class="difficulty-card"
+            [class.selected]="configuration.difficulty === option.value"
+            (click)="configuration.difficulty = option.value">
+            <mat-icon>{{ option.icon }}</mat-icon>
+            <span>{{ option.labelKey | translate }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Answer Configuration Section -->
+      <div class="config-section">
+        <h3>
+          <mat-icon>quiz</mat-icon>
+          {{ 'AI.CUSTOM_GENERATION.ANSWER_CONFIG' | translate }}
+        </h3>
+        <p class="section-description">{{ 'AI.CUSTOM_GENERATION.ANSWER_CONFIG_DESC' | translate }}</p>
+        
+        <div class="answer-config-grid">
+          <!-- Correct Answers -->
+          <div class="answer-control-group">
+            <label>{{ 'AI.CUSTOM_GENERATION.CORRECT_ANSWERS' | translate }}</label>
+            <div class="counter-control small">
+              <button type="button" class="counter-btn" (click)="decrementCorrectAnswers()" [disabled]="configuration.correctAnswers <= 1">
+                <mat-icon>remove</mat-icon>
+              </button>
+              <div class="counter-display">
+                <span class="counter-value">{{ configuration.correctAnswers }}</span>
+              </div>
+              <button type="button" class="counter-btn" (click)="incrementCorrectAnswers()" [disabled]="configuration.correctAnswers >= 3">
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <!-- Wrong Answers -->
+          <div class="answer-control-group">
+            <label>{{ 'AI.CUSTOM_GENERATION.WRONG_ANSWERS' | translate }}</label>
+            <div class="counter-control small">
+              <button type="button" class="counter-btn" (click)="decrementWrongAnswers()" [disabled]="configuration.wrongAnswers <= 1">
+                <mat-icon>remove</mat-icon>
+              </button>
+              <div class="counter-display">
+                <span class="counter-value">{{ configuration.wrongAnswers }}</span>
+              </div>
+              <button type="button" class="counter-btn" (click)="incrementWrongAnswers()" [disabled]="configuration.wrongAnswers >= 3">
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="answer-summary">
+          <mat-icon>info</mat-icon>
+          <span>{{ 'AI.CUSTOM_GENERATION.TOTAL_ANSWERS' | translate }}: {{ getTotalAnswers() }}</span>
+        </div>
+      </div>
+
+      <!-- Question Type Section -->
+      <div class="config-section">
+        <h3>
+          <mat-icon>psychology</mat-icon>
+          {{ 'AI.CUSTOM_GENERATION.QUESTION_TYPE' | translate }}
+        </h3>
+        <p class="section-description">{{ 'AI.CUSTOM_GENERATION.QUESTION_TYPE_DESC' | translate }}</p>
+        
+        <div class="question-type-grid">
+          <div 
+            *ngFor="let option of questionTypeOptions" 
+            class="question-type-card"
+            [class.selected]="configuration.questionType === option.value"
+            (click)="configuration.questionType = option.value">
+            <mat-icon>{{ option.icon }}</mat-icon>
+            <span>{{ option.labelKey | translate }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Language & Advanced Options -->
+      <div class="config-section">
+        <h3>
+          <mat-icon>settings</mat-icon>
+          {{ 'AI.CUSTOM_GENERATION.ADVANCED_OPTIONS' | translate }}
+        </h3>
+        
+        <div class="advanced-options-grid">
+          <!-- Language Selection -->
+          <div class="setting-group">
+            <label for="language">{{ 'AI.CUSTOM_GENERATION.LANGUAGE' | translate }}</label>
+            <select 
+              id="language"
+              [(ngModel)]="configuration.language"
+              class="dropdown-select">
+              <option 
+                *ngFor="let option of languageOptions" 
+                [value]="option.value">
+                {{ option.label }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Include Explanations -->
+          <label class="setting-toggle">
+            <input 
+              type="checkbox" 
+              [(ngModel)]="configuration.includeExplanations">
+            <div class="toggle-content">
+              <div class="toggle-header">
+                <span class="setting-title">{{ 'AI.CUSTOM_GENERATION.INCLUDE_EXPLANATIONS' | translate }}</span>
+                <div class="toggle-switch" [class.enabled]="configuration.includeExplanations">
+                  <div class="toggle-thumb"></div>
+                </div>
+              </div>
+              <span class="setting-description">{{ 'AI.CUSTOM_GENERATION.INCLUDE_EXPLANATIONS_DESC' | translate }}</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Generation Summary -->
+      <div class="generation-summary">
+        <div class="summary-header">
+          <mat-icon>summarize</mat-icon>
+          <h3>{{ 'AI.CUSTOM_GENERATION.SUMMARY' | translate }}</h3>
+        </div>
+        
+        <div class="summary-stats">
+          <div class="stat-item">
+            <mat-icon>pin</mat-icon>
+            <span class="stat-number">{{ configuration.cardCount }}</span>
+            <span class="stat-label">{{ 'AI.CUSTOM_GENERATION.CARDS' | translate }}</span>
+          </div>
+          
+          <div class="stat-item">
+            <mat-icon>quiz</mat-icon>
+            <span class="stat-number">{{ getTotalAnswers() }}</span>
+            <span class="stat-label">{{ 'AI.CUSTOM_GENERATION.ANSWERS_PER_CARD' | translate }}</span>
+          </div>
+          
+          <div class="stat-item">
+            <mat-icon>tune</mat-icon>
+            <span class="stat-number">{{ getDifficultyLabel() }}</span>
+            <span class="stat-label">{{ 'AI.CUSTOM_GENERATION.DIFFICULTY' | translate }}</span>
+          </div>
+        </div>
+
+        <div class="topic-preview" *ngIf="configuration.topic.trim()">
+          <mat-icon>topic</mat-icon>
+          <span><strong>{{ 'AI.CUSTOM_GENERATION.TOPIC' | translate }}:</strong> {{ configuration.topic }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <div class="action-buttons">
+        <button class="cancel-btn" (click)="onClose()" type="button">
+          {{ 'COMMON.CANCEL' | translate }}
+        </button>
+        <button 
+          class="generate-btn" 
+          (click)="onGenerateCards()" 
+          type="button"
+          [disabled]="!isConfigurationValid()">
+          <mat-icon>bolt</mat-icon>
+          {{ 'AI.CUSTOM_GENERATION.GENERATE_CARDS' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

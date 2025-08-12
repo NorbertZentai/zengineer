@@ -40,7 +40,11 @@ export class AiService {
     numQuestions?: number;
     sourceText?: string;
     testSummary?: unknown;
-  difficulty?: 'easy' | 'medium' | 'hard';
+    difficulty?: 'easy' | 'medium' | 'hard';
+    correctAnswers?: number;
+    wrongAnswers?: number;
+    questionType?: 'multiple_choice' | 'true_false' | 'fill_in_blank';
+    includeExplanations?: boolean;
   }): Promise<AiCardDTO[]> {
     try {
       const res = await fetch(`${this.baseUrl}/generate-quiz`, {

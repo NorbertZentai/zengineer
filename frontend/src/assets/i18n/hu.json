@@ -495,6 +495,36 @@
     "ERRORS": {
       "SERVER_UNAVAILABLE": "Az AI szerver nem érhető el (http://localhost:8787). Indítsd el: npm run ai:dev a projekt gyökerében.",
       "SERVER_NOT_RUNNING": "Az AI szerver nem fut. Indítsd: npm run ai:dev (mock módban is működik, ha nincs GEMINI_API_KEY)."
+    },
+    "CUSTOM_GENERATION": {
+      "TITLE": "Egyéni AI kártya generálás",
+      "CARD_COUNT": "Kártyák száma",
+      "CARD_COUNT_DESC": "Határozd meg, hány kártyát szeretnél generálni (maximum 15)",
+      "CARDS": "kártya",
+      "TOPIC": "Téma",
+      "TOPIC_DESC": "Add meg röviden, milyen témájú kártyákat szeretnél",
+      "TOPIC_PLACEHOLDER": "pl: Világtörténelem, Matematika, Biológia...",
+      "DIFFICULTY": "Nehézségi szint",
+      "DIFFICULTY_DESC": "Válaszd ki a kérdések nehézségi szintjét",
+      "ANSWER_CONFIG": "Válasz konfiguráció",
+      "ANSWER_CONFIG_DESC": "Állítsd be, hány helyes és helytelen válasz legyen kérdésenként",
+      "CORRECT_ANSWERS": "Helyes válaszok",
+      "WRONG_ANSWERS": "Helytelen válaszok",
+      "TOTAL_ANSWERS": "Összes válasz",
+      "QUESTION_TYPE": "Kérdés típusa",
+      "QUESTION_TYPE_DESC": "Válaszd ki, milyen típusú kérdéseket szeretnél",
+      "ADVANCED_OPTIONS": "Haladó beállítások",
+      "LANGUAGE": "Nyelv",
+      "INCLUDE_EXPLANATIONS": "Magyarázatok hozzáadása",
+      "INCLUDE_EXPLANATIONS_DESC": "Az AI magyarázatokat is generál a válaszokhoz",
+      "SUMMARY": "Összefoglaló",
+      "ANSWERS_PER_CARD": "válasz/kártya",
+      "GENERATE_CARDS": "Kártyák generálása"
+    },
+    "QUESTION_TYPES": {
+      "MULTIPLE_CHOICE": "Feleletválasztós",
+      "TRUE_FALSE": "Igaz/Hamis",
+      "FILL_IN_BLANK": "Hiányos mondat"
     }
   },
   "DASHBOARD": {
