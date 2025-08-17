@@ -192,7 +192,7 @@
           <mat-icon>sentiment_very_dissatisfied</mat-icon>
           <span>{{ 'DIFFICULTY_LEVEL.HARD' | translate }}</span>
         </button>
-        <button mat-menu-item (click)="openAiCardConfig()">
+        <button mat-menu-item (click)="openAiCardConfig()" type="button">
           <mat-icon>settings</mat-icon>
           <span>{{ 'TEST.MENU.CUSTOM' | translate }}</span>
         </button>
@@ -379,6 +379,13 @@
             
             <!-- Card actions jobb felső sarok -->
             <div class="card-actions" (click)="$event.stopPropagation()" *ngIf="isOwner">
+              <button class="action-btn ai-analysis" 
+                      (click)="getAiAnalysis(card)" 
+                      [disabled]="isAnalysisLoading(card.id!)"
+                      [class.has-result]="hasAnalysisResult(card.id!)"
+                      title="AI Elemzés">
+                <mat-icon>{{ isAnalysisLoading(card.id!) ? 'hourglass_empty' : 'smart_toy' }}</mat-icon>
+              </button>
               <button class="action-btn edit" (click)="editCard(card)" title="Szerkesztés">
                 <mat-icon>edit</mat-icon>
               </button>
@@ -425,12 +432,44 @@
           </div>
           <!-- Card actions jobb felső sarok -->
           <div class="card-actions" (click)="$event.stopPropagation()" *ngIf="isOwner">
+            <button class="action-btn ai-analysis" 
+                    (click)="getAiAnalysis(card)" 
+                    [disabled]="isAnalysisLoading(card.id!)"
+                    [class.has-result]="hasAnalysisResult(card.id!)"
+                    title="AI Elemzés">
+              <mat-icon>{{ isAnalysisLoading(card.id!) ? 'hourglass_empty' : 'smart_toy' }}</mat-icon>
+            </button>
             <button class="action-btn edit" (click)="editCard(card)" title="Szerkesztés">
               <mat-icon>edit</mat-icon>
             </button>
             <button class="action-btn delete" (click)="deleteCard(card.id!)" title="Törlés">
               <mat-icon>delete</mat-icon>
             </button>
+          </div>
+        </div>
+        
+        <!-- AI Analysis Result -->
+        <div class="ai-analysis-result" *ngIf="hasAnalysisResult(card.id!)">
+          <div class="analysis-header">
+            <mat-icon>smart_toy</mat-icon>
+            <span>AI Elemzés</span>
+          </div>
+          <div class="analysis-content">
+            <div class="analysis-score">
+              Minőségi pontszám: {{ getAnalysisResult(card.id!)?.qualityScore || 'N/A' }}/10
+            </div>
+            <div class="analysis-suggestions" *ngIf="getAnalysisResult(card.id!)?.suggestions?.length > 0">
+              <h4>Javaslatok:</h4>
+              <ul>
+                <li *ngFor="let suggestion of getAnalysisResult(card.id!)?.suggestions">{{ suggestion }}</li>
+              </ul>
+            </div>
+            <div class="analysis-improvements" *ngIf="getAnalysisResult(card.id!)?.improvements?.length > 0">
+              <h4>Fejlesztési lehetőségek:</h4>
+              <ul>
+                <li *ngFor="let improvement of getAnalysisResult(card.id!)?.improvements">{{ improvement }}</li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -462,6 +501,7 @@
   *ngIf="showAiCardConfig"
   [quizId]="quiz?.id || ''"
   [quizName]="quiz?.name || ''"
+  [quizData]="quiz"
   (close)="closeAiCardConfig()"
   (generateCards)="generateCustomAiCards($event)">
 </app-ai-card-config-modal>

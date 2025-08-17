@@ -496,6 +496,10 @@
       "SERVER_UNAVAILABLE": "The AI server is unavailable (http://localhost:8787). Start it with: npm run ai:dev at the project root.",
       "SERVER_NOT_RUNNING": "The AI server is not running. Start it: npm run ai:dev (works in mock mode without GEMINI_API_KEY)."
     },
+    "ANALYSIS": {
+      "SUCCESS": "AI analysis completed successfully",
+      "ERROR": "Error occurred during AI analysis"
+    },
     "CUSTOM_GENERATION": {
       "TITLE": "Custom AI Card Generation",
       "CARD_COUNT": "Number of Cards",

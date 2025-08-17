@@ -1,5 +1,5 @@
 <div class="modal-overlay" (click)="onClose()">
-  <div class="modal-container" (click)="$event.stopPropagation()">
+  <div class="modal-container" (click)="$event.stopPropagation()" [class.dark-theme]="isDarkTheme">
     <!-- Header -->
     <div class="modal-header">
       <div class="header-content">
@@ -48,14 +48,29 @@
         </h3>
         <p class="section-description">{{ 'AI.CUSTOM_GENERATION.TOPIC_DESC' | translate }}</p>
         
-        <div class="topic-input-group">
-          <input 
-            type="text" 
-            [(ngModel)]="configuration.topic"
-            [placeholder]="'AI.CUSTOM_GENERATION.TOPIC_PLACEHOLDER' | translate"
-            class="topic-input"
-            maxlength="100">
-          <div class="character-count">{{ configuration.topic.length }}/100</div>
+        <div class="topic-input-container">
+          <div class="topic-input-group">
+            <textarea 
+              [(ngModel)]="configuration.topic"
+              [placeholder]="'AI.CUSTOM_GENERATION.TOPIC_PLACEHOLDER' | translate"
+              class="topic-input"
+              maxlength="500"
+              rows="3"
+              [disabled]="isGeneratingTopicSuggestion">
+            </textarea>
+            <div class="character-count">{{ configuration.topic.length }}/500</div>
+          </div>
+          
+          <button 
+            type="button" 
+            class="ai-suggest-btn"
+            (click)="generateTopicSuggestion()"
+            [disabled]="isGeneratingTopicSuggestion || !quizData"
+            [title]="'AI.CUSTOM_GENERATION.AI_SUGGEST_TOPIC_TOOLTIP' | translate">
+            <mat-icon *ngIf="!isGeneratingTopicSuggestion">auto_awesome</mat-icon>
+            <mat-icon *ngIf="isGeneratingTopicSuggestion" class="spinning">refresh</mat-icon>
+            <span>{{ 'AI.CUSTOM_GENERATION.AI_SUGGEST_TOPIC' | translate }}</span>
+          </button>
         </div>
       </div>
 

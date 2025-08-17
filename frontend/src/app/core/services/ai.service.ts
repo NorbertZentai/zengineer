@@ -108,4 +108,38 @@ export class AiService {
       throw err;
     }
   }
+
+  async analyzeCard(card: any): Promise<any> {
+    try {
+      const res = await fetch(`${this.baseUrl}/analyze-card`, {
+        method: 'POST',
+        headers: this.headers(),
+        body: JSON.stringify({
+          question: card.question,
+          answer: card.answer || JSON.stringify(card.answers),
+          cardType: card.card_type,
+          hint: card.hint
+        })
+      });
+      if (!res.ok) {
+        const msg = await res.text().catch(() => 'AI analysis error');
+        throw new Error(msg);
+      }
+      const data = await res.json();
+      // Notify usage updated
+      this.usageUpdated$.next();
+      return data.analysis;
+    } catch (err: any) {
+      const msg = String(err?.message || err || '');
+      if ([
+        'Failed to fetch',
+        'NetworkError',
+        'ERR_CONNECTION_REFUSED',
+        'TypeError: fetch'
+      ].some((s) => msg.includes(s))) {
+        throw new Error(this.translate.instant('AI.ERRORS.SERVER_NOT_RUNNING'));
+      }
+      throw err;
+    }
+  }
 }

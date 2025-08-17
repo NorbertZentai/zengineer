@@ -496,14 +496,20 @@
       "SERVER_UNAVAILABLE": "Az AI szerver nem érhető el (http://localhost:8787). Indítsd el: npm run ai:dev a projekt gyökerében.",
       "SERVER_NOT_RUNNING": "Az AI szerver nem fut. Indítsd: npm run ai:dev (mock módban is működik, ha nincs GEMINI_API_KEY)."
     },
+    "ANALYSIS": {
+      "SUCCESS": "AI elemzés sikeresen elkészült",
+      "ERROR": "Hiba történt az AI elemzés során"
+    },
     "CUSTOM_GENERATION": {
       "TITLE": "Egyéni AI kártya generálás",
       "CARD_COUNT": "Kártyák száma",
       "CARD_COUNT_DESC": "Határozd meg, hány kártyát szeretnél generálni (maximum 15)",
       "CARDS": "kártya",
       "TOPIC": "Téma",
-      "TOPIC_DESC": "Add meg röviden, milyen témájú kártyákat szeretnél",
-      "TOPIC_PLACEHOLDER": "pl: Világtörténelem, Matematika, Biológia...",
+      "TOPIC_DESC": "Add meg részletesen, milyen témájú kártyákat szeretnél, vagy használd az AI javaslatot",
+      "TOPIC_PLACEHOLDER": "pl: Világtörténelem második világháború események, Matematika alapfüggvények tulajdonságai...",
+      "AI_SUGGEST_TOPIC": "AI Javaslat",
+      "AI_SUGGEST_TOPIC_TOOLTIP": "Automatikus témajavaslat generálása a kvíz adatai alapján",
       "DIFFICULTY": "Nehézségi szint",
       "DIFFICULTY_DESC": "Válaszd ki a kérdések nehézségi szintjét",
       "ANSWER_CONFIG": "Válasz konfiguráció",

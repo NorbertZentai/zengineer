@@ -553,6 +553,10 @@ export class QuizDetailsComponent implements OnInit {
   showScrollTop = false;
   private scrollListener: (() => void) | null = null;
 
+  // AI Analysis states
+  aiAnalysisResults: Map<string, any> = new Map();
+  loadingAnalysis: Set<string> = new Set();
+
   scrollToTop(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -1193,5 +1197,36 @@ export class QuizDetailsComponent implements OnInit {
         (cardEl as HTMLElement).style.height = `${maxHeight}px`;
       }
     });
+  }
+
+  // AI Analysis functionality
+  async getAiAnalysis(card: QuizCard): Promise<void> {
+    if (!card.id || this.loadingAnalysis.has(card.id)) return;
+    
+    try {
+      this.loadingAnalysis.add(card.id);
+      
+      const analysis = await this.ai.analyzeCard(card);
+      this.aiAnalysisResults.set(card.id, analysis);
+      
+      this.notificationService.success(this.t('AI.ANALYSIS.SUCCESS'));
+    } catch (error) {
+      console.error('AI analysis error:', error);
+      this.notificationService.error(this.t('AI.ANALYSIS.ERROR'));
+    } finally {
+      this.loadingAnalysis.delete(card.id);
+    }
+  }
+
+  getAnalysisResult(cardId: string): any {
+    return this.aiAnalysisResults.get(cardId);
+  }
+
+  isAnalysisLoading(cardId: string): boolean {
+    return this.loadingAnalysis.has(cardId);
+  }
+
+  hasAnalysisResult(cardId: string): boolean {
+    return this.aiAnalysisResults.has(cardId);
   }
 }

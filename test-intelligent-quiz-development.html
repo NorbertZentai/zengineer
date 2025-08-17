@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Fejlett Quiz Leírás Generátor - Zengineer</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .scenario {
+            background: #f8fafc;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .scenario h3 {
+            color: #1f2937;
+            margin: 0 0 12px 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .input-data {
+            background: #fff;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 10px 0;
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .output-suggestion {
+            background: #ecfdf5;
+            border: 2px solid #10b981;
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #065f46;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+
+        .feature-highlight {
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+
+        .feature-highlight ul {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+
+        .feature-highlight li {
+            margin: 6px 0;
+            font-size: 14px;
+        }
+
+        .progress-flow {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .progress-step {
+            text-align: center;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 2px solid #e5e7eb;
+        }
+
+        .progress-step.active {
+            background: #ecfdf5;
+            border-color: #10b981;
+        }
+
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px auto;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .progress-flow {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Intelligens Quiz Leírás Fejlesztő</h1>
+        
+        <div class="feature-highlight">
+            <h3>🚀 Új Algoritmus Jellemzői</h3>
+            <ul>
+                <li><strong>Nincs felesleges "AI instrukció"</strong> - A magyarázatok checkbox-szal kezelhetők</li>
+                <li><strong>Meglévő leírás továbbfejlesztése</strong> - Ha van, azt javítjuk; ha nincs, alapokkal indulunk</li>
+                <li><strong>Progresszív nehézség</strong> - Automatikus szintfelismerés a quiz jellemzői alapján</li>
+                <li><strong>Gyakorlatias fókusz</strong> - Konkrét témakörök és alkalmazások</li>
+                <li><strong>Adaptív hosszúság</strong> - Rövid leírásokat kiegészít, hosszakat optimalizál</li>
+            </ul>
+        </div>
+
+        <div class="progress-flow">
+            <div class="progress-step active">
+                <div class="step-number">1</div>
+                <h4>Alapszint</h4>
+                <p>Nincs leírás vagy kevés tartalom</p>
+            </div>
+            <div class="progress-step">
+                <div class="step-number">2</div>
+                <h4>Fejlesztés</h4>
+                <p>Meglévő leírás kiegészítése</p>
+            </div>
+            <div class="progress-step">
+                <div class="step-number">3</div>
+                <h4>Haladó</h4>
+                <p>Komplex témák és összefüggések</p>
+            </div>
+        </div>
+
+        <div class="scenario">
+            <h3>📚 1. Forgatókönyv: Új Quiz (Nincs Leírás)</h3>
+            <div class="input-data">
+                <strong>Input:</strong><br>
+                Név: "Angular Alapok"<br>
+                Leírás: "" (üres)<br>
+                Címkék: ["TypeScript", "Components"]<br>
+                Nehézség: 2
+            </div>
+            <div class="output-suggestion">
+                <strong>Generált javaslat:</strong><br>
+                "Téma: Angular Alapok. TypeScript alapjai és kulcsfogalmai. Kezdő szintű kérdések az alapvető megértéshez. Tantárgy: Webfejlesztés. Témakörök: TypeScript, Components. Szint: alapszintű - alapfogalmak és egyszerű összefüggések"
+            </div>
+        </div>
+
+        <div class="scenario">
+            <h3>🔧 2. Forgatókönyv: Meglévő Rövid Leírás</h3>
+            <div class="input-data">
+                <strong>Input:</strong><br>
+                Név: "Történelem Quiz"<br>
+                Leírás: "Második világháború"<br>
+                Címkék: ["történelem", "háború"]<br>
+                Nehézség: 3
+            </div>
+            <div class="output-suggestion">
+                <strong>Fejlesztett javaslat:</strong><br>
+                "Téma: Történelem Quiz. Második világháború. Készíts részletes kérdéseket a témakörök mélyebb megértéséhez. Tantárgy: Történelem. Témakörök: történelem, háború. Szint: középszintű - gyakorlati alkalmazás és összefüggések"
+            </div>
+        </div>
+
+        <div class="scenario">
+            <h3>🎓 3. Forgatókönyv: Haladó Quiz (Részletes Leírás)</h3>
+            <div class="input-data">
+                <strong>Input:</strong><br>
+                Név: "Speciális Matematika"<br>
+                Leírás: "Lineáris algebra és differenciálgeometria speciális alkalmazásai a modern fizikában és mérnöki számításokban, beleértve a tensor analízist és a komplex függvénytan alkalmazását..."<br>
+                Címkék: ["matematika", "haladó", "lineáris algebra"]<br>
+                Nehézség: 5
+            </div>
+            <div class="output-suggestion">
+                <strong>Optimalizált javaslat:</strong><br>
+                "Téma: Speciális Matematika. Lineáris algebra és differenciálgeometria speciális alkalmazásai a modern fizikában és mérnöki számításokban, beleértve a tensor analízist. Fókuszálj a gyakorlati alkalmazásra és összefüggésekre. Tantárgy: Matematika. Témakörök: matematika, haladó, lineáris algebra. Szint: haladó - komplex összefüggések és mélyebb elemzés"
+            </div>
+        </div>
+
+        <div class="scenario">
+            <h3>🔄 4. Forgatókönyv: Automatikus Szintfelismerés</h3>
+            <div class="input-data">
+                <strong>Input:</strong><br>
+                Név: "Expert Python Patterns"<br>
+                Leírás: "Haladó programozási minták és speciális algoritmusok"<br>
+                Címkék: ["python", "expert", "algoritmusok"]<br>
+                Nehézség: 4
+            </div>
+            <div class="output-suggestion">
+                <strong>Szint-specifikus javaslat:</strong><br>
+                "Téma: Expert Python Patterns. Haladó programozási minták és speciális algoritmusok. Készíts részletes kérdéseket a témakörök mélyebb megértéséhez. Tantárgy: Programozás. Témakörök: python, expert, algoritmusok. Szint: haladó - komplex összefüggések és mélyebb elemzés"
+            </div>
+        </div>
+
+        <div class="feature-highlight">
+            <h3>⚡ Algoritmus Előnyei</h3>
+            <ul>
+                <li><strong>Progresszív fejlesztés:</strong> A rendszer "tanulja" a quiz fejlődését</li>
+                <li><strong>Kontextus-érzékeny:</strong> A leírást a meglévő tartalom alapján optimalizálja</li>
+                <li><strong>Szint-adaptív:</strong> Automatikusan felismeri és beállítja a megfelelő szintet</li>
+                <li><strong>Praktikus output:</strong> Nincs felesleges "AI" kifejezés vagy redundáns instrukció</li>
+                <li><strong>Magyar oktatásra optimalizált:</strong> Hazai tantervekhez és módszerekhez igazított</li>
+            </ul>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <p style="color: #667eea; font-weight: 600;">
+                🎯 Az algoritmus most intelligensen fejleszti a quiz leírásokat<br>
+                a meglévő tartalom és szint alapján!
+            </p>
+        </div>
+    </div>
+</body>
+</html>

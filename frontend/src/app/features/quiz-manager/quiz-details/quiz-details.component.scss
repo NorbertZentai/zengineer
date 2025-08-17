@@ -312,7 +312,72 @@
           }
         }
       }
+
+      // AI Analysis Result Panel
+      .ai-analysis-result {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: var(--bg-secondary);
+        border-radius: 8px;
+        border-left: 4px solid var(--primary);
+
+        .analysis-header {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin-bottom: 1rem;
+          font-weight: 600;
+          color: var(--text-primary);
+
+          mat-icon {
+            color: var(--primary);
+          }
+        }
+
+        .analysis-content {
+          .analysis-score {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 1rem;
+          }
+
+          .analysis-suggestions,
+          .analysis-improvements {
+            margin-bottom: 1rem;
+
+            h4 {
+              font-size: 0.9rem;
+              color: var(--text-secondary);
+              margin-bottom: 0.5rem;
+              font-weight: 600;
+            }
+
+            ul {
+              margin: 0;
+              padding-left: 1.5rem;
+              
+              li {
+                margin-bottom: 0.25rem;
+                color: var(--text-primary);
+                font-size: 0.9rem;
+                line-height: 1.4;
+              }
+            }
+          }
+        }
+      }
     }
+  }
+}
+
+// Spin animation for loading
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 
@@ -1435,6 +1500,28 @@
           &.delete:hover {
             background: rgba(239, 68, 68, 0.9);
             color: white;
+          }
+
+          &.ai-analysis {
+            &:hover {
+              background: rgba(168, 85, 247, 0.9);
+              color: white;
+            }
+
+            &.has-result {
+              background: rgba(34, 197, 94, 0.2);
+              border-color: rgba(34, 197, 94, 0.4);
+              color: rgba(34, 197, 94, 1);
+            }
+
+            &:disabled {
+              opacity: 0.6;
+              cursor: not-allowed;
+              
+              mat-icon {
+                animation: spin 1s linear infinite;
+              }
+            }
           }
 
           mat-icon {
