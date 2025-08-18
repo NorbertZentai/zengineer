@@ -45,9 +45,6 @@ export class QuizListComponent implements OnInit {
   error: string | null = null;
   activeMenuId: string | null = null;
 
-  logQuiz(quiz: Quiz) {
-    console.log('[QUIZ LIST HTML] Rendered copied quiz:', quiz);
-  }
   @Output() edit = new EventEmitter<any>();
   @Output() delete = new EventEmitter<any>();
   @Output() stats = new EventEmitter<any>();
@@ -112,8 +109,8 @@ export class QuizListComponent implements OnInit {
     if (this.activeMenuId === quiz.id) {
       return;
     }
-    if (quiz.name?.includes('(Copy)')) {
-      console.log('[QUIZ LIST] Navigating to copied quiz:', quiz);
+    if (!quiz.id) {
+      return;
     }
     this.router.navigate(['/quiz-manager', quiz.id]);
   }

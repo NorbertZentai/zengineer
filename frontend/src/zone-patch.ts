@@ -1,5 +1,5 @@
 // Zone.js patch to suppress NavigatorLockAcquireTimeoutError
-console.log('Zone patch loaded'); // Debug log
+import 'zone.js';  // Included with Angular CLI.
 
 // Clear any problematic localStorage entries for Supabase auth
 try {
@@ -8,9 +8,7 @@ try {
     if (key.includes('supabase') || key.includes('sb-')) {
       // Don't clear, but check for corrupted entries
       const value = localStorage.getItem(key);
-      if (value && value.includes('lock')) {
-        console.log('Potentially problematic localStorage entry:', key);
-      }
+      // Silently check for issues without logging
     }
   });
 } catch (e) {

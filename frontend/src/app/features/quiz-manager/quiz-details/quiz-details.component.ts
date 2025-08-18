@@ -104,10 +104,7 @@ export class QuizDetailsComponent implements OnInit {
           if (cardCount > suitableCards.length) cardCount = suitableCards.length;
         }
         let easyCards = suitableCards.slice(0, cardCount);
-    // DEBUG: Log selected card IDs
-    console.log('Easy test: selected card IDs:', easyCards.map(card => card.id));
-    // DEBUG: Log selected card IDs
-    console.log('Easy test: selected card IDs:', easyCards.map(card => card.id));
+        
     const config: TestConfiguration = {
       testTypes: [
   { id: 'multiple_choice', enabled: true, name: this.t('TEST.TYPES.MULTIPLE_CHOICE'), description: this.t('TEST.TYPES.MULTIPLE_CHOICE_DESC') },
@@ -801,12 +798,7 @@ export class QuizDetailsComponent implements OnInit {
       await this.authService.waitForInit();
       this.quiz = await this.quizService.getQuizById(quizId);
       const rawCards = await this.quizService.getQuizCards(quizId);
-      // Csak másolt kvíznél írunk ki debug logokat
-      const isCopy = this.quiz?.name?.includes('(Copy)');
-      if (isCopy) {
-        console.log('[QUIZ DETAILS] quiz:', this.quiz);
-        console.log('[QUIZ DETAILS] rawCards:', rawCards);
-      }
+      
       this.cards = rawCards.map((card, idx) => {
         let parsedAnswer: any = null;
         let cardType = 'flashcard';
@@ -831,9 +823,7 @@ export class QuizDetailsComponent implements OnInit {
       if (firstParseErrorCard) {
         this.error = (firstParseErrorCard as CardWithParsed).parseError ?? null;
       }
-      if (isCopy) {
-        console.log('[QUIZ DETAILS] mapped cards:', this.cards);
-      }
+      
       this.cardPerformance = await this.testService.getCardPerformance(quizId);
       if (this.quiz) {
         this.editForm = {
@@ -1057,8 +1047,11 @@ export class QuizDetailsComponent implements OnInit {
         difficulty: config.difficulty,
         correctAnswers: config.correctAnswers,
         wrongAnswers: config.wrongAnswers,
-        questionType: config.questionType,
-        includeExplanations: config.includeExplanations
+        questionTypes: config.questionTypes, // Módosítva: questionTypes tömb
+        includeExplanations: config.includeExplanations,
+        // Ha van bővített konfiguráció, azt is átadjuk
+        ...(config as any).typeExamples && { typeExamples: (config as any).typeExamples },
+        ...(config as any).detailedInstructions && { detailedInstructions: (config as any).detailedInstructions }
       };
       
       const cards = await this.ai.generateQuizCards(aiRequest);

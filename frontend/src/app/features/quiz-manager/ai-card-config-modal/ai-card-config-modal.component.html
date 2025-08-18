@@ -1,6 +1,5 @@
 <div class="modal-overlay" (click)="onClose()">
   <div class="modal-container" (click)="$event.stopPropagation()" [class.dark-theme]="isDarkTheme">
-    <!-- Header -->
     <div class="modal-header">
       <div class="header-content">
         <div class="quiz-info">
@@ -142,28 +141,89 @@
         </div>
       </div>
 
-      <!-- Question Type Section -->
-      <div class="config-section">
+  <!-- Question Type Section -->
+  <div class="config-section question-types-section" [class.open]="isRecommendedDropdownOpen || isAdditionalDropdownOpen">
         <h3>
           <mat-icon>psychology</mat-icon>
-          {{ 'AI.CUSTOM_GENERATION.QUESTION_TYPE' | translate }}
+          {{ 'AI.CUSTOM_GENERATION.QUESTION_TYPES' | translate }}
         </h3>
-        <p class="section-description">{{ 'AI.CUSTOM_GENERATION.QUESTION_TYPE_DESC' | translate }}</p>
+        <p class="section-description">{{ 'AI.CUSTOM_GENERATION.QUESTION_TYPES_DESC' | translate }}</p>
         
-        <div class="question-type-grid">
-          <div 
-            *ngFor="let option of questionTypeOptions" 
-            class="question-type-card"
-            [class.selected]="configuration.questionType === option.value"
-            (click)="configuration.questionType = option.value">
-            <mat-icon>{{ option.icon }}</mat-icon>
-            <span>{{ option.labelKey | translate }}</span>
+        <!-- Kérdéstípus kiválasztó - EGYEDI DROPDOWN VERZIÓ -->
+        
+        <div class="question-types-container" (click)="$event.stopPropagation()">
+          
+          <!-- AJÁNLOTT TÍPUSOK EGYEDI DROPDOWN -->
+          <div class="dropdown-wrapper" [class.open]="isRecommendedDropdownOpen">
+            <div class="dropdown-trigger" 
+                 (click)="toggleRecommendedDropdown()" 
+                 [class.active]="isRecommendedDropdownOpen">
+              <div class="trigger-content">
+                <div class="trigger-icon">⭐</div>
+                <div class="trigger-text">
+                  <span class="trigger-title">{{ 'AI.CUSTOM_GENERATION.QUESTION_TYPES_RECOMMENDED' | translate }}</span>
+                  <span class="trigger-count">{{ getSelectedCount(recommendedAndBasicTypesList) }}/{{ recommendedAndBasicTypesList.length }} {{ 'AI.CUSTOM_GENERATION.SELECTED_COUNT' | translate }}</span>
+                </div>
+              </div>
+              <mat-icon class="trigger-arrow" [class.rotated]="isRecommendedDropdownOpen">
+                expand_more
+              </mat-icon>
+            </div>
+            
+            <div class="dropdown-options">
+              <div *ngFor="let type of recommendedAndBasicTypesList; let i = index"
+                   class="dropdown-option"
+                   (click)="toggleQuestionType(type.value); $event.stopPropagation()"
+                   [class.selected]="isQuestionTypeSelected(type.value)">
+                <div class="option-checkbox">
+                  <mat-icon>{{ isQuestionTypeSelected(type.value) ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+                </div>
+                <div class="option-content">
+                  <span class="option-title">{{ type.labelKey | translate }}</span>
+                  <small class="option-category">{{ 'AI.CUSTOM_GENERATION.CATEGORIES.' + type.category | translate }}</small>
+                </div>
+              </div>
+            </div>
           </div>
+
+          <!-- TOVÁBBI TÍPUSOK EGYEDI DROPDOWN -->
+          <div class="dropdown-wrapper" [class.open]="isAdditionalDropdownOpen">
+            <div class="dropdown-trigger" 
+                 (click)="toggleAdditionalDropdown()" 
+                 [class.active]="isAdditionalDropdownOpen">
+              <div class="trigger-content">
+                <div class="trigger-icon">🔧</div>
+                <div class="trigger-text">
+                  <span class="trigger-title">{{ 'AI.CUSTOM_GENERATION.QUESTION_TYPES_ADDITIONAL' | translate }}</span>
+                  <span class="trigger-count">{{ getSelectedCount(additionalTypesList) }}/{{ additionalTypesList.length }} {{ 'AI.CUSTOM_GENERATION.SELECTED_COUNT' | translate }}</span>
+                </div>
+              </div>
+              <mat-icon class="trigger-arrow" [class.rotated]="isAdditionalDropdownOpen">
+                expand_more
+              </mat-icon>
+            </div>
+            
+            <div class="dropdown-options">
+              <div *ngFor="let type of additionalTypesList; let i = index"
+                   class="dropdown-option"
+                   (click)="toggleQuestionType(type.value); $event.stopPropagation()"
+                   [class.selected]="isQuestionTypeSelected(type.value)">
+                <div class="option-checkbox">
+                  <mat-icon>{{ isQuestionTypeSelected(type.value) ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+                </div>
+                <div class="option-content">
+                  <span class="option-title">{{ type.labelKey | translate }}</span>
+                  <small class="option-category">{{ 'AI.CUSTOM_GENERATION.CATEGORIES.' + type.category | translate }}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+          
         </div>
       </div>
 
-      <!-- Language & Advanced Options -->
-      <div class="config-section">
+  <!-- Language & Advanced Options -->
+  <div class="config-section advanced-options-section">
         <h3>
           <mat-icon>settings</mat-icon>
           {{ 'AI.CUSTOM_GENERATION.ADVANCED_OPTIONS' | translate }}

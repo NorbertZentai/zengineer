@@ -465,11 +465,7 @@ export class TestExecutionComponent implements OnInit, OnDestroy {
       // ...existing code...
       const result = await this.testService.completeTest();
       result.quiz_name = quizName;
-      // Log only the final result JSON to the console
-  console.log('Final result JSON:', JSON.stringify(result, null, 2));
-      // Debug: Print session.questions and testResult.answers for ID comparison
-      console.log('session.questions:', this.session?.questions);
-      console.log('testResult.answers:', result.answers);
+      
       // ...existing code...
       this.testResult = result;
       this.showResult = true;

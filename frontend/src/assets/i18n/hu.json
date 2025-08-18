@@ -517,8 +517,18 @@
       "CORRECT_ANSWERS": "Helyes válaszok",
       "WRONG_ANSWERS": "Helytelen válaszok",
       "TOTAL_ANSWERS": "Összes válasz",
-      "QUESTION_TYPE": "Kérdés típusa",
-      "QUESTION_TYPE_DESC": "Válaszd ki, milyen típusú kérdéseket szeretnél",
+      "QUESTION_TYPES": "Kérdés típusok",
+      "QUESTION_TYPES_DESC": "Válaszd ki, milyen típusú kérdéseket szeretnél (több típus is kiválasztható)",
+      "QUESTION_TYPES_RECOMMENDED": "Ajánlott típusok",
+      "QUESTION_TYPES_ADDITIONAL": "További típusok",
+      "SELECTED_COUNT": "kiválasztva",
+      "CATEGORIES": {
+        "basic": "Alapvető",
+        "interactive": "Interaktív",
+        "textual": "Szöveges",
+        "mathematical": "Matematikai",
+        "coding": "Programozási"
+      },
       "ADVANCED_OPTIONS": "Haladó beállítások",
       "LANGUAGE": "Nyelv",
       "INCLUDE_EXPLANATIONS": "Magyarázatok hozzáadása",
@@ -528,9 +538,25 @@
       "GENERATE_CARDS": "Kártyák generálása"
     },
     "QUESTION_TYPES": {
-      "MULTIPLE_CHOICE": "Feleletválasztós",
-      "TRUE_FALSE": "Igaz/Hamis",
-      "FILL_IN_BLANK": "Hiányos mondat"
+      "MULTIPLE_CHOICE": "Többválasztós",
+      "SINGLE_CHOICE": "Egyválasztós",
+      "FILL_IN_BLANK": "Hiányos mondat",
+      "SHORT_ANSWER": "Rövid válasz",
+      "DEFINITION": "Definíció",
+      "EXPLANATION": "Magyarázat",
+      "ESSAY": "Esszé kérdés",
+      "CALCULATION": "Számítás",
+      "PROBLEM_SOLVING": "Problémamegoldás",
+      "STEP_BY_STEP": "Lépésenkénti megoldás",
+      "FORMULA_DERIVATION": "Képlet levezetés",
+      "CODE_COMPLETION": "Kód kiegészítés",
+      "DEBUG_CODE": "Hibakeresés",
+      "ALGORITHM_DESIGN": "Algoritmus tervezés",
+      "CODE_OUTPUT": "Kód kimenet",
+      "SEQUENCE_ORDER": "Sorba rendezés",
+      "MATCHING_PAIRS": "Párosítás",
+      "CATEGORIZATION": "Kategorizálás",
+      "DIAGRAM_ANALYSIS": "Diagram elemzés"
     }
   },
   "DASHBOARD": {
