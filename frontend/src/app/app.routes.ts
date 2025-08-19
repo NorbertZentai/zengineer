@@ -33,5 +33,10 @@ export const routes: Routes = [
     loadChildren: () => import('./features/quiz-manager/quiz-manager.module').then(m => m.QuizManagerModule),
     canActivate: [authGuard],
   },
+    {
+      path: 'article-manager',
+      loadChildren: () => import('./features/article-manager/article-manager.module').then(m => m.ArticleManagerModule),
+      canActivate: [authGuard],
+    },
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
 ];

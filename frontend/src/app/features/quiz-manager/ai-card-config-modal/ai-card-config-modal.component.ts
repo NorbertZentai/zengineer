@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, HostListener, OnDestroy, ViewEncapsulation, AfterViewInit, ElementRef, Renderer2 } from '@angular/core';
+import { Component, EventEmitter, Input, Output, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -65,7 +65,6 @@ export interface TopicCategory {
   imports: [CommonModule, FormsModule, MatIconModule, TranslateModule],
   templateUrl: './ai-card-config-modal.component.html',
   styleUrls: ['./ai-card-config-modal.component.scss'],
-  encapsulation: ViewEncapsulation.None,
   animations: [
     trigger('slideToggle', [
       transition(':enter', [
@@ -78,7 +77,7 @@ export interface TopicCategory {
     ])
   ]
 })
-export class AiCardConfigModalComponent implements OnDestroy, AfterViewInit {
+export class AiCardConfigModalComponent implements OnDestroy {
   @Input() quizId: string = '';
   @Input() quizName: string = '';
   @Input() set quizData(data: Quiz | null) {
@@ -107,15 +106,6 @@ export class AiCardConfigModalComponent implements OnDestroy, AfterViewInit {
   };
 
   isGeneratingTopicSuggestion = false;
-
-  // Custom language dropdown state
-  isLanguageDropdownOpen = false;
-  
-  // Language options with Hungarian labels
-  languageOptions = [
-    { value: 'hu', label: 'Magyar' },
-    { value: 'en', label: 'English' }
-  ];
 
   // Bővített kérdéstípus katalógus
   allQuestionTypes: QuestionTypeConfig[] = [
@@ -485,6 +475,11 @@ export class AiCardConfigModalComponent implements OnDestroy, AfterViewInit {
     { value: 'hard' as const, labelKey: 'DIFFICULTY_LEVEL.HARD', icon: 'sentiment_very_dissatisfied' }
   ];
 
+  languageOptions = [
+    { value: 'hu', label: 'Magyar' },
+    { value: 'en', label: 'English' }
+  ];
+
   // Aktuális kérdéstípus csoportok
   questionTypeGroups: QuestionTypeGroup[] = [];
   
@@ -497,12 +492,7 @@ export class AiCardConfigModalComponent implements OnDestroy, AfterViewInit {
   isRecommendedDropdownOpen = false;
   isAdditionalDropdownOpen = false;
 
-  constructor(
-    private translate: TranslateService, 
-    private themeService: ThemeService,
-    private elementRef: ElementRef,
-    private renderer: Renderer2
-  ) {
+  constructor(private translate: TranslateService, private themeService: ThemeService) {
     // Biztosítjuk, hogy a configuration.questionTypes inicializálva legyen
     if (!this.configuration.questionTypes) {
       this.configuration.questionTypes = [];
@@ -715,10 +705,6 @@ export class AiCardConfigModalComponent implements OnDestroy, AfterViewInit {
     const target = event.target as HTMLElement;
     if (!target.closest('.custom-dropdown-question-types')) {
       this.closeDropdowns();
-    }
-    // Language dropdown bezárása is
-    if (!target.closest('.custom-language-dropdown')) {
-      this.isLanguageDropdownOpen = false;
     }
   }
 
@@ -1161,61 +1147,6 @@ export class AiCardConfigModalComponent implements OnDestroy, AfterViewInit {
   getDifficultyLabel(): string {
     const option = this.difficultyOptions.find(d => d.value === this.configuration.difficulty);
     return option ? this.translate.instant(option.labelKey) : '';
-  }
-
-  ngAfterViewInit(): void {
-    // Futásidőben beállítjuk a select elem appearance tulajdonságait
-    setTimeout(() => {
-      const selectElement = this.elementRef.nativeElement.querySelector('#language');
-      if (selectElement) {
-        // CSS tulajdonságok beállítása
-        this.renderer.setStyle(selectElement, '-webkit-appearance', 'none');
-        this.renderer.setStyle(selectElement, '-moz-appearance', 'none');
-        this.renderer.setStyle(selectElement, 'appearance', 'none');
-        
-        // További webkit specifikus tulajdonságok
-        this.renderer.setStyle(selectElement, '-webkit-border-radius', '16px');
-        this.renderer.setStyle(selectElement, '-webkit-box-shadow', 'none');
-        this.renderer.setStyle(selectElement, '-webkit-user-select', 'none');
-        
-        // Inline stílusok még agresszívebb beállítása
-        selectElement.style.webkitAppearance = 'none';
-        selectElement.style.mozAppearance = 'none';
-        selectElement.style.appearance = 'none';
-        
-        // További styling force
-        selectElement.style.backgroundImage = "url('data:image/svg+xml;utf8,<svg fill=\"%23667eea\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M7 10l5 5 5-5z\"/></svg>')";
-        selectElement.style.backgroundRepeat = 'no-repeat';
-        selectElement.style.backgroundPosition = 'right 18px center';
-        selectElement.style.backgroundSize = '20px';
-        selectElement.style.paddingRight = '50px';
-        
-        // CSS attribútum direkt beállítása
-        selectElement.setAttribute('style', selectElement.getAttribute('style') + '; -webkit-appearance: none !important; -moz-appearance: none !important; appearance: none !important;');
-        
-        console.log('Select element appearance reset applied:', {
-          webkitAppearance: selectElement.style.webkitAppearance,
-          mozAppearance: selectElement.style.mozAppearance,
-          appearance: selectElement.style.appearance,
-          computedStyle: window.getComputedStyle(selectElement).appearance
-        });
-      }
-    }, 100);
-  }
-
-  // Custom dropdown methods
-  toggleLanguageDropdown(): void {
-    this.isLanguageDropdownOpen = !this.isLanguageDropdownOpen;
-  }
-
-  selectLanguage(value: string): void {
-    this.configuration.language = value;
-    this.isLanguageDropdownOpen = false;
-  }
-
-  getSelectedLanguageLabel(): string {
-    const selectedOption = this.languageOptions.find(option => option.value === this.configuration.language);
-    return selectedOption ? selectedOption.label : 'Magyar';
   }
 
   ngOnDestroy(): void {
