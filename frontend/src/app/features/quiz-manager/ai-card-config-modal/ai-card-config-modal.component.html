@@ -233,16 +233,25 @@
           <!-- Language Selection -->
           <div class="setting-group">
             <label for="language">{{ 'AI.CUSTOM_GENERATION.LANGUAGE' | translate }}</label>
-            <select 
-              id="language"
-              [(ngModel)]="configuration.language"
-              class="dropdown-select">
-              <option 
-                *ngFor="let option of languageOptions" 
-                [value]="option.value">
-                {{ option.label }}
-              </option>
-            </select>
+            
+            <!-- Custom Language Dropdown -->
+            <div class="custom-language-dropdown" [class.open]="isLanguageDropdownOpen">
+              <div class="dropdown-trigger" (click)="toggleLanguageDropdown()">
+                <span class="selected-value">{{ getSelectedLanguageLabel() }}</span>
+                <mat-icon class="dropdown-arrow" [class.rotated]="isLanguageDropdownOpen">keyboard_arrow_down</mat-icon>
+              </div>
+              
+              <div class="dropdown-options" *ngIf="isLanguageDropdownOpen">
+                <div 
+                  class="dropdown-option" 
+                  *ngFor="let option of languageOptions"
+                  [class.selected]="configuration.language === option.value"
+                  (click)="selectLanguage(option.value)">
+                  <span>{{ option.label }}</span>
+                  <mat-icon *ngIf="configuration.language === option.value">check</mat-icon>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Include Explanations -->
