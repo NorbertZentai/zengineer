@@ -676,11 +676,8 @@
     "SORT_BY_TAGS": "Sort by Tags",
     "TAGS_COUNT": "tags",
     "FORM": {
-      "TITLE": "Title",
       "TITLE_PLACEHOLDER": "Article title...",
-      "TAGS": "Tags",
-      "TAGS_PLACEHOLDER": "comma,separated,tags",
-      "CONTENT": "Content",
+      "TAGS_PLACEHOLDER": "comma, separated, tags",
       "CONTENT_PLACEHOLDER": "Write your article content here...",
       "PUBLISHED": "Published",
       "SAVING": "Saving..."

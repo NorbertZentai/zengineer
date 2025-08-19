@@ -676,11 +676,8 @@
     "SORT_BY_TAGS": "Címkék szerint rendezés",
     "TAGS_COUNT": "címke",
     "FORM": {
-      "TITLE": "Cím",
       "TITLE_PLACEHOLDER": "Cikk címe...",
-      "TAGS": "Címkék",
-      "TAGS_PLACEHOLDER": "vessző,elválasztott,címkék",
-      "CONTENT": "Tartalom",
+      "TAGS_PLACEHOLDER": "vessző, elválasztott, címkék",
       "CONTENT_PLACEHOLDER": "Írd ide a cikk tartalmát...",
       "PUBLISHED": "Publikált",
       "SAVING": "Mentés..."

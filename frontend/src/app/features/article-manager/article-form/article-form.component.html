@@ -1,50 +1,415 @@
-<form (ngSubmit)="submit()" class="article-form" #f="ngForm">
-	<div class="field">
-		<label>{{ 'ARTICLE_MANAGER.FORM.TITLE' | translate }}</label>
-		<input
-			type="text"
-			name="title"
-			required
-			[(ngModel)]="model.title"
-			placeholder="{{ 'ARTICLE_MANAGER.FORM.TITLE_PLACEHOLDER' | translate }}"
-		/>
+<div class="article-form-page">
+	<!-- Page Header with Back Button and Editable Title -->
+	<div class="page-header">
+		<div class="header-content">
+			<button class="back-btn" (click)="goBack()">
+				<mat-icon>arrow_back</mat-icon>
+			</button>
+			
+			<div class="title-display" 
+				*ngIf="!isEditingTitle" 
+				(click)="startTitleEdit()"
+				[class.has-title]="model.title && model.title.trim()">
+				{{ model.title && model.title.trim() ? model.title : 'Új cím' }}
+			</div>
+			
+			<input 
+				#titleEditInput
+				*ngIf="isEditingTitle"
+				class="title-edit-input"
+				[(ngModel)]="model.title"
+				(blur)="finishTitleEdit()"
+				(keydown.enter)="finishTitleEdit()"
+				(keydown.escape)="cancelTitleEdit()"
+				placeholder="Cikk címe"
+			/>
+		</div>
 	</div>
 
-	<div class="field">
-		<label>{{ 'ARTICLE_MANAGER.FORM.TAGS' | translate }}</label>
-		<input
-			type="text"
-			name="tags"
-			[(ngModel)]="model.tagsString"
-			(ngModelChange)="setTags($event)"
-			placeholder="{{ 'ARTICLE_MANAGER.FORM.TAGS_PLACEHOLDER' | translate }}"
-		/>
-	</div>
+	<!-- Editor Container with Sidebar -->
+	<div class="editor-container">
+		<!-- Main Editor Area -->
+		<div class="article-editor">
+			<form (ngSubmit)="submit()" class="editor-form" #f="ngForm" id="articleForm">
+				<!-- Enhanced Toolbar - Compact Rich Text Editor -->
+				<div class="editor-toolbar">
+					<!-- Basic Text Formatting -->
+					<div class="toolbar-group">
+						<button type="button" class="toolbar-btn" 
+							[class.active]="isFormatActive('bold')"
+							(click)="toggleFormat('bold')" 
+							title="Félkövér (Ctrl+B)">
+							<mat-icon>format_bold</mat-icon>
+						</button>
+						<button type="button" class="toolbar-btn" 
+							[class.active]="isFormatActive('italic')"
+							(click)="toggleFormat('italic')" 
+							title="Dőlt (Ctrl+I)">
+							<mat-icon>format_italic</mat-icon>
+						</button>
+						<button type="button" class="toolbar-btn" 
+							[class.active]="isFormatActive('underline')"
+							(click)="toggleFormat('underline')" 
+							title="Aláhúzott (Ctrl+U)">
+							<mat-icon>format_underlined</mat-icon>
+						</button>
+					</div>
+					
+					<div class="toolbar-separator"></div>
+					
+					<!-- Headings -->
+					<div class="toolbar-group">
+						<select class="heading-select" (change)="setHeading($event)" [value]="currentHeading">
+							<option value="">Normál</option>
+							<option value="h1">H1</option>
+							<option value="h2">H2</option>
+							<option value="h3">H3</option>
+							<option value="h4">H4</option>
+						</select>
+					</div>
+					
+					<div class="toolbar-separator"></div>
+					
+					<!-- Lists -->
+					<div class="toolbar-group">
+						<button type="button" class="toolbar-btn" 
+							[class.active]="isFormatActive('insertUnorderedList')"
+							(click)="toggleList('insertUnorderedList')" 
+							title="Lista">
+							<mat-icon>format_list_bulleted</mat-icon>
+						</button>
+						<button type="button" class="toolbar-btn" 
+							[class.active]="isFormatActive('insertOrderedList')"
+							(click)="toggleList('insertOrderedList')" 
+							title="Számozott lista">
+							<mat-icon>format_list_numbered</mat-icon>
+						</button>
+					</div>
+					
+					<div class="toolbar-separator"></div>
+					
+					<!-- Alignment -->
+					<div class="toolbar-group">
+						<button type="button" class="toolbar-btn" 
+							[class.active]="currentAlignment === 'left'"
+							(click)="setAlignment('left')" 
+							title="Balra">
+							<mat-icon>format_align_left</mat-icon>
+						</button>
+						<button type="button" class="toolbar-btn" 
+							[class.active]="currentAlignment === 'center'"
+							(click)="setAlignment('center')" 
+							title="Középre">
+							<mat-icon>format_align_center</mat-icon>
+						</button>
+						<button type="button" class="toolbar-btn" 
+							[class.active]="currentAlignment === 'right'"
+							(click)="setAlignment('right')" 
+							title="Jobbra">
+							<mat-icon>format_align_right</mat-icon>
+						</button>
+					</div>
+					
+					<div class="toolbar-separator"></div>
+					
+					<!-- Quick Media -->
+					<div class="toolbar-group">
+						<button type="button" class="toolbar-btn" 
+							(click)="insertLink()" 
+							title="Link">
+							<mat-icon>link</mat-icon>
+						</button>
+						<button type="button" class="toolbar-btn" 
+							(click)="insertImage()" 
+							title="Kép">
+							<mat-icon>image</mat-icon>
+						</button>
+					</div>
+					
+					<div class="toolbar-separator"></div>
+					
+					<!-- More Options Dropdown -->
+					<div class="toolbar-group">
+						<div class="more-options-dropdown" [class.open]="showMoreOptions">
+							<button type="button" class="toolbar-btn more-btn" 
+								(click)="toggleMoreOptions()" 
+								title="További opciók">
+								<mat-icon>expand_more</mat-icon>
+							</button>
+							
+							<div class="more-options-panel" *ngIf="showMoreOptions" (clickOutside)="closeMoreOptions()">
+								<!-- Advanced Formatting -->
+								<div class="option-group">
+									<div class="option-group-title">Formázás</div>
+									<button type="button" class="option-btn" 
+										[class.active]="isFormatActive('strikethrough')"
+										(click)="toggleFormat('strikethrough')" 
+										title="Áthúzott">
+										<mat-icon>strikethrough_s</mat-icon>
+										<span>Áthúzott</span>
+									</button>
+									<button type="button" class="option-btn" 
+										(click)="clearFormatting()" 
+										title="Formázás törlése">
+										<mat-icon>format_clear</mat-icon>
+										<span>Formázás törlése</span>
+									</button>
+								</div>
+								
+								<!-- Colors -->
+								<div class="option-group">
+									<div class="option-group-title">Színek</div>
+									<div class="color-options">
+										<div class="color-dropdown">
+											<button type="button" class="option-btn color-btn" 
+												(click)="toggleColorDropdown()" 
+												title="Szöveg szín">
+												<mat-icon>format_color_text</mat-icon>
+												<span>Szöveg szín</span>
+												<div class="color-indicator" [style.background-color]="currentTextColor"></div>
+											</button>
+											<div class="color-palette" *ngIf="showColorDropdown" (clickOutside)="closeColorDropdown()">
+												<div class="color-row">
+													<div class="color-option" 
+														*ngFor="let color of textColors" 
+														[style.background-color]="color"
+														(click)="setTextColor(color)"
+														[class.selected]="currentTextColor === color">
+													</div>
+												</div>
+											</div>
+										</div>
+										
+										<div class="color-dropdown">
+											<button type="button" class="option-btn color-btn" 
+												(click)="toggleHighlightDropdown()" 
+												title="Kiemelés">
+												<mat-icon>format_color_fill</mat-icon>
+												<span>Kiemelés</span>
+												<div class="color-indicator" [style.background-color]="currentHighlightColor"></div>
+											</button>
+											<div class="color-palette" *ngIf="showHighlightDropdown" (clickOutside)="closeHighlightDropdown()">
+												<div class="color-row">
+													<div class="color-option" 
+														*ngFor="let color of highlightColors" 
+														[style.background-color]="color"
+														(click)="setHighlightColor(color)"
+														[class.selected]="currentHighlightColor === color">
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								
+								<!-- Advanced Elements -->
+								<div class="option-group">
+									<div class="option-group-title">Elemek</div>
+									<button type="button" class="option-btn" 
+										(click)="insertTable()" 
+										title="Táblázat">
+										<mat-icon>table_chart</mat-icon>
+										<span>Táblázat</span>
+									</button>
+									<button type="button" class="option-btn" 
+										(click)="insertCodeBlock()" 
+										title="Kód blokk">
+										<mat-icon>code</mat-icon>
+										<span>Kód blokk</span>
+									</button>
+									<button type="button" class="option-btn" 
+										(click)="insertQuote()" 
+										title="Idézet">
+										<mat-icon>format_quote</mat-icon>
+										<span>Idézet</span>
+									</button>
+									<button type="button" class="option-btn" 
+										(click)="insertHorizontalRule()" 
+										title="Elválasztó">
+										<mat-icon>horizontal_rule</mat-icon>
+										<span>Elválasztó</span>
+									</button>
+								</div>
+								
+								<!-- List Formatting -->
+								<div class="option-group">
+									<div class="option-group-title">Lista formázás</div>
+									<button type="button" class="option-btn" 
+										(click)="indentList()" 
+										title="Behúzás">
+										<mat-icon>format_indent_increase</mat-icon>
+										<span>Behúzás</span>
+									</button>
+									<button type="button" class="option-btn" 
+										(click)="outdentList()" 
+										title="Kihúzás">
+										<mat-icon>format_indent_decrease</mat-icon>
+										<span>Kihúzás</span>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<div class="toolbar-separator"></div>
+					
+					<!-- Actions -->
+					<div class="toolbar-group">
+						<button type="button" class="toolbar-btn" 
+							(click)="undo()" 
+							title="Visszavonás (Ctrl+Z)">
+							<mat-icon>undo</mat-icon>
+						</button>
+						<button type="button" class="toolbar-btn" 
+							(click)="redo()" 
+							title="Újra (Ctrl+Y)">
+							<mat-icon>redo</mat-icon>
+						</button>
+					</div>
+					
+					<div class="toolbar-separator"></div>
+					
+					<!-- View Mode Toggle (Visual/HTML only) -->
+					<div class="toolbar-group">
+						<button type="button" class="toolbar-btn" 
+							[class.active]="viewMode === 'visual'"
+							(click)="setViewMode('visual')" 
+							title="Vizuális">
+							<mat-icon>visibility</mat-icon>
+						</button>
+						<button type="button" class="toolbar-btn" 
+							[class.active]="viewMode === 'html'"
+							(click)="setViewMode('html')" 
+							title="HTML">
+							<mat-icon>code</mat-icon>
+						</button>
+					</div>
+				</div>
 
-	<div class="field">
-		<label>{{ 'ARTICLE_MANAGER.FORM.CONTENT' | translate }}</label>
-		<textarea
-			name="content"
-			rows="6"
-			required
-			[(ngModel)]="model.content"
-			placeholder="{{ 'ARTICLE_MANAGER.FORM.CONTENT_PLACEHOLDER' | translate }}"
-		></textarea>
-	</div>
+				<!-- Enhanced Content Editor -->
+				<div class="content-section">
+					<!-- Visual Editor -->
+					<div class="rich-editor-container" *ngIf="viewMode === 'visual'">
+						<div 
+							#richEditor
+							class="rich-editor"
+							contenteditable="true"
+							[innerHTML]="model.content"
+							(input)="onRichEditorInput($event)"
+							(keydown)="onEditorKeydown($event)"
+							(paste)="onEditorPaste($event)"
+							[attr.data-placeholder]="'Írj valamit...'"
+							spellcheck="false"
+						></div>
+					</div>
+					
+					<!-- HTML Editor -->
+					<div class="html-editor-container" *ngIf="viewMode === 'html'">
+						<textarea
+							name="content"
+							class="html-editor"
+							required
+							[(ngModel)]="model.content"
+							(input)="syncVisualEditor()"
+							placeholder="<p>HTML tartalom...</p>"
+							rows="20"
+							spellcheck="false"
+						></textarea>
+					</div>
+				</div>
+			</form>
+		</div>
 
-	<div class="field inline">
-		<label>
-			<input type="checkbox" name="published" [(ngModel)]="model.published" />
-			{{ 'ARTICLE_MANAGER.FORM.PUBLISHED' | translate }}
-		</label>
-	</div>
+		<!-- Right Sidebar Panel -->
+		<div class="sidebar-panel">
+			<div class="panel-header">
+				<h3>Cikk beállítások</h3>
+			</div>
+			
+			<div class="panel-content">
+				<!-- Preview Mode in Sidebar -->
+				<div class="preview-container" *ngIf="isPreviewMode()">
+					<h4 class="preview-title">Előnézet</h4>
+					<div class="article-preview" [innerHTML]="model.content"></div>
+				</div>
 
-	<div class="actions">
-		<button type="button" (click)="cancel.emit()" class="btn ghost">
-			{{ 'COMMON.CANCEL' | translate }}
-		</button>
-		<button type="submit" [disabled]="f.invalid || saving" class="btn primary">
-			{{ saving ? ('ARTICLE_MANAGER.FORM.SAVING' | translate) : ('COMMON.SAVE' | translate) }}
-		</button>
+				<!-- Settings (shown when not in preview mode) -->
+				<div class="settings-content" *ngIf="!isPreviewMode()">
+					<!-- Action Buttons -->
+					<div class="action-buttons">
+						<button 
+							type="button" 
+							class="preview-btn"
+							[class.active]="isPreviewMode()"
+							(click)="setViewMode('preview')"
+						>
+							<mat-icon>preview</mat-icon>
+							Előnézet
+						</button>
+						
+						<button 
+							type="button" 
+							[disabled]="f?.invalid || savingDraft" 
+							class="save-btn"
+							(click)="saveDraft()"
+						>
+							<mat-icon *ngIf="!savingDraft">save</mat-icon>
+							<mat-icon *ngIf="savingDraft" class="spinning">hourglass_empty</mat-icon>
+							{{ savingDraft ? 'Mentés...' : 'Mentés' }}
+						</button>
+						
+						<button 
+							type="submit" 
+							form="articleForm"
+							[disabled]="f?.invalid || saving" 
+							class="publish-btn"
+							(click)="publish()"
+						>
+							<mat-icon *ngIf="!saving">publish</mat-icon>
+							<mat-icon *ngIf="saving" class="spinning">hourglass_empty</mat-icon>
+							{{ saving ? 'Közzététel...' : (model.published ? 'Frissítés' : 'Közzététel') }}
+						</button>
+					</div>
+
+					<!-- Tags Section -->
+					<div class="tags-section">
+						<label>Címkék</label>
+						<input
+							type="text"
+							name="tags"
+							class="tags-input"
+							[(ngModel)]="model.tagsString"
+							(ngModelChange)="setTags($event)"
+							placeholder="{{ 'ARTICLE_MANAGER.FORM.TAGS_PLACEHOLDER' | translate }}"
+							form="articleForm"
+						/>
+						<small class="tags-help">Vesszővel elválasztva</small>
+					</div>
+
+					<!-- Article Status -->
+					<div class="status-section">
+						<label>Státusz</label>
+						<div class="status-indicator">
+							<mat-icon [class.published]="model.published">
+								{{ model.published ? 'visibility' : 'visibility_off' }}
+							</mat-icon>
+							<span>{{ model.published ? 'Közzétéve' : 'Piszkozat' }}</span>
+						</div>
+					</div>
+				</div>
+
+				<!-- Back to Editor Button (shown only in preview mode) -->
+				<div class="preview-actions" *ngIf="isPreviewMode()">
+					<button 
+						type="button" 
+						class="back-to-editor-btn"
+						(click)="setViewMode('visual')"
+					>
+						<mat-icon>edit</mat-icon>
+						Vissza a szerkesztőhöz
+					</button>
+				</div>
+			</div>
+		</div>
 	</div>
-</form>
+</div>

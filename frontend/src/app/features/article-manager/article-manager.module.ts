@@ -10,6 +10,20 @@ const routes: Routes = [
 				(m) => m.ArticleManagerComponent,
 			),
 	},
+	{
+		path: 'create',
+		loadComponent: () =>
+			import('./article-form/article-form.component').then(
+				(m) => m.ArticleFormComponent,
+			),
+	},
+	{
+		path: 'edit/:id',
+		loadComponent: () =>
+			import('./article-form/article-form.component').then(
+				(m) => m.ArticleFormComponent,
+			),
+	},
 ];
 
 @NgModule({

@@ -3,9 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslateModule } from '@ngx-translate/core';
+import { Router } from '@angular/router';
 import { ArticleListComponent } from './article-list/article-list.component';
-import { ArticleFormComponent } from './article-form/article-form.component';
-import { Article } from './services/article.service';
 
 @Component({
   selector: 'app-article-manager',
@@ -17,21 +16,15 @@ import { Article } from './services/article.service';
     FormsModule,
     MatIconModule,
     TranslateModule,
-    ArticleListComponent,
-    ArticleFormComponent
+    ArticleListComponent
   ]
 })
 export class ArticleManagerComponent {
-  selectedArticle: any = null;
-  viewMode: 'list' | 'edit' = 'list';
-  showCreateModal = false;
-
-  constructor() {}
+  constructor(private router: Router) {}
 
   // Event handling
   onEdit(article: any) {
-    this.selectedArticle = article;
-    this.viewMode = 'edit';
+    this.router.navigate(['/article-manager/edit', article.id]);
   }
 
   onDelete(article: any) {
@@ -39,21 +32,6 @@ export class ArticleManagerComponent {
   }
 
   onCreateNew() {
-    this.showCreateModal = true;
-  }
-
-  onModalClose() {
-    this.showCreateModal = false;
-  }
-
-  onArticleCreated(articleData: Omit<Article, 'id' | 'createdAt' | 'updatedAt'>) {
-    // Article successfully created, refresh the list
-    this.showCreateModal = false;
-    // The ArticleService automatically updates the list
-  }
-
-  onBack() {
-    this.selectedArticle = null;
-    this.viewMode = 'list';
+    this.router.navigate(['/article-manager/create']);
   }
 }

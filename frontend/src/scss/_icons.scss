@@ -1,0 +1,36 @@
+// Simple CSS-based icons for the article editor
+.icon-arrow-left:before { content: '←'; }
+.icon-eye:before { content: '👁'; }
+.icon-check:before { content: '✓'; }
+.icon-loading:before { content: '⟳'; }
+.icon-tag:before { content: '🏷'; }
+.icon-edit:before { content: '✏'; }
+.icon-bold:before { content: 'B'; font-weight: bold; }
+.icon-italic:before { content: 'I'; font-style: italic; }
+.icon-link:before { content: '🔗'; }
+.icon-image:before { content: '📷'; }
+
+// Alternative with more minimal Unicode symbols
+@supports (font-feature-settings: "liga") {
+  .icon-arrow-left:before { content: '←'; }
+  .icon-eye:before { content: '👁'; }
+  .icon-check:before { content: '✓'; }
+  .icon-loading:before { content: '⟳'; }
+  .icon-tag:before { content: '#'; }
+  .icon-edit:before { content: '✎'; }
+  .icon-bold:before { content: 'B'; }
+  .icon-italic:before { content: 'I'; }
+  .icon-link:before { content: '🔗'; }
+  .icon-image:before { content: '🖼'; }
+}
+
+// Loading animation
+.icon-loading {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

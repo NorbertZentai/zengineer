@@ -83,7 +83,7 @@
     <div class="quiz-meta">
       <div class="quiz-meta-item" *ngIf="article.tags">
         <mat-icon>local_offer</mat-icon>
-        <span>{{ article.tags?.length || 0 }} {{ 'ARTICLE_MANAGER.TAGS' | translate }}</span>
+        <span>{{ article.tags.length || 0 }} {{ 'ARTICLE_MANAGER.TAGS' | translate }}</span>
       </div>
       <div class="quiz-meta-item" *ngIf="article.created_at">
         <mat-icon>schedule</mat-icon>
