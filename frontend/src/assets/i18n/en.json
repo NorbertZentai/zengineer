@@ -43,8 +43,9 @@
     "CREATE": {
       "TITLE": "Create",
       "NEW_QUIZ": "New Quiz",
-      "NEW_PROJECT": "New Project",
-      "NEW_FOLDER": "New Folder"
+  "NEW_PROJECT": "New Project",
+  "NEW_FOLDER": "New Folder",
+  "NEW_ARTICLE": "New Article"
     }
   },
   "LOGIN": {

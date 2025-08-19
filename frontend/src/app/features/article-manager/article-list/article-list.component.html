@@ -1,63 +1,75 @@
-<div class="article-manager">
-	<header class="toolbar">
-		<h1>{{ 'ARTICLE_MANAGER.TITLE' | translate }}</h1>
-		<div class="actions">
-					<input
-						type="text"
-						[placeholder]="'ARTICLE_MANAGER.FILTER.PLACEHOLDER' | translate"
-						[ngModel]="filterText()"
-						(ngModelChange)="filterText.set($event)"
-					/>
-			<button class="btn primary" (click)="newArticle()">
-				{{ 'ARTICLE_MANAGER.ACTIONS.NEW' | translate }}
-			</button>
-		</div>
-	</header>
-
-	<section *ngIf="creating()" class="panel">
-		<h2>{{ 'ARTICLE_MANAGER.CREATE.TITLE' | translate }}</h2>
-		<app-article-form
-			(cancel)="cancelCreate()"
-			(saveArticle)="save($event)"
-		></app-article-form>
-	</section>
-
-	<section *ngIf="!creating() && filtered().length === 0" class="empty">
-		<p>{{ 'ARTICLE_MANAGER.EMPTY.NO_ARTICLES' | translate }}</p>
-		<button class="btn" (click)="newArticle()">
-			{{ 'ARTICLE_MANAGER.EMPTY.CREATE_FIRST' | translate }}
-		</button>
-	</section>
-
-	<ul *ngIf="filtered().length" class="article-list">
-		<li *ngFor="let a of filtered(); trackBy: trackById" class="article-item">
-			<div class="meta">
-				<h3>{{ a.title }}</h3>
-				<div class="tags" *ngIf="a.tags.length">
-					<span *ngFor="let t of a.tags" class="tag">{{ t }}</span>
+<div class="quiz-manager-container article-manager-container">
+	<div class="quiz-manager-content-card">
+		<header class="quiz-manager-header article-header">
+			<div class="header-left">
+				<div class="quiz-manager-icon article-icon">
+					<mat-icon>article</mat-icon>
 				</div>
-				<small>
-					{{ 'ARTICLE_MANAGER.LIST.CREATED' | translate }}
-					{{ a.createdAt | date: 'YYYY.MM.dd HH:mm' }} ·
-					{{ 'ARTICLE_MANAGER.LIST.UPDATED' | translate }}
-					{{ a.updatedAt | date: 'YYYY.MM.dd HH:mm' }}
-				</small>
+				<h1>{{ 'ARTICLE_MANAGER.TITLE' | translate }}</h1>
 			</div>
-			<div class="row-actions">
-				<button class="btn small" (click)="startEdit(a.id)">
-					{{ 'ARTICLE_MANAGER.ACTIONS.EDIT' | translate }}
-				</button>
-				<button class="btn small danger" (click)="delete(a.id)">
-					{{ 'ARTICLE_MANAGER.ACTIONS.DELETE' | translate }}
+			<div class="header-right">
+				<input
+					type="text"
+					class="article-filter-input"
+					[placeholder]="'ARTICLE_MANAGER.FILTER.PLACEHOLDER' | translate"
+					[ngModel]="filterText()"
+					(ngModelChange)="filterText.set($event)"
+				/>
+				<button class="create-quiz-btn" (click)="newArticle()">
+					<mat-icon>add</mat-icon>
+					{{ 'ARTICLE_MANAGER.ACTIONS.NEW' | translate }}
 				</button>
 			</div>
-			<div *ngIf="editingId() === a.id" class="edit-panel">
+		</header>
+
+		<div class="quiz-manager-content article-manager-content">
+			<section *ngIf="creating()" class="article-panel">
+				<h2>{{ 'ARTICLE_MANAGER.CREATE.TITLE' | translate }}</h2>
 				<app-article-form
-					[article]="a"
-					(cancel)="editingId.set(null)"
-					(saveArticle)="update(a.id, $event)"
+					(cancel)="cancelCreate()"
+					(saveArticle)="save($event)"
 				></app-article-form>
-			</div>
-		</li>
-	</ul>
+			</section>
+
+			<section *ngIf="!creating() && filtered().length === 0" class="article-empty">
+				<p>{{ 'ARTICLE_MANAGER.EMPTY.NO_ARTICLES' | translate }}</p>
+				<button class="create-quiz-btn" (click)="newArticle()">
+					<mat-icon>add</mat-icon>
+					{{ 'ARTICLE_MANAGER.EMPTY.CREATE_FIRST' | translate }}
+				</button>
+			</section>
+
+			<ul *ngIf="filtered().length" class="article-list">
+				<li *ngFor="let a of filtered(); trackBy: trackById" class="article-item">
+					<div class="meta">
+						<h3>{{ a.title }}</h3>
+						<div class="tags" *ngIf="a.tags.length">
+							<span *ngFor="let t of a.tags" class="tag">{{ t }}</span>
+						</div>
+						<small>
+							{{ 'ARTICLE_MANAGER.LIST.CREATED' | translate }}
+							{{ a.createdAt | date: 'YYYY.MM.dd HH:mm' }} ·
+							{{ 'ARTICLE_MANAGER.LIST.UPDATED' | translate }}
+							{{ a.updatedAt | date: 'YYYY.MM.dd HH:mm' }}
+						</small>
+					</div>
+					<div class="row-actions">
+						<button class="btn small" (click)="startEdit(a.id)">
+							{{ 'ARTICLE_MANAGER.ACTIONS.EDIT' | translate }}
+						</button>
+						<button class="btn small danger" (click)="delete(a.id)">
+							{{ 'ARTICLE_MANAGER.ACTIONS.DELETE' | translate }}
+						</button>
+					</div>
+					<div *ngIf="editingId() === a.id" class="edit-panel">
+						<app-article-form
+							[article]="a"
+							(cancel)="editingId.set(null)"
+							(saveArticle)="update(a.id, $event)"
+						></app-article-form>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
 </div>

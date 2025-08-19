@@ -32,8 +32,9 @@
     "CREATE": {
       "TITLE": "Létrehozás",
       "NEW_QUIZ": "Új kvíz",
-      "NEW_PROJECT": "Új projekt",
-      "NEW_FOLDER": "Új mappa"
+  "NEW_PROJECT": "Új projekt",
+  "NEW_FOLDER": "Új mappa",
+  "NEW_ARTICLE": "Új cikk"
     }
   },
   "ERRORS": {

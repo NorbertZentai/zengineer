@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, effect, inject, signal } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { ArticleService, Article } from '@features/article-manager/services/article.service';
@@ -8,7 +9,7 @@ import { ArticleFormComponent } from '../article-form/article-form.component';
 @Component({
 	selector: 'app-article-list',
 	standalone: true,
-	imports: [CommonModule, FormsModule, TranslateModule, ArticleFormComponent],
+	imports: [CommonModule, FormsModule, TranslateModule, MatIconModule, ArticleFormComponent],
 	templateUrl: './article-list.component.html',
 	styleUrls: ['./article-list.component.scss'],
 })
