@@ -1,0 +1,50 @@
+<form (ngSubmit)="submit()" class="article-form" #f="ngForm">
+	<div class="field">
+		<label>{{ 'ARTICLE_MANAGER.FORM.TITLE' | translate }}</label>
+		<input
+			type="text"
+			name="title"
+			required
+			[(ngModel)]="model.title"
+			placeholder="{{ 'ARTICLE_MANAGER.FORM.TITLE_PLACEHOLDER' | translate }}"
+		/>
+	</div>
+
+	<div class="field">
+		<label>{{ 'ARTICLE_MANAGER.FORM.TAGS' | translate }}</label>
+		<input
+			type="text"
+			name="tags"
+			[(ngModel)]="model.tagsString"
+			(ngModelChange)="setTags($event)"
+			placeholder="{{ 'ARTICLE_MANAGER.FORM.TAGS_PLACEHOLDER' | translate }}"
+		/>
+	</div>
+
+	<div class="field">
+		<label>{{ 'ARTICLE_MANAGER.FORM.CONTENT' | translate }}</label>
+		<textarea
+			name="content"
+			rows="6"
+			required
+			[(ngModel)]="model.content"
+			placeholder="{{ 'ARTICLE_MANAGER.FORM.CONTENT_PLACEHOLDER' | translate }}"
+		></textarea>
+	</div>
+
+	<div class="field inline">
+		<label>
+			<input type="checkbox" name="published" [(ngModel)]="model.published" />
+			{{ 'ARTICLE_MANAGER.FORM.PUBLISHED' | translate }}
+		</label>
+	</div>
+
+	<div class="actions">
+		<button type="button" (click)="cancel.emit()" class="btn ghost">
+			{{ 'COMMON.CANCEL' | translate }}
+		</button>
+		<button type="submit" [disabled]="f.invalid || saving" class="btn primary">
+			{{ saving ? ('ARTICLE_MANAGER.FORM.SAVING' | translate) : ('COMMON.SAVE' | translate) }}
+		</button>
+	</div>
+</form>

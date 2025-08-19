@@ -1,0 +1,31 @@
+.article-form {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+	label { font-weight: 600; font-size: .8rem; letter-spacing: .5px; text-transform: uppercase; }
+	input, textarea {
+		border: 1px solid var(--border-color, #c9d1d9);
+		background: var(--input-bg, #fff);
+		padding: .6rem .75rem;
+		border-radius: 6px;
+		font: inherit;
+		resize: vertical;
+	}
+}
+
+.field.inline { flex-direction: row; align-items: center; }
+
+.actions { display: flex; gap: .6rem; justify-content: flex-end; }
+
+@media (prefers-color-scheme: dark) {
+	.article-form {
+		--border-color: #314255;
+		--input-bg: #23313f;
+	}
+}

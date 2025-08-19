@@ -18,6 +18,7 @@
     "QUIZ_MANAGER": "Kvíz kezelő",
     "LIBRARY": "Könyvtár",
     "ANALYTICS": "Analitika",
+    "ARTICLE_MANAGER": "Cikkkezelő",
     "ABOUT": "Rólunk",
     "FEATURES": "Funkciók",
     "PROFILE": "Profil",
@@ -642,5 +643,26 @@
     "MULTIPLE_CHOICE": "Feleletválasztós",
     "WRITTEN": "Írásbeli",
     "MULTI_SELECT": "Többszörös válasz"
+  },
+  "ARTICLE_MANAGER": {
+    "TITLE": "Cikkkezelő",
+    "FILTER": { "PLACEHOLDER": "Keresés cím vagy címke..." },
+    "ACTIONS": { "NEW": "Új cikk", "EDIT": "Szerkesztés", "DELETE": "Törlés" },
+    "CREATE": { "TITLE": "Cikk létrehozása" },
+    "EMPTY": {
+      "NO_ARTICLES": "Még nincsenek cikkek",
+      "CREATE_FIRST": "Hozd létre az első cikked"
+    },
+    "LIST": { "CREATED": "Létrehozva", "UPDATED": "Frissítve" },
+    "FORM": {
+      "TITLE": "Cím",
+      "TITLE_PLACEHOLDER": "Cikk címe...",
+      "TAGS": "Címkék",
+      "TAGS_PLACEHOLDER": "vessző,elválasztott,címkék",
+      "CONTENT": "Tartalom",
+      "CONTENT_PLACEHOLDER": "Írd ide a cikk tartalmát...",
+      "PUBLISHED": "Publikált",
+      "SAVING": "Mentés..."
+    }
   }
 }
