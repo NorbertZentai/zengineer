@@ -648,8 +648,22 @@
   },
   "ARTICLE_MANAGER": {
     "TITLE": "Article Manager",
+    "SEARCH_PLACEHOLDER": "Search articles...",
+    "SORT_BY_TITLE": "Sort by Title",
+    "SORT_BY_CREATED": "Sort by Created Date",
+    "SORT_BY_STATUS": "Sort by Status",
+    "EMPTY_STATE_DESC": "No articles yet. Start by creating your first article!",
+    "CREATE_FIRST": "Create First Article",
+    "TAGS": "tags",
+    "PUBLISHED": "Published",
+    "PUBLISHED_ARTICLE": "Published Article",
+    "DRAFT_ARTICLE": "Draft Article",
+    "ACTIONS": {
+      "EDIT": "Edit",
+      "PREVIEW": "Preview",
+      "DELETE": "Delete"
+    },
     "FILTER": { "PLACEHOLDER": "Search title or tag..." },
-    "ACTIONS": { "NEW": "New Article", "EDIT": "Edit", "DELETE": "Delete" },
     "CREATE": { "TITLE": "Create Article" },
     "EDIT": { "TITLE": "Edit Article" },
     "EMPTY": {
@@ -658,6 +672,9 @@
       "CREATE_FIRST": "Create your first article"
     },
     "LIST": { "CREATED": "Created", "UPDATED": "Updated" },
+    "SORT_BY_NAME": "Sort by Name",
+    "SORT_BY_TAGS": "Sort by Tags",
+    "TAGS_COUNT": "tags",
     "FORM": {
       "TITLE": "Title",
       "TITLE_PLACEHOLDER": "Article title...",

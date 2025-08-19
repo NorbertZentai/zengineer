@@ -648,8 +648,22 @@
   },
   "ARTICLE_MANAGER": {
     "TITLE": "Cikkkezelő",
+    "SEARCH_PLACEHOLDER": "Keresés cikkek között...",
+    "SORT_BY_TITLE": "Cím szerint",
+    "SORT_BY_CREATED": "Létrehozás dátuma",
+    "SORT_BY_STATUS": "Státusz szerint",
+    "EMPTY_STATE_DESC": "Még nincsenek cikkeink. Kezdd az első cikk létrehozásával!",
+    "CREATE_FIRST": "Első cikk létrehozása",
+    "TAGS": "címke",
+    "PUBLISHED": "Publikálva",
+    "PUBLISHED_ARTICLE": "Publikált cikk",
+    "DRAFT_ARTICLE": "Piszkozat",
+    "ACTIONS": {
+      "EDIT": "Szerkesztés",
+      "PREVIEW": "Előnézet",
+      "DELETE": "Törlés"
+    },
     "FILTER": { "PLACEHOLDER": "Keresés cím vagy címke..." },
-    "ACTIONS": { "NEW": "Új cikk", "EDIT": "Szerkesztés", "DELETE": "Törlés" },
     "CREATE": { "TITLE": "Cikk létrehozása" },
     "EDIT": { "TITLE": "Cikk szerkesztése" },
     "EMPTY": {
@@ -658,6 +672,9 @@
       "CREATE_FIRST": "Hozd létre az első cikked"
     },
     "LIST": { "CREATED": "Létrehozva", "UPDATED": "Frissítve" },
+    "SORT_BY_NAME": "Név szerint rendezés",
+    "SORT_BY_TAGS": "Címkék szerint rendezés",
+    "TAGS_COUNT": "címke",
     "FORM": {
       "TITLE": "Cím",
       "TITLE_PLACEHOLDER": "Cikk címe...",
