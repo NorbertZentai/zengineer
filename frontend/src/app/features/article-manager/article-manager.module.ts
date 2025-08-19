@@ -6,8 +6,8 @@ const routes: Routes = [
 	{
 		path: '',
 		loadComponent: () =>
-			import('./article-list/article-list.component').then(
-				(m) => m.ArticleListComponent,
+			import('./article-manager.component').then(
+				(m) => m.ArticleManagerComponent,
 			),
 	},
 ];

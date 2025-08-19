@@ -1,0 +1,65 @@
+<div class="quiz-manager-container">
+  <div class="quiz-manager-content-card">
+    <header class="quiz-manager-header">
+      <div class="header-left">
+        <div class="quiz-manager-icon article-icon">
+          <mat-icon>article</mat-icon>
+        </div>
+        <h1>{{ 'ARTICLE_MANAGER.TITLE' | translate }}</h1>
+      </div>
+      <div class="header-right" *ngIf="viewMode === 'list'">
+        <button class="create-quiz-btn" (click)="onCreateNew()">
+          <mat-icon>add</mat-icon>
+          {{ 'ARTICLE_MANAGER.ACTIONS.NEW' | translate }}
+        </button>
+      </div>
+    </header>
+    
+    <div class="quiz-manager-content">
+      <!-- Article List View -->
+      <ng-container *ngIf="viewMode === 'list'">
+        <app-article-list
+          (edit)="onEdit($event)"
+          (delete)="onDelete($event)"
+          (createNew)="onCreateNew()">
+        </app-article-list>
+      </ng-container>
+      
+      <!-- Article Edit View -->
+      <ng-container *ngIf="viewMode === 'edit'">
+        <div class="edit-container">
+          <div class="edit-header">
+            <button class="back-btn" (click)="onBack()">
+              <mat-icon>arrow_back</mat-icon>
+              {{ 'COMMON.BACK' | translate }}
+            </button>
+            <h2>{{ 'ARTICLE_MANAGER.EDIT.TITLE' | translate }}</h2>
+          </div>
+          <app-article-form
+            [article]="selectedArticle"
+            (cancel)="onBack()"
+            (saveArticle)="onBack()">
+          </app-article-form>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <!-- Create Modal -->
+  <div class="create-modal-overlay" *ngIf="showCreateModal" (click)="onModalClose()">
+    <div class="create-modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ 'ARTICLE_MANAGER.CREATE.TITLE' | translate }}</h2>
+        <button class="close-btn" (click)="onModalClose()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <div class="modal-body">
+        <app-article-form
+          (cancel)="onModalClose()"
+          (saveArticle)="onArticleCreated($event); onModalClose()">
+        </app-article-form>
+      </div>
+    </div>
+  </div>
+</div>

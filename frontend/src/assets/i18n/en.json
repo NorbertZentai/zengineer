@@ -7,6 +7,7 @@
   "CLOSE": "Close",
   "CANCEL": "Cancel",
   "SAVE": "Save",
+  "BACK": "Back",
   "LOADING": "Loading...",
   "PUBLIC": "Public",
   "PRIVATE": "Private",
@@ -650,8 +651,10 @@
     "FILTER": { "PLACEHOLDER": "Search title or tag..." },
     "ACTIONS": { "NEW": "New Article", "EDIT": "Edit", "DELETE": "Delete" },
     "CREATE": { "TITLE": "Create Article" },
+    "EDIT": { "TITLE": "Edit Article" },
     "EMPTY": {
       "NO_ARTICLES": "No articles yet",
+      "DESCRIPTION": "Start creating your knowledge base by writing your first article.",
       "CREATE_FIRST": "Create your first article"
     },
     "LIST": { "CREATED": "Created", "UPDATED": "Updated" },

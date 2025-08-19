@@ -17,6 +17,10 @@
           <mat-icon>add</mat-icon>
           Új kvíz
         </button>
+        <button (click)="$event.stopPropagation(); navigateToNewArticle()">
+          <mat-icon>article</mat-icon>
+          {{ 'NAV.CREATE.NEW_ARTICLE' | translate }}
+        </button>
         <button (click)="$event.stopPropagation(); navigateToImport()">
           <mat-icon>file_upload</mat-icon>
           Import

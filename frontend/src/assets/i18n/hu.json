@@ -1,17 +1,18 @@
 {
   "COMMON": {
-    "TITLE": "Üdvözlünk a Zengineer-ben!",
+    "TITLE": "Üdvözlünk a Zengineerben!",
     "LOGIN": "Bejelentkezés",
     "REGISTER": "Regisztráció",
     "LOGOUT": "Kijelentkezés",
-  "CLOSE": "Bezárás",
-  "CANCEL": "Mégse",
-  "SAVE": "Mentés",
-  "LOADING": "Betöltés...",
-  "PUBLIC": "Nyilvános",
-  "PRIVATE": "Privát",
-  "ERROR": "Hiba",
-  "SUCCESS": "Siker"
+    "CLOSE": "Bezárás",
+    "CANCEL": "Mégse",
+    "SAVE": "Mentés",
+    "BACK": "Vissza",
+    "LOADING": "Betöltés...",
+    "PUBLIC": "Nyilvános",
+    "PRIVATE": "Privát",
+    "ERROR": "Hiba",
+    "SUCCESS": "Sikeres"
   },
   "NAV": {
     "DASHBOARD": "Irányítópult",
@@ -650,8 +651,10 @@
     "FILTER": { "PLACEHOLDER": "Keresés cím vagy címke..." },
     "ACTIONS": { "NEW": "Új cikk", "EDIT": "Szerkesztés", "DELETE": "Törlés" },
     "CREATE": { "TITLE": "Cikk létrehozása" },
+    "EDIT": { "TITLE": "Cikk szerkesztése" },
     "EMPTY": {
       "NO_ARTICLES": "Még nincsenek cikkek",
+      "DESCRIPTION": "Kezdd el a tudásbázisod felépítését az első cikked megírásával.",
       "CREATE_FIRST": "Hozd létre az első cikked"
     },
     "LIST": { "CREATED": "Létrehozva", "UPDATED": "Frissítve" },

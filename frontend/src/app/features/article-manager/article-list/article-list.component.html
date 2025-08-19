@@ -1,75 +1,98 @@
-<div class="quiz-manager-container article-manager-container">
-	<div class="quiz-manager-content-card">
-		<header class="quiz-manager-header article-header">
-			<div class="header-left">
-				<div class="quiz-manager-icon article-icon">
-					<mat-icon>article</mat-icon>
-				</div>
-				<h1>{{ 'ARTICLE_MANAGER.TITLE' | translate }}</h1>
-			</div>
-			<div class="header-right">
-				<input
-					type="text"
-					class="article-filter-input"
-					[placeholder]="'ARTICLE_MANAGER.FILTER.PLACEHOLDER' | translate"
-					[ngModel]="filterText()"
-					(ngModelChange)="filterText.set($event)"
-				/>
-				<button class="create-quiz-btn" (click)="newArticle()">
-					<mat-icon>add</mat-icon>
-					{{ 'ARTICLE_MANAGER.ACTIONS.NEW' | translate }}
-				</button>
-			</div>
-		</header>
+<!-- Scroll to top button -->
+<button class="scroll-to-top-btn" *ngIf="showScrollTop" (click)="scrollToTop()" title="Ugrás a tetejére">
+  <mat-icon>vertical_align_top</mat-icon>
+</button>
 
-		<div class="quiz-manager-content article-manager-content">
-			<section *ngIf="creating()" class="article-panel">
-				<h2>{{ 'ARTICLE_MANAGER.CREATE.TITLE' | translate }}</h2>
-				<app-article-form
-					(cancel)="cancelCreate()"
-					(saveArticle)="save($event)"
-				></app-article-form>
-			</section>
+<!-- Article list UI -->
+<div class="quiz-list-header">
+  <input type="text" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" [placeholder]="'ARTICLE_MANAGER.SEARCH_PLACEHOLDER' | translate" class="quiz-search" />
+  <!-- Szűrő/rendező gombok -->
+  <button class="quiz-sort" (click)="sortBy.set('title')">{{ 'ARTICLE_MANAGER.SORT_BY_TITLE' | translate }}</button>
+  <button class="quiz-sort" (click)="sortBy.set('created')">{{ 'ARTICLE_MANAGER.SORT_BY_CREATED' | translate }}</button>
+  <button class="quiz-sort" (click)="sortBy.set('status')">{{ 'ARTICLE_MANAGER.SORT_BY_STATUS' | translate }}</button>
+</div>
 
-			<section *ngIf="!creating() && filtered().length === 0" class="article-empty">
-				<p>{{ 'ARTICLE_MANAGER.EMPTY.NO_ARTICLES' | translate }}</p>
-				<button class="create-quiz-btn" (click)="newArticle()">
-					<mat-icon>add</mat-icon>
-					{{ 'ARTICLE_MANAGER.EMPTY.CREATE_FIRST' | translate }}
-				</button>
-			</section>
+<div *ngIf="isLoading()" class="quiz-list-loading">
+  <div class="spinner"></div>
+</div>
 
-			<ul *ngIf="filtered().length" class="article-list">
-				<li *ngFor="let a of filtered(); trackBy: trackById" class="article-item">
-					<div class="meta">
-						<h3>{{ a.title }}</h3>
-						<div class="tags" *ngIf="a.tags.length">
-							<span *ngFor="let t of a.tags" class="tag">{{ t }}</span>
-						</div>
-						<small>
-							{{ 'ARTICLE_MANAGER.LIST.CREATED' | translate }}
-							{{ a.createdAt | date: 'YYYY.MM.dd HH:mm' }} ·
-							{{ 'ARTICLE_MANAGER.LIST.UPDATED' | translate }}
-							{{ a.updatedAt | date: 'YYYY.MM.dd HH:mm' }}
-						</small>
-					</div>
-					<div class="row-actions">
-						<button class="btn small" (click)="startEdit(a.id)">
-							{{ 'ARTICLE_MANAGER.ACTIONS.EDIT' | translate }}
-						</button>
-						<button class="btn small danger" (click)="delete(a.id)">
-							{{ 'ARTICLE_MANAGER.ACTIONS.DELETE' | translate }}
-						</button>
-					</div>
-					<div *ngIf="editingId() === a.id" class="edit-panel">
-						<app-article-form
-							[article]="a"
-							(cancel)="editingId.set(null)"
-							(saveArticle)="update(a.id, $event)"
-						></app-article-form>
-					</div>
-				</li>
-			</ul>
-		</div>
-	</div>
+<div *ngIf="!isLoading() && error()" class="quiz-list-error">
+  <div class="error-illustration"></div>
+  <p>{{ error() }}</p>
+</div>
+
+<div *ngIf="!isLoading() && !error() && filteredArticles().length === 0" class="quiz-list-empty">
+  <div class="empty-illustration"></div>
+  <p>{{ 'ARTICLE_MANAGER.EMPTY_STATE_DESC' | translate }}</p>
+  <button class="create-first-quiz-btn" (click)="onCreateNew()">
+    <mat-icon>add_circle</mat-icon>
+    {{ 'ARTICLE_MANAGER.CREATE_FIRST' | translate }}
+  </button>
+</div>
+
+<div class="quiz-list-grid" *ngIf="!isLoading() && filteredArticles().length > 0">
+  <div class="quiz-card" 
+       *ngFor="let article of filteredArticles()" 
+       [style.border-left-color]="getArticleColor(article.id)"
+       [class.menu-active]="activeMenuId() === article.id"
+       (click)="onArticleClick(article)">
+    <div class="quiz-card-header">
+      <div class="quiz-color-indicator" [style.background-color]="getArticleColor(article.id)"></div>
+      <div class="quiz-title-section">
+        <div class="quiz-title-row">
+          <h3 class="quiz-title">{{ article.title }}</h3>
+          <div class="quiz-actions-menu" [class.menu-open]="activeMenuId() === article.id">
+            <mat-icon class="visibility-icon" [title]="article.status === 'published' ? ('ARTICLE_MANAGER.PUBLISHED_ARTICLE' | translate) : ('ARTICLE_MANAGER.DRAFT_ARTICLE' | translate)">
+              {{ article.status === 'published' ? 'public' : 'draft' }}
+            </mat-icon>
+            <button class="menu-trigger" (click)="toggleMenu(article.id, $event); $event.stopPropagation()" [class.active]="activeMenuId() === article.id">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <div class="dropdown-menu" 
+                 *ngIf="activeMenuId() === article.id" 
+                 (click)="closeMenu(); $event.stopPropagation()">
+              <button class="menu-item" (click)="onEdit(article); $event.stopPropagation()">
+                <mat-icon>edit</mat-icon>
+                <span>{{ 'ARTICLE_MANAGER.ACTIONS.EDIT' | translate }}</span>
+              </button>
+              <button class="menu-item" (click)="onPreview(article); $event.stopPropagation()">
+                <mat-icon>visibility</mat-icon>
+                <span>{{ 'ARTICLE_MANAGER.ACTIONS.PREVIEW' | translate }}</span>
+              </button>
+              <div class="menu-divider"></div>
+              <button class="menu-item danger" (click)="onDelete(article); $event.stopPropagation()">
+                <mat-icon>delete</mat-icon>
+                <span>{{ 'ARTICLE_MANAGER.ACTIONS.DELETE' | translate }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="quiz-description" *ngIf="article.content">
+      {{ getPreviewText(article.content) }}
+    </div>
+    
+    <!-- Tags -->
+    <div class="article-tags" *ngIf="article.tags && article.tags.length > 0">
+      <span class="tag" *ngFor="let tag of article.tags.slice(0, 3)">{{ tag }}</span>
+      <span class="tag more-tags" *ngIf="article.tags.length > 3">+{{ article.tags.length - 3 }}</span>
+    </div>
+    
+    <div class="quiz-meta">
+      <div class="quiz-meta-item" *ngIf="article.tags">
+        <mat-icon>local_offer</mat-icon>
+        <span>{{ article.tags?.length || 0 }} {{ 'ARTICLE_MANAGER.TAGS' | translate }}</span>
+      </div>
+      <div class="quiz-meta-item" *ngIf="article.created_at">
+        <mat-icon>schedule</mat-icon>
+        <span>{{ formatDate(article.created_at) }}</span>
+      </div>
+      <div class="quiz-meta-item" *ngIf="article.status === 'published'">
+        <mat-icon>public</mat-icon>
+        <span>{{ 'ARTICLE_MANAGER.PUBLISHED' | translate }}</span>
+      </div>
+    </div>
+  </div>
 </div>

@@ -5,6 +5,7 @@
     <div class="navbar-menu">
       <a routerLink="/dashboard" routerLinkActive="active">{{ 'NAV.DASHBOARD' | translate }}</a>
       <a routerLink="/quiz-manager" routerLinkActive="active">{{ 'NAV.QUIZ_MANAGER' | translate }}</a>
+      <a routerLink="/article-manager" routerLinkActive="active">{{ 'NAV.ARTICLE_MANAGER' | translate }}</a>
       <a routerLink="/library" routerLinkActive="active">{{ 'NAV.LIBRARY' | translate }}</a>
     </div>
     <div class="navbar-actions">
@@ -149,6 +150,9 @@
           </a>
           <a routerLink="/quiz-manager" routerLinkActive="mobile-navbar__link--active" class="mobile-navbar__link" (click)="closeMobileMenu()">
             {{ 'NAV.QUIZ_MANAGER' | translate }}
+          </a>
+          <a routerLink="/article-manager" routerLinkActive="mobile-navbar__link--active" class="mobile-navbar__link" (click)="closeMobileMenu()">
+            {{ 'NAV.ARTICLE_MANAGER' | translate }}
           </a>
           <a routerLink="/library" routerLinkActive="mobile-navbar__link--active" class="mobile-navbar__link" (click)="closeMobileMenu()">
             {{ 'NAV.LIBRARY' | translate }}
