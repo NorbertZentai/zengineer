@@ -29,6 +29,15 @@
             </svg>
             {{ 'NAV.CREATE.NEW_QUIZ' | translate }}
           </a>
+          <a routerLink="/article-manager" [queryParams]="{action: 'create-article'}" (click)="closeDropdowns()" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+              <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+              <path d="M8 8h8"></path>
+              <path d="M8 12h8"></path>
+              <path d="M8 16h5"></path>
+            </svg>
+            {{ 'NAV.CREATE.NEW_ARTICLE' | translate }}
+          </a>
           <a (click)="onImport(); closeDropdowns()" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
               <path d="M12 19V6"></path>
@@ -155,6 +164,15 @@
                 <path d="M21 16c.552 0 1 .448 1 1v3a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-3c0-.552.448-1 1-1"></path>
               </svg>
               {{ 'NAV.CREATE.NEW_QUIZ' | translate }}
+            </a>
+            <a routerLink="/article-manager" [queryParams]="{action: 'create-article'}" class="mobile-navbar__create-btn" (click)="closeMobileMenu()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+                <path d="M8 8h8"></path>
+                <path d="M8 12h8"></path>
+                <path d="M8 16h5"></path>
+              </svg>
+              {{ 'NAV.CREATE.NEW_ARTICLE' | translate }}
             </a>
           </div>
         </div>
